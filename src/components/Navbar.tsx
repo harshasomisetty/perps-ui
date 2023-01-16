@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-const TABS: string[] = ["home"];
+const TABS: string[] = ["portfolio", "trade"];
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
@@ -17,14 +17,14 @@ const Navbar = () => {
     <div className="border-rounded navbar flex flex-row justify-between rounded-lg border-neutral bg-neutral-focus ">
       <div className="navbar-start">
         <Link href="/">
-          <div className="btn btn-ghost text-3xl font-light normal-case hover:btn-link">
+          <div className="btn-ghost btn text-3xl font-light normal-case hover:btn-link">
             LOGO
           </div>
         </Link>
       </div>
       <div className="navbar-center">
         <ul className="menu menu-horizontal p-0">
-          {TABS.slice(1).map((tabName) => (
+          {TABS.slice(0).map((tabName) => (
             <li
               className={`${
                 router.pathname.slice(1).split("/")[0] === tabName

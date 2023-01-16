@@ -5,7 +5,7 @@ const IndexPage = () => {
   useEffect(() => {
     const { pathname } = Router;
     if (pathname == "/") {
-      Router.push("/home");
+      Router.push("/portfolio");
     }
   });
 
