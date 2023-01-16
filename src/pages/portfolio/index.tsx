@@ -1,17 +1,11 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import React, { useEffect, useState } from "react";
-import Router, { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { wallet, publicKey } = useWallet();
   const { connection } = useConnection();
   const [userSol, setUserSol] = useState(0);
-
-  const router = useRouter();
-
-  const { pair } = router.query;
-  console.log("pathname", router.pathname);
 
   useEffect(() => {
     async function fetchData() {

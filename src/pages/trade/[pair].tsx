@@ -1,12 +1,8 @@
-import Router, { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function Page() {
   const router = useRouter();
-
   const { pair } = router.query;
-  //   console.log("pair", pair);
-  //   console.log("pathname", router.pathname);
 
   return (
     <div>
