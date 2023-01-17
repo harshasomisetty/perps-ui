@@ -2,6 +2,8 @@ import DailyStats from "@/components/DailyStats";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import PlaceOrder from "@/components/PlaceOrder";
+import TradingViewStockChartWidget from "react-tradingview-components";
 
 export default function Page() {
   const router = useRouter();
@@ -43,9 +45,21 @@ export default function Page() {
   }, [pair]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="flex flex-row">
-      <p>{pair}</p>
-      <DailyStats price={price} change={change} high={high} low={low} />
+    <div className="flex flex-row justify-between">
+      <div className="flex flex-col">
+        <div className="flex flex-row">
+          <p>{pair}</p>
+          <DailyStats price={price} change={change} high={high} low={low} />
+        </div>
+        <div>Chart</div>
+        {/* <TradingViewStockChartWidget
+          symbol="NASDAQ:AAPL"
+          theme="Dark"
+          range="12m"
+        /> */}
+        <div>Positions</div>
+      </div>
+      <PlaceOrder />
     </div>
   );
 }
