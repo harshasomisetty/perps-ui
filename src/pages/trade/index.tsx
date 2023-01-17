@@ -1,12 +1,16 @@
-import Link from "next/link";
+import { SidebarLayout } from "@/components/SidebarLayout";
+import { CandlestickChart } from "@/components/CandlestickChart";
+import { TradeSidebar } from "@/components/TradeSidebar";
 
 export default function Page() {
   return (
-    <>
-      <p>trade page</p>
-      <Link href="/trade/SOL-USD" className="link-primary link">
-        SOL-USD
-      </Link>
-    </>
+    <SidebarLayout className="pt-11">
+      <div>
+        <CandlestickChart className="h-[350px] md:h-[500px]" />
+      </div>
+      <div>
+        <TradeSidebar />
+      </div>
+    </SidebarLayout>
   );
 }
