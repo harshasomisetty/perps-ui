@@ -18,11 +18,23 @@ export default function PlaceOrder() {
         </div>
         <div className="flex flex-row">
           <p>Leverage</p>
-          <input type="range" min="0" max="100" value="40" className="range" />
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="40"
+            className="range"
+            onChange={(e) => {
+              console.log("change", e.target.value);
+            }}
+          />
           <input
             type="text"
             placeholder="Type here"
             className="input w-full max-w-xs"
+            onChange={(e) => {
+              console.log("change", e.target.value);
+            }}
           />
         </div>
 
