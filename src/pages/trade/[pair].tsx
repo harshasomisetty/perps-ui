@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import PlaceOrder from "@/components/PlaceOrder";
-import TradingViewWidget from "react-tradingview-widget";
+// import TradingViewWidget from "react-tradingview-widget";
 
 export default function Page() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function Page() {
         <div className="w-min">
           <p>chart</p>
 
-          <TradingViewWidget symbol="SOLUSD" />
+          {/* <TradingViewWidget symbol="SOLUSD" /> */}
         </div>
         <div>Positions</div>
       </div>

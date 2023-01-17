@@ -9,7 +9,7 @@ export function SidebarLayout(props: Props) {
   return (
     <div
       className={twMerge(
-        "max-w-7xl",
+        "max-w-[1550px]",
         "mx-auto",
         "px-4",
         "w-full",
