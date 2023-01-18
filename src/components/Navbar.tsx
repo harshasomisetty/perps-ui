@@ -38,9 +38,6 @@ export const Navbar = () => {
         <NavbarLink href="/trade" icon={<ChartCandlestickIcon />}>
           Trade
         </NavbarLink>
-        <NavbarLink href="/dashboard" icon={<DashboardIcon />}>
-          Dashboard
-        </NavbarLink>
         <NavbarLink href="/pools" icon={<StoragePoolIcon />}>
           Pools
         </NavbarLink>
