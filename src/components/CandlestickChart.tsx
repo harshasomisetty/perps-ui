@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
-// @ts-ignore
-import { Themes } from "react-tradingview-widget";
+
+import { ChartCurrency } from "./ChartCurrency";
+import { DailyStats } from "./DailyStats";
 
 // @ts-ignore
 const TradingViewWidget = dynamic<any>(import("react-tradingview-widget"), {
@@ -14,7 +15,11 @@ interface Props {
 export function CandlestickChart(props: Props) {
   return (
     <div className={props.className}>
-      <TradingViewWidget autosize symbol="SOLUSD" theme={Themes.DARK} />
+      <div className="mb-8 flex items-center">
+        <ChartCurrency />
+        <DailyStats className="ml-12" />
+      </div>
+      <TradingViewWidget autosize symbol="SOLUSD" theme="Dark" />
     </div>
   );
 }

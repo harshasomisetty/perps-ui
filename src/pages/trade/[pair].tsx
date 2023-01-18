@@ -1,4 +1,4 @@
-import DailyStats from "@/components/DailyStats";
+import { DailyStats } from "@/components/DailyStats";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";

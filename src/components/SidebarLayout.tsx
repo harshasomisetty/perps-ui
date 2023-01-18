@@ -14,7 +14,7 @@ export function SidebarLayout(props: Props) {
         "px-4",
         "w-full",
         "lg:gap-x-16",
-        "lg:grid-cols-[1fr,424px]",
+        "lg:grid-cols-[424px,1fr]",
         "lg:grid",
         "lg:px-16",
         props.className

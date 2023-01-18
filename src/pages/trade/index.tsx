@@ -6,10 +6,10 @@ export default function Page() {
   return (
     <SidebarLayout className="pt-11">
       <div>
-        <CandlestickChart className="h-[350px] md:h-[500px]" />
+        <TradeSidebar />
       </div>
       <div>
-        <TradeSidebar />
+        <CandlestickChart className="h-[350px] md:h-[500px]" />
       </div>
     </SidebarLayout>
   );

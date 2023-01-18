@@ -4,6 +4,7 @@ import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 
 import { SidebarTab } from "./SidebarTab";
+import { TradeLong } from "./TradeLong";
 
 enum Tab {
   Long,
@@ -53,6 +54,7 @@ export function TradeSidebar(props: Props) {
             <div>Swap</div>
           </SidebarTab>
         </div>
+        {tab === Tab.Long && <TradeLong className="mt-6" />}
       </div>
     </div>
   );
