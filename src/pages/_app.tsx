@@ -18,7 +18,7 @@ import { FC, useMemo } from "react";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 
-import Navbar from "@/components/Navbar";
+import { Navbar } from "@/components/Navbar";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -46,7 +46,7 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen p-3" data-theme="dracula">
+    <div className="min-h-screen bg-black pt-14">
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
           <WalletModalProvider>{children}</WalletModalProvider>

@@ -1,8 +1,12 @@
-import { useRouter } from "next/router";
+import { twMerge } from "tailwind-merge";
+import ChartCandlestickIcon from "@carbon/icons-react/lib/ChartCandlestick";
+import CircleDash from "@carbon/icons-react/lib/CircleDash";
+import DashboardIcon from "@carbon/icons-react/lib/Dashboard";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import StoragePoolIcon from "@carbon/icons-react/lib/StoragePool";
 
-const TABS: string[] = ["portfolio", "trade"];
+import { NavbarLink } from "./NavbarLink";
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
@@ -10,41 +14,40 @@ const WalletMultiButtonDynamic = dynamic(
   { ssr: false }
 );
 
-const Navbar = () => {
-  const router = useRouter();
-
+export const Navbar = () => {
   return (
-    <div className="border-rounded navbar flex flex-row justify-between rounded-lg border-neutral bg-neutral-focus ">
-      <div className="navbar-start">
-        <Link href="/">
-          <div className="btn-ghost btn text-3xl font-light normal-case hover:btn-link">
-            LOGO
-          </div>
-        </Link>
+    <nav
+      className={twMerge(
+        "bg-zinc-900",
+        "fixed",
+        "flex",
+        "h-14",
+        "justify-between",
+        "items-center",
+        "left-0",
+        "px-4",
+        "right-0",
+        "top-0"
+      )}
+    >
+      <Link className="hidden items-center space-x-2 md:flex" href="/">
+        <CircleDash className="h-7 w-7 fill-white/80" />
+        <div className="text-white">APP NAME</div>
+      </Link>
+      <div className="flex h-full items-center space-x-2">
+        <NavbarLink href="/trade" icon={<ChartCandlestickIcon />}>
+          Trade
+        </NavbarLink>
+        <NavbarLink href="/dashboard" icon={<DashboardIcon />}>
+          Dashboard
+        </NavbarLink>
+        <NavbarLink href="/pools" icon={<StoragePoolIcon />}>
+          Pools
+        </NavbarLink>
       </div>
-      <div className="navbar-center">
-        <ul className="menu menu-horizontal p-0">
-          {TABS.slice(0).map((tabName) => (
-            <li
-              className={`${
-                router.pathname.slice(1).split("/")[0] === tabName
-                  ? "rounded-none border-b border-primary"
-                  : ""
-              } `}
-              key={tabName}
-            >
-              <Link href={"/" + tabName}>
-                <div>{tabName}</div>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <div>
+        <WalletMultiButtonDynamic className="bg-transparent" />
       </div>
-      <div className="navbar-end flex flex-row space-x-2 ">
-        <WalletMultiButtonDynamic />
-      </div>
-    </div>
+    </nav>
   );
 };
-
-export default Navbar;
