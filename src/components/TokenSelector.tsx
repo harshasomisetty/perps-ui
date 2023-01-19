@@ -27,7 +27,7 @@ function formatNumber(num: number) {
   return formatter.format(num);
 }
 
-function getTokenIcon(token: Token) {
+export function getTokenIcon(token: Token) {
   switch (token) {
     case Token.SOL:
       return <SolanaIconCircle />;
@@ -97,14 +97,14 @@ export function TokenSelector(props: Props) {
         )}
       >
         <button
-          className="flex items-center"
+          className="group flex items-center"
           onClick={() => setSelectorOpen(true)}
         >
           {cloneElement(getTokenIcon(props.token), {
             className: "border border-white/20 h-6 rounded-full w-6",
           })}
           <div className="ml-1 text-2xl text-white">{props.token}</div>
-          <ChevronRightIcon className="ml-2 fill-white" />
+          <ChevronRightIcon className="ml-2 fill-gray-500 transition-colors group-hover:fill-white" />
         </button>
         <div>
           <input
@@ -135,8 +135,14 @@ export function TokenSelector(props: Props) {
         </div>
       </div>
       {selectorOpen && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 z-20 bg-black/40">
-          <div className="absolute top-0 bottom-0 left-0 w-[424px] bg-zinc-900 p-4">
+        <div
+          className="fixed top-0 left-0 right-0 bottom-0 z-20 bg-black/40"
+          onClick={() => setSelectorOpen(false)}
+        >
+          <div
+            className="absolute top-0 bottom-0 left-0 w-[424px] bg-zinc-900 p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <header className="flex items-center justify-between">
               <div className="text-sm font-medium text-white">You Pay</div>
               <button onClick={() => setSelectorOpen(false)}>

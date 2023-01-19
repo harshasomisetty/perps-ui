@@ -51,9 +51,11 @@ export function LeverageSlider(props: Props) {
                 "h-5",
                 "mt-1",
                 "rounded-sm",
-                "transition-colors",
+                "transition-all",
                 "w-2",
-                "hover:bg-neutral-300"
+                "hover:outline",
+                "hover:outline-[3px]",
+                "hover:outline-white/20"
               )}
             />
           </Slider.Track>
