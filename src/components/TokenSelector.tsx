@@ -135,7 +135,7 @@ export function TokenSelector(props: Props) {
         </div>
       </div>
       {selectorOpen && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/40">
+        <div className="fixed top-0 left-0 right-0 bottom-0 z-20 bg-black/40">
           <div className="absolute top-0 bottom-0 left-0 w-[424px] bg-zinc-900 p-4">
             <header className="flex items-center justify-between">
               <div className="text-sm font-medium text-white">You Pay</div>

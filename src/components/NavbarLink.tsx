@@ -12,7 +12,7 @@ export function NavbarLink(props: Props) {
   const router = useRouter();
 
   const currentPath = router.pathname;
-  const selected = currentPath === props.href;
+  const selected = currentPath.startsWith(props.href);
 
   return (
     <Link

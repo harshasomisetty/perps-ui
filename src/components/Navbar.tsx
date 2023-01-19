@@ -1,7 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import ChartCandlestickIcon from "@carbon/icons-react/lib/ChartCandlestick";
 import CircleDash from "@carbon/icons-react/lib/CircleDash";
-import DashboardIcon from "@carbon/icons-react/lib/Dashboard";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import StoragePoolIcon from "@carbon/icons-react/lib/StoragePool";

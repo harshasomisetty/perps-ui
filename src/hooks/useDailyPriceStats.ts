@@ -99,10 +99,12 @@ export function useDailyPriceStats(token?: Token) {
   const [allStats, setAllStats] = useState<Partial<AllStats>>({});
 
   useEffect(() => {
-    if (typeof window !== "undefined" && token) {
+    if (typeof window !== "undefined") {
+      fetchAllStats().then(setAllStats);
+
       timer.current = window.setInterval(async () => {
-        setAllStats(await fetchAllStats());
-      }, 5000);
+        fetchAllStats().then(setAllStats);
+      }, 10000);
     }
 
     return () => {
