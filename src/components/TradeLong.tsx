@@ -2,6 +2,7 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 
 import { TokenSelector, Token } from "./TokenSelector";
+import { LeverageSlider } from "./LeverageSlider";
 
 interface Props {
   className?: string;
@@ -12,6 +13,7 @@ export function TradeLong(props: Props) {
   const [payAmount, setPayAmount] = useState(0);
   const [longToken, setLongToken] = useState(Token.SOL);
   const [longAmount, setLongAmount] = useState(0);
+  const [leverage, setLeverage] = useState(1);
 
   return (
     <div className={props.className}>
@@ -32,6 +34,11 @@ export function TradeLong(props: Props) {
         token={longToken}
         onChangeAmount={setLongAmount}
         onSelectToken={setLongToken}
+      />
+      <LeverageSlider
+        className="mt-6"
+        value={leverage}
+        onChange={setLeverage}
       />
     </div>
   );
