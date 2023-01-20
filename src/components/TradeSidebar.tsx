@@ -5,6 +5,7 @@ import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 
 import { SidebarTab } from "./SidebarTab";
 import { TradeLong } from "./TradeLong";
+import { TradeLongDetails, Token } from "./TradeLongDetails";
 
 enum Tab {
   Long,
@@ -56,6 +57,23 @@ export function TradeSidebar(props: Props) {
         </div>
         {tab === Tab.Long && <TradeLong className="mt-6" />}
       </div>
+      {tab === Tab.Long && (
+        <TradeLongDetails
+          availableLiquidity={3871943.82}
+          borrowFee={0.0052}
+          className={twMerge(
+            "bg-zinc-900",
+            "border-[rgba(255,255,255,0.04)]",
+            "border",
+            "mt-2",
+            "p-4",
+            "rounded"
+          )}
+          entryPrice={16.4}
+          exitPrice={16.4}
+          token={Token.SOL}
+        />
+      )}
     </div>
   );
 }
