@@ -40,6 +40,9 @@ export const Navbar = () => {
         <NavbarLink href="/pools" icon={<StoragePoolIcon />}>
           Pools
         </NavbarLink>
+        <NavbarLink href="/portfolio" icon={<StoragePoolIcon />}>
+          Portfolio
+        </NavbarLink>
       </div>
       <div>
         <WalletMultiButtonDynamic className="bg-transparent" />
