@@ -6,6 +6,11 @@ import {
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { ProgramAccount } from "@project-serum/anchor";
+import {
+  getTokenGivenAddress,
+  Token,
+  useDailyPriceStats,
+} from "@/hooks/useDailyPriceStats";
 
 // create starter react page
 
@@ -16,6 +21,9 @@ export default function Pools() {
   const [custodies, setCustodies] = useState<Record<string, Object | Null[]>>(
     {}
   );
+
+  const stats = useDailyPriceStats();
+  console.log("stats", stats);
 
   useEffect(() => {
     async function fetchData() {
@@ -68,7 +76,17 @@ export default function Pools() {
             <p>tokens</p>
             {custodies[pool.publicKey.toString()] &&
               custodies[pool.publicKey.toString()].map((custody) => (
-                <p>{custody.mint.toString()}</p>
+                <div>
+                  {" "}
+                  <p>{getTokenGivenAddress(custody.mint.toString())}</p>
+                  <p>
+                    Price:{" "}
+                    {
+                      stats[getTokenGivenAddress(custody.mint.toString())]
+                        .currentPrice
+                    }
+                  </p>
+                </div>
               ))}
 
             {/* {pool.account.tokens.map((token) => ()} */}

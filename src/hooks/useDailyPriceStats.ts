@@ -22,6 +22,15 @@ export const TOKEN_LIST = [
   Token.Bonk,
 ];
 
+export function getTokenGivenAddress(address: string) {
+  switch (address) {
+    case "So11111111111111111111111111111111111111112":
+      return Token.SOL;
+    case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
+      return Token.USDC;
+  }
+}
+
 function getTokenId(token: Token) {
   switch (token) {
     case Token.SOL:
