@@ -1,4 +1,7 @@
-import { PERPETUALS_PROGRAM_ID } from "@/utils/constants";
+import {
+  getPerpetualProgramAndProvider,
+  PERPETUALS_PROGRAM_ID,
+} from "@/utils/constants";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
@@ -10,6 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
+      let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
       let uSol = Number(await connection.getBalance(publicKey!));
       setUserSol(uSol);
 
@@ -18,6 +22,11 @@ export default function Home() {
         PERPETUALS_PROGRAM_ID
       );
       console.log("Pool", pool.toBase58().toString());
+      console.log("Perpetual", perpetual_program);
+
+      let poolInfo = await perpetual_program.account.pool.fetch(pool);
+      console.log("Pool Info", poolInfo);
+      // exhibitInfo = await Exhibition.account.exhibit.fetch(exhibit);
     }
     if (wallet && publicKey) {
       fetchData();

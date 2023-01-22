@@ -11,10 +11,7 @@ const opts = {
   skipPreflight: true,
 };
 
-export async function getProvider(
-  wallet: Wallet,
-  network: string = "localnet"
-) {
+export async function getProvider(wallet: Wallet, network: string = "devnet") {
   /* create the provider and return it to the caller */
   /* network set to local network for now */
 
