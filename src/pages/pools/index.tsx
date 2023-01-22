@@ -13,6 +13,9 @@ export default function Pools() {
   const { wallet, publicKey } = useWallet();
   const { connection } = useConnection();
   const [pools, setPools] = useState<ProgramAccount<T>[]>([]);
+  const [custodies, setCustodies] = useState<Record<string, Object | Null[]>>(
+    {}
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -20,8 +23,30 @@ export default function Pools() {
 
       let poolInfos = await perpetual_program.account.pool.all();
 
-      setPools(poolInfos);
-      console.log(poolInfos);
+      Object.values(poolInfos).forEach(async (pool) => {
+        console.log("print pool", pool.account.tokens);
+
+        let c = [];
+        Object.values(pool.account.tokens).forEach((token) => {
+          c.push(token.custody.toString());
+        });
+
+        let fetchedCusto =
+          await perpetual_program.account.custody.fetchMultiple(c);
+        console.log("custody example", fetchedCusto[0]);
+
+        setPools(poolInfos);
+        setCustodies({
+          ...custodies,
+          [pool.publicKey.toString()]: fetchedCusto,
+        });
+      });
+
+      // poolInfos.forEach((pool) => {
+      //   pool.tokens.forEach((token) => {
+      //     c.push(token.custody.toString());
+      //   });
+      // });
     }
     if (wallet && publicKey) {
       fetchData();
@@ -35,21 +60,20 @@ export default function Pools() {
   return (
     <div>
       <p>Pools page</p>
-      <div className="table">
-        <thead>
-          <tr>
-            <td>name</td>
-            <td>address</td>
-          </tr>
-        </thead>
-        <tbody>
-          {pools.map((pool) => (
-            <tr>
-              <td>{pool.account.name}</td>
-              <td>{pool.publicKey.toString()}</td>
-            </tr>
-          ))}
-        </tbody>
+      <div className="m-2 border p-2">
+        {pools.map((pool) => (
+          <div>
+            <p>{pool.account.name}</p>
+            <p>{pool.publicKey.toString()}</p>
+            <p>tokens</p>
+            {custodies[pool.publicKey.toString()] &&
+              custodies[pool.publicKey.toString()].map((custody) => (
+                <p>{custody.mint.toString()}</p>
+              ))}
+
+            {/* {pool.account.tokens.map((token) => ()} */}
+          </div>
+        ))}
       </div>
     </div>
   );
