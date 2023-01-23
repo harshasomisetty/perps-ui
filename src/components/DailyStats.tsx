@@ -12,10 +12,11 @@ function formatNumber(number: number) {
 
 interface DailyStatsProps {
   className?: string;
+  token: Token;
 }
 
 export function DailyStats(props: DailyStatsProps) {
-  const stats = useDailyPriceStats(Token.SOL);
+  const stats = useDailyPriceStats(props.token);
 
   return (
     <div

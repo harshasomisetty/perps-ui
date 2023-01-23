@@ -6,6 +6,7 @@ import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 import { SidebarTab } from "./SidebarTab";
 import { TradeLong } from "./TradeLong";
 import { Token } from "./TokenSelector";
+import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 
 enum Tab {
   Long,
@@ -21,6 +22,8 @@ interface Props {
 
 export function TradeSidebar(props: Props) {
   const [tab, setTab] = useState(Tab.Long);
+
+  const stats = useDailyPriceStats(props.inputPayToken);
 
   return (
     <div className={props.className}>

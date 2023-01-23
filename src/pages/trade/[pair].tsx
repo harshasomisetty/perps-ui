@@ -64,6 +64,7 @@ export default function Page() {
   }
 
   // TOOD eur is not supported through token type
+  // TODO figure out how to reconcile usdc and usd pairs
   return (
     <SidebarLayout className="pt-11">
       <div>
