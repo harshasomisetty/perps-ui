@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 import { SidebarLayout } from "@/components/SidebarLayout";
 import { CandlestickChart } from "@/components/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
-import { Token } from "@/hooks/useDailyPriceStats";
+import { Token } from "@/lib/Token";
+import { Positions } from "@/components/Positions";
 
 function getToken(pair: string) {
   const [token, _] = pair.split("-");
@@ -61,11 +62,8 @@ export default function Page() {
         <TradeSidebar />
       </div>
       <div>
-        <CandlestickChart
-          className="h-[350px] md:h-[500px]"
-          comparisonCurrency={currency}
-          token={token}
-        />
+        <CandlestickChart comparisonCurrency={currency} token={token} />
+        <Positions className="mt-8" />
       </div>
     </SidebarLayout>
   );

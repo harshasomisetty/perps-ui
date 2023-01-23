@@ -3,21 +3,8 @@ import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import { cloneElement, useState } from "react";
 
-import { SolanaIconCircle } from "./SolanaIconCircle";
-import { UsdcIconCircle } from "./UsdcIconCircle";
-import { MSolIconCircle } from "./MSolIconCircle";
-import { STSolIconCircle } from "./STSolIconCircle";
-import { RayIconCircle } from "./RayIconCircle";
-import { UsdtIconCircle } from "./UsdtIconCircle";
-import { OrcaIconCircle } from "./OrcaIconCircle";
-import { BonkIconCircle } from "./BonkIconCircle";
-import {
-  Token,
-  TOKEN_LIST,
-  useDailyPriceStats,
-} from "@/hooks/useDailyPriceStats";
-
-export { Token };
+import { TOKEN_LIST, useDailyPriceStats } from "@/hooks/useDailyPriceStats";
+import { Token, getTokenLabel, getTokenIcon } from "@/lib/Token";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -25,48 +12,6 @@ function formatNumber(num: number) {
     minimumFractionDigits: 2,
   });
   return formatter.format(num);
-}
-
-export function getTokenIcon(token: Token) {
-  switch (token) {
-    case Token.SOL:
-      return <SolanaIconCircle />;
-    case Token.USDC:
-      return <UsdcIconCircle />;
-    case Token.mSOL:
-      return <MSolIconCircle />;
-    case Token.stSOL:
-      return <STSolIconCircle />;
-    case Token.RAY:
-      return <RayIconCircle />;
-    case Token.USDT:
-      return <UsdtIconCircle />;
-    case Token.ORCA:
-      return <OrcaIconCircle />;
-    case Token.Bonk:
-      return <BonkIconCircle />;
-  }
-}
-
-function getTokenLabel(token: Token) {
-  switch (token) {
-    case Token.SOL:
-      return "Solana";
-    case Token.USDC:
-      return "UDC Coin";
-    case Token.mSOL:
-      return "Marinade Staked SOL";
-    case Token.stSOL:
-      return "Lido Staked SOL";
-    case Token.RAY:
-      return "Raydium";
-    case Token.USDT:
-      return "USDT";
-    case Token.ORCA:
-      return "Orca";
-    case Token.Bonk:
-      return "BonkCoin";
-  }
 }
 
 interface Props {

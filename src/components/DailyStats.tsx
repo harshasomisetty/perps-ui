@@ -1,6 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
-import { useDailyPriceStats, Token } from "@/hooks/useDailyPriceStats";
+import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
+import { Token } from "@/lib/Token";
 
 function formatNumber(number: number) {
   const formatter = Intl.NumberFormat("en", {

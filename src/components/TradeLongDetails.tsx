@@ -1,10 +1,7 @@
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 
-import { Token } from "@/hooks/useDailyPriceStats";
-import { getTokenIcon } from "./TokenSelector";
-
-export { Token };
+import { Token, getTokenIcon } from "@/lib/Token";
 
 function formatPrice(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -45,44 +42,43 @@ export function TradeLongDetails(props: Props) {
           {props.token}
         </div>
       </header>
-      {[
-        {
-          label: "Entry Price",
-          value: `$${formatPrice(props.entryPrice)}`,
-        },
-        {
-          label: "Exit Price",
-          value: `$${formatPrice(props.exitPrice)}`,
-        },
-        {
-          label: "Borrow Price",
-          value: (
-            <>
-              {`${formatFees(props.borrowFee)}% `}
-              <span className="text-zinc-500"> / hr</span>
-            </>
-          ),
-        },
-        {
-          label: "Available Liquidity",
-          value: `$${formatPrice(props.availableLiquidity)}`,
-        },
-      ].map(({ label, value }, i) => (
-        <div
-          className={twMerge(
-            "border-t",
-            "border-zinc-700",
-            "flex",
-            "items-center",
-            "justify-between",
-            "py-4"
-          )}
-          key={i}
-        >
-          <div className="text-xs text-zinc-400">{label}</div>
-          <div className="text-sm text-white">{value}</div>
-        </div>
-      ))}
+      <div className="grid grid-cols-2 gap-4">
+        {[
+          {
+            label: "Entry Price",
+            value: `$${formatPrice(props.entryPrice)}`,
+          },
+          {
+            label: "Exit Price",
+            value: `$${formatPrice(props.exitPrice)}`,
+          },
+          {
+            label: "Borrow Price",
+            value: (
+              <>
+                {`${formatFees(props.borrowFee)}% `}
+                <span className="text-zinc-500"> / hr</span>
+              </>
+            ),
+          },
+          {
+            label: "Available Liquidity",
+            value: `$${formatPrice(props.availableLiquidity)}`,
+          },
+        ].map(({ label, value }, i) => (
+          <div
+            className={twMerge(
+              "border-zinc-700",
+              i < 2 && "pb-4",
+              i < 2 && "border-b"
+            )}
+            key={i}
+          >
+            <div className="text-sm text-zinc-400">{label}</div>
+            <div className="text-sm text-white">{value}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
