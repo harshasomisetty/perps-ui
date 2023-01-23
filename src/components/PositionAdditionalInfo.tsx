@@ -3,6 +3,9 @@ import { format } from "date-fns";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import OverflowMenuHorizontalIcon from "@carbon/icons-react/lib/OverflowMenuHorizontal";
 import EditIcon from "@carbon/icons-react/lib/Edit";
+import IncreaseLevelIcon from "@carbon/icons-react/lib/IncreaseLevel";
+import ArrowDownIcon from "@carbon/icons-react/lib/ArrowDown";
+import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
 import { Position } from "@/hooks/usePositions";
 import { SolidButton } from "./SolidButton";
@@ -84,21 +87,81 @@ export function PositionAdditionalInfo(props: Props) {
           <CloseIcon className="mr-2 h-4 w-4" />
           <div>Close Position</div>
         </SolidButton>
-        <button
-          className={twMerge(
-            "bg-zinc-900",
-            "grid",
-            "h-6",
-            "ml-4",
-            "place-items-center",
-            "rounded-full",
-            "transition-all",
-            "w-6",
-            "hover:bg-zinc-700"
-          )}
-        >
-          <OverflowMenuHorizontalIcon className="h-4 w-4 fill-white" />
-        </button>
+        <Dropdown.Root>
+          <Dropdown.Trigger
+            className={twMerge(
+              "bg-zinc-900",
+              "grid",
+              "h-6",
+              "ml-4",
+              "place-items-center",
+              "rounded-full",
+              "transition-all",
+              "w-6",
+              "hover:bg-zinc-700"
+            )}
+          >
+            <OverflowMenuHorizontalIcon className="h-4 w-4 fill-white" />
+          </Dropdown.Trigger>
+          <Dropdown.Portal>
+            <Dropdown.Content className="overflow-hidden rounded bg-zinc-800 shadow-2xl">
+              <Dropdown.Item
+                className={twMerge(
+                  "gap-x-2",
+                  "grid",
+                  "grid-cols-[16px,1fr]",
+                  "cursor-pointer",
+                  "items-center",
+                  "px-6",
+                  "py-3",
+                  "text-sm",
+                  "text-white",
+                  "transition-colors",
+                  "hover:bg-zinc-700"
+                )}
+              >
+                <EditIcon className="h-4 w-4 fill-current" />
+                <div>Change Collateral</div>
+              </Dropdown.Item>
+              <Dropdown.Item
+                className={twMerge(
+                  "gap-x-2",
+                  "grid",
+                  "grid-cols-[16px,1fr]",
+                  "cursor-pointer",
+                  "items-center",
+                  "px-6",
+                  "py-3",
+                  "text-sm",
+                  "text-white",
+                  "transition-colors",
+                  "hover:bg-zinc-700"
+                )}
+              >
+                <IncreaseLevelIcon className="h-4 w-4 fill-current" />
+                <div>Change Size</div>
+              </Dropdown.Item>
+              <Dropdown.Item
+                className={twMerge(
+                  "gap-x-2",
+                  "grid",
+                  "grid-cols-[16px,1fr]",
+                  "cursor-pointer",
+                  "items-center",
+                  "px-5",
+                  "py-3",
+                  "text-sm",
+                  "text-white",
+                  "transition-colors",
+                  "hover:bg-zinc-700"
+                )}
+              >
+                <ArrowDownIcon className="h-4 w-4 fill-current" />
+                <div>Withdraw Profit</div>
+              </Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Portal>
+        </Dropdown.Root>
       </div>
     </div>
   );
