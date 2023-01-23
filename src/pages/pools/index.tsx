@@ -23,7 +23,6 @@ export default function Pools() {
   );
 
   const stats = useDailyPriceStats();
-  console.log("stats", stats);
 
   useEffect(() => {
     async function fetchData() {
@@ -74,20 +73,40 @@ export default function Pools() {
             <p>{pool.account.name}</p>
             <p>{pool.publicKey.toString()}</p>
             <p>tokens</p>
-            {custodies[pool.publicKey.toString()] &&
-              custodies[pool.publicKey.toString()].map((custody) => (
-                <div>
-                  {" "}
-                  <p>{getTokenGivenAddress(custody.mint.toString())}</p>
-                  <p>
-                    Price:{" "}
-                    {
-                      stats[getTokenGivenAddress(custody.mint.toString())]
-                        .currentPrice
-                    }
-                  </p>
-                </div>
-              ))}
+            <table className="table">
+              <thead>
+                <tr>
+                  <td>Token name</td>
+                  <td>Liquidity</td>
+                  <td>Price</td>
+                  <td>Amount</td>
+                  <td>Target Weight</td>
+                  <td>Utilization</td>
+                  <td>Fee</td>
+                </tr>
+              </thead>{" "}
+              <tbody>
+                {custodies[pool.publicKey.toString()] &&
+                  custodies[pool.publicKey.toString()].map(function (custody) {
+                    let token = getTokenGivenAddress(custody.mint.toString());
+
+                    return (
+                      <tr>
+                        <td>{token}</td>
+                        <td>
+                          {stats[token].currentPrice *
+                            Number(custody.assets.owned)}
+                        </td>
+                        <td>{stats[token].currentPrice}</td>
+                        <td>{Number(custody.assets.owned)}</td>
+                        <td>Target Weight</td>
+                        <td>Utilization</td>
+                        <td>Fee</td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
 
             {/* {pool.account.tokens.map((token) => ()} */}
           </div>
