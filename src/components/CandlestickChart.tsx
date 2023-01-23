@@ -13,19 +13,15 @@ function getSymbol(
   token: Token.SOL,
   comparisonCurrency: "usd" | "eur" | Token.USDC | Token.USDT
 ) {
-  switch (token) {
-    case Token.SOL: {
-      switch (comparisonCurrency) {
-        case "usd":
-          return "SOLUSD";
-        case "eur":
-          return "SOLEUR";
-        case Token.USDC:
-          return "SOLUSDC";
-        case Token.USDT:
-          return "SOLUSDT";
-      }
-    }
+  switch (comparisonCurrency) {
+    case "usd":
+      return Token[token] + "USD";
+    case "eur":
+      return Token[token] + "EUR";
+    case Token.USDC:
+      return Token[token] + "USDC";
+    case Token.USDT:
+      return Token[token] + "USDT";
   }
 }
 

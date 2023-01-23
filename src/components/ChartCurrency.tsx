@@ -7,20 +7,14 @@ import Link from "next/link";
 import { UsdcIconCircle } from "./UsdcIconCircle";
 import { SolanaIconCircle } from "./SolanaIconCircle";
 import { UsdtIconCircle } from "./UsdtIconCircle";
-import { Token } from "./TokenSelector";
+import { getTokenIcon, Token } from "./TokenSelector";
 import { ChartCurrencyDropdownItem } from "./ChartCurrencyDropdownItem";
+import { RayIconCircle } from "./RayIconCircle";
 
 interface Props {
   className?: string;
   comparisonCurrency: "usd" | "eur" | Token.USDC | Token.USDT;
   token: Token.SOL;
-}
-
-function getTokenIcon(token: Props["token"]) {
-  switch (token) {
-    case Token.SOL:
-      return <SolanaIconCircle />;
-  }
 }
 
 function getCurrencyIcon(currency: Props["comparisonCurrency"]) {

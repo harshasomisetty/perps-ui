@@ -5,6 +5,7 @@ import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 
 import { SidebarTab } from "./SidebarTab";
 import { TradeLong } from "./TradeLong";
+import { Token } from "./TokenSelector";
 
 enum Tab {
   Long,
@@ -14,6 +15,8 @@ enum Tab {
 
 interface Props {
   className?: string;
+  inputPayToken: Token;
+  outputPayToken: Token;
 }
 
 export function TradeSidebar(props: Props) {
@@ -54,7 +57,13 @@ export function TradeSidebar(props: Props) {
             <div>Swap</div>
           </SidebarTab>
         </div>
-        {tab === Tab.Long && <TradeLong className="mt-6" />}
+        {tab === Tab.Long && (
+          <TradeLong
+            className="mt-6"
+            inputPayToken={props.inputPayToken}
+            outputPayToken={props.outputPayToken}
+          />
+        )}
       </div>
     </div>
   );

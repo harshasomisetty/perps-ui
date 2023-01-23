@@ -27,7 +27,7 @@ function formatNumber(num: number) {
   return formatter.format(num);
 }
 
-function getTokenIcon(token: Token) {
+export function getTokenIcon(token: Token) {
   switch (token) {
     case Token.SOL:
       return <SolanaIconCircle />;

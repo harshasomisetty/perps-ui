@@ -6,12 +6,14 @@ import { LeverageSlider } from "./LeverageSlider";
 
 interface Props {
   className?: string;
+  inputPayToken: Token;
+  outputPayToken: Token;
 }
 
 export function TradeLong(props: Props) {
-  const [payToken, setPayToken] = useState(Token.SOL);
+  const [payToken, setPayToken] = useState(props.inputPayToken);
   const [payAmount, setPayAmount] = useState(0);
-  const [longToken, setLongToken] = useState(Token.SOL);
+  const [longToken, setLongToken] = useState(props.outputPayToken);
   const [longAmount, setLongAmount] = useState(0);
   const [leverage, setLeverage] = useState(1);
 

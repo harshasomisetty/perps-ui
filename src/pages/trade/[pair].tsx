@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { SidebarLayout } from "@/components/SidebarLayout";
 import { CandlestickChart } from "@/components/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
-import { Token } from "@/hooks/useDailyPriceStats";
+import { getTokenGivenString, Token } from "@/hooks/useDailyPriceStats";
 
 function getToken(pair: string) {
   const [token, _] = pair.split("-");
@@ -20,7 +20,7 @@ function getComparisonCurrency(pair: string) {
 
   if (currency) {
     if (currency.toLocaleLowerCase() === "usd") {
-      return "usd";
+      return Token.USDC;
     }
 
     if (currency.toLocaleLowerCase() === "eur") {
@@ -43,8 +43,16 @@ export default function Page() {
   const router = useRouter();
   const { pair } = router.query;
 
-  let token: ReturnType<typeof getToken> = Token.SOL;
-  let currency: ReturnType<typeof getComparisonCurrency> = "usd";
+  if (!pair) {
+    return <></>;
+  }
+
+  let token: ReturnType<typeof getToken> = getTokenGivenString(
+    pair.split("-")[0]
+  );
+  // let token = Token.SOL;
+  let currency: ReturnType<typeof getComparisonCurrency> =
+    getComparisonCurrency(pair);
 
   if (pair && Array.isArray(pair)) {
     const tokenAndCurrency = pair[0];
@@ -55,10 +63,11 @@ export default function Page() {
     }
   }
 
+  // TOOD eur is not supported through token type
   return (
     <SidebarLayout className="pt-11">
       <div>
-        <TradeSidebar />
+        <TradeSidebar inputPayToken={token} outputPayToken={currency} />
       </div>
       <div>
         <CandlestickChart

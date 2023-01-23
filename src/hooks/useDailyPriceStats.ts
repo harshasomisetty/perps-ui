@@ -31,6 +31,28 @@ export function getTokenGivenAddress(address: string) {
   }
 }
 
+// function that maps token string to token enum
+export function getTokenGivenString(token: string) {
+  switch (token) {
+    case "SOL":
+      return Token.SOL;
+    case "mSOL":
+      return Token.mSOL;
+    case "stSOL":
+      return Token.stSOL;
+    case "USDC":
+      return Token.USDC;
+    case "USDT":
+      return Token.USDT;
+    case "RAY":
+      return Token.RAY;
+    case "ORCA":
+      return Token.ORCA;
+    case "Bonk":
+      return Token.Bonk;
+  }
+}
+
 function getTokenId(token: Token) {
   switch (token) {
     case Token.SOL:
