@@ -10,26 +10,31 @@ const TradingViewWidget = dynamic<any>(import("react-tradingview-widget"), {
   ssr: false,
 });
 
-function getSymbol(
-  token: Token.SOL,
-  comparisonCurrency: "usd" | "eur" | Token.USDC | Token.USDT
-) {
-  switch (comparisonCurrency) {
-    case "usd":
-      return Token[token] + "USD";
-    case "eur":
-      return Token[token] + "EUR";
+function getSymbol(token: Token) {
+  switch (token) {
+    case Token.Bonk:
+      return "BONKUSDT";
+    case Token.ORCA:
+      return "ORCAUSD";
+    case Token.RAY:
+      return "RAYUSD";
+    case Token.SOL:
+      return "SOLUSD";
     case Token.USDC:
-      return Token[token] + "USDC";
+      return "USDCUSD";
     case Token.USDT:
-      return Token[token] + "USDT";
+      return "USDTUSD";
+    case Token.mSOL:
+      return "MSOLUSD";
+    case Token.stSOL:
+      return "STSOLUSDT";
   }
 }
 
 interface Props {
   className?: string;
-  comparisonCurrency: "usd" | "eur" | Token.USDC | Token.USDT;
-  token: Token.SOL;
+  comparisonCurrency: "usd";
+  token: Token;
 }
 
 export function CandlestickChart(props: Props) {
@@ -46,7 +51,7 @@ export function CandlestickChart(props: Props) {
       <div className="h-[350px] md:h-[500px]">
         <TradingViewWidget
           autosize
-          symbol={getSymbol(props.token, props.comparisonCurrency)}
+          symbol={getSymbol(props.token)}
           theme="Dark"
         />
       </div>
