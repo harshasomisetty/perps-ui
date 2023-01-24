@@ -14,9 +14,9 @@ export function Position(props: Props) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className={twMerge("border-b", "border-zinc-700", props.className)}>
+    <div className={twMerge(expanded && "bg-zinc-800", props.className)}>
       <PositionInfo
-        className={twMerge("transition-colors", expanded && "bg-zinc-800")}
+        className="transition-colors"
         expanded={expanded}
         position={props.position}
         onClickExpand={() => setExpanded((cur) => !cur)}

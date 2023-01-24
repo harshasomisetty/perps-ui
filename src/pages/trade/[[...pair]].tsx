@@ -3,41 +3,16 @@ import { useRouter } from "next/router";
 import { SidebarLayout } from "@/components/SidebarLayout";
 import { CandlestickChart } from "@/components/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
-import { Token } from "@/lib/Token";
+import { Token, asToken } from "@/lib/Token";
 import { Positions } from "@/components/Positions";
 
 function getToken(pair: string) {
   const [token, _] = pair.split("-");
-
-  if (token && token.toLocaleLowerCase() === "sol") {
-    return Token.SOL as const;
-  }
-
-  throw new Error("invalid token");
+  return asToken(token || "");
 }
 
 function getComparisonCurrency(pair: string) {
-  const [_, currency] = pair.split("-");
-
-  if (currency) {
-    if (currency.toLocaleLowerCase() === "usd") {
-      return "usd";
-    }
-
-    if (currency.toLocaleLowerCase() === "eur") {
-      return "eur";
-    }
-
-    if (currency.toLocaleLowerCase() === "usdc") {
-      return Token.USDC;
-    }
-
-    if (currency.toLocaleLowerCase() === "usdt") {
-      return Token.USDT;
-    }
-  }
-
-  throw new Error("invalid currency");
+  return "usd" as const;
 }
 
 export default function Page() {
