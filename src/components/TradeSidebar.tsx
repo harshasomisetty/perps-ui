@@ -5,8 +5,6 @@ import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 
 import { SidebarTab } from "./SidebarTab";
 import { TradeLong } from "./TradeLong";
-import { Token } from "./TokenSelector";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 
 enum Tab {
   Long,
@@ -16,27 +14,15 @@ enum Tab {
 
 interface Props {
   className?: string;
-  inputPayToken: Token;
-  outputPayToken: Token;
 }
 
 export function TradeSidebar(props: Props) {
   const [tab, setTab] = useState(Tab.Long);
 
-  const stats = useDailyPriceStats(props.inputPayToken);
-
   return (
     <div className={props.className}>
       <div className="mb-3 font-medium text-white">Place a Market Order</div>
-      <div
-        className={twMerge(
-          "bg-zinc-900",
-          "border-[rgba(255,255,255,0.04)]",
-          "border",
-          "p-4",
-          "rounded"
-        )}
-      >
+      <div className={twMerge("bg-zinc-900", "p-4", "rounded")}>
         <div className="grid grid-cols-3 gap-x-1 rounded bg-black p-1">
           <SidebarTab
             selected={tab === Tab.Long}
@@ -60,13 +46,7 @@ export function TradeSidebar(props: Props) {
             <div>Swap</div>
           </SidebarTab>
         </div>
-        {tab === Tab.Long && (
-          <TradeLong
-            className="mt-6"
-            inputPayToken={props.inputPayToken}
-            outputPayToken={props.outputPayToken}
-          />
-        )}
+        {tab === Tab.Long && <TradeLong className="mt-6" />}
       </div>
     </div>
   );

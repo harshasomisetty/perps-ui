@@ -1,8 +1,9 @@
 import dynamic from "next/dynamic";
 
+import { Token } from "@/lib/Token";
+
 import { ChartCurrency } from "./ChartCurrency";
 import { DailyStats } from "./DailyStats";
-import { Token } from "./TokenSelector";
 
 // @ts-ignore
 const TradingViewWidget = dynamic<any>(import("react-tradingview-widget"), {
@@ -42,11 +43,13 @@ export function CandlestickChart(props: Props) {
         />
         <DailyStats className="ml-12" token={props.token} />
       </div>
-      <TradingViewWidget
-        autosize
-        symbol={getSymbol(props.token, "usd")}
-        theme="Dark"
-      />
+      <div className="h-[350px] md:h-[500px]">
+        <TradingViewWidget
+          autosize
+          symbol={getSymbol(props.token, props.comparisonCurrency)}
+          theme="Dark"
+        />
+      </div>
     </div>
   );
 }

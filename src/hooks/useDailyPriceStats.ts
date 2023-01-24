@@ -1,15 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export enum Token {
-  SOL = "SOL",
-  mSOL = "mSOL",
-  stSOL = "stSOL",
-  USDC = "USDC",
-  USDT = "USDT",
-  RAY = "RAY",
-  ORCA = "ORCA",
-  Bonk = "Bonk",
-}
+import { Token } from "@/lib/Token";
 
 export const TOKEN_LIST = [
   Token.SOL,

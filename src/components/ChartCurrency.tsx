@@ -2,12 +2,12 @@ import { twMerge } from "tailwind-merge";
 import { cloneElement } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
-import Link from "next/link";
+
+import { Token } from "@/lib/Token";
 
 import { UsdcIconCircle } from "./UsdcIconCircle";
 import { SolanaIconCircle } from "./SolanaIconCircle";
 import { UsdtIconCircle } from "./UsdtIconCircle";
-import { getTokenIcon, Token } from "./TokenSelector";
 import { ChartCurrencyDropdownItem } from "./ChartCurrencyDropdownItem";
 import { RayIconCircle } from "./RayIconCircle";
 
