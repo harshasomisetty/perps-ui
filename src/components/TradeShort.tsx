@@ -8,7 +8,7 @@ import { TokenSelector } from "./TokenSelector";
 import { LeverageSlider } from "./LeverageSlider";
 import { TradeDetails } from "./TradeDetails";
 import { SolidButton } from "./SolidButton";
-import { TradeLongDetails } from "./TradeLongDetails";
+import { TradeShortDetails } from "./TradeShortDetails";
 import { PoolSelector } from "./PoolSelector";
 
 const PLACEHOLDER_POOLS = [
@@ -33,11 +33,11 @@ interface Props {
   className?: string;
 }
 
-export function TradeLong(props: Props) {
+export function TradeShort(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
   const [payAmount, setPayAmount] = useState(0);
-  const [longToken, setLongToken] = useState(Token.SOL);
-  const [longAmount, setLongAmount] = useState(0);
+  const [shortToken, setShortToken] = useState(Token.SOL);
+  const [shortAmount, setShortAmount] = useState(0);
   const [leverage, setLeverage] = useState(1);
   const [selectedPoolId, setSelectedPoolId] = useState("1");
 
@@ -61,10 +61,10 @@ export function TradeLong(props: Props) {
       <div className="mt-4 text-sm font-medium text-white">Your Long</div>
       <TokenSelector
         className="mt-2"
-        amount={longAmount}
-        token={longToken}
-        onChangeAmount={setLongAmount}
-        onSelectToken={setLongToken}
+        amount={shortAmount}
+        token={shortToken}
+        onChangeAmount={setShortAmount}
+        onSelectToken={setShortToken}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
       <PoolSelector
@@ -86,7 +86,7 @@ export function TradeLong(props: Props) {
         liquidationPrice={liquidationPrice}
         fees={0.05}
       />
-      <TradeLongDetails
+      <TradeShortDetails
         availableLiquidity={3871943.82}
         borrowFee={0.0052}
         className={twMerge(
@@ -100,7 +100,7 @@ export function TradeLong(props: Props) {
         )}
         entryPrice={16.4}
         exitPrice={16.4}
-        token={longToken}
+        token={shortToken}
       />
     </div>
   );

@@ -106,19 +106,16 @@ export function PositionInfo(props: Props) {
             />
           </button>
         </div>
-        <div className="mt-1 text-sm">&nbsp;</div>
       </PositionColumn>
       <PositionColumn num={5}>
         <div className="text-sm text-white">
           ${formatPrice(props.position.entryPrice)}
         </div>
-        <div className="mt-1 text-sm">&nbsp;</div>
       </PositionColumn>
       <PositionColumn num={6}>
         <div className="text-sm text-white">
           ${formatPrice(props.position.markPrice)}
         </div>
-        <div className="mt-1 text-sm">&nbsp;</div>
       </PositionColumn>
       <PositionColumn num={7}>
         <div className="flex items-center justify-between pr-2">
@@ -142,7 +139,6 @@ export function PositionInfo(props: Props) {
             <ChevronDownIcon className="h-4 w-4 fill-white" />
           </button>
         </div>
-        <div className="mt-1 text-sm">&nbsp;</div>
       </PositionColumn>
     </div>
   );

@@ -18,6 +18,29 @@ export enum Token {
   Bonk = "Bonk",
 }
 
+export function asToken(tokenStr: string): Token {
+  switch (tokenStr) {
+    case "SOL":
+      return Token.SOL;
+    case "mSOL":
+      return Token.mSOL;
+    case "stSOL":
+      return Token.stSOL;
+    case "USDC":
+      return Token.USDC;
+    case "USDT":
+      return Token.USDT;
+    case "RAY":
+      return Token.RAY;
+    case "ORCA":
+      return Token.ORCA;
+    case "Bonk":
+      return Token.Bonk;
+    default:
+      throw new Error("Not a valid token string");
+  }
+}
+
 export function getTokenLabel(token: Token) {
   switch (token) {
     case Token.SOL:

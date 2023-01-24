@@ -21,6 +21,13 @@ export interface Position {
   valueDeltaPercentage: number;
 }
 
+export interface PositionPool {
+  id: string;
+  name: string;
+  tokens: Token[];
+  positions: Position[];
+}
+
 interface Pending {
   status: "pending";
 }
@@ -32,7 +39,7 @@ interface Failure {
 
 interface Success {
   status: "success";
-  data: Position[];
+  data: PositionPool[];
 }
 
 type Positions = Pending | Failure | Success;
@@ -46,57 +53,71 @@ async function fetchPositions(): Promise<Success> {
     data: [
       {
         id: "1",
-        collateral: 90.19,
-        entryPrice: 16.4,
-        leverage: 15,
-        liquidationPrice: 1458.93,
-        liquidationThreshold: 1400.5,
-        markPrice: 1400.5,
-        pnlDelta: 0.16,
-        pnlDeltaPercent: 1.93,
-        size: 1400.5,
-        timestamp: Date.now(),
-        token: Token.SOL,
-        type: "long",
-        value: 15.48,
-        valueDelta: 0.1635,
-        valueDeltaPercentage: 0.99,
+        name: "Test pool 1",
+        tokens: [Token.SOL, Token.Bonk],
+        positions: [
+          {
+            id: "1",
+            collateral: 90.19,
+            entryPrice: 16.4,
+            leverage: 15,
+            liquidationPrice: 1458.93,
+            liquidationThreshold: 1400.5,
+            markPrice: 1400.5,
+            pnlDelta: 0.16,
+            pnlDeltaPercent: 1.93,
+            size: 1400.5,
+            timestamp: Date.now(),
+            token: Token.SOL,
+            type: "long",
+            value: 15.48,
+            valueDelta: 0.1635,
+            valueDeltaPercentage: 0.99,
+          },
+          {
+            id: "2",
+            collateral: 90.19,
+            entryPrice: 16.4,
+            leverage: 15,
+            liquidationPrice: 1458.93,
+            liquidationThreshold: 1400.5,
+            markPrice: 1400.5,
+            pnlDelta: -0.16,
+            pnlDeltaPercent: -1.93,
+            size: 1400.5,
+            timestamp: Date.now(),
+            token: Token.Bonk,
+            type: "short",
+            value: 15.48,
+            valueDelta: -0.1635,
+            valueDeltaPercentage: -0.99,
+          },
+        ],
       },
       {
         id: "2",
-        collateral: 90.19,
-        entryPrice: 16.4,
-        leverage: 15,
-        liquidationPrice: 1458.93,
-        liquidationThreshold: 1400.5,
-        markPrice: 1400.5,
-        pnlDelta: -0.16,
-        pnlDeltaPercent: -1.93,
-        size: 1400.5,
-        timestamp: Date.now(),
-        token: Token.Bonk,
-        type: "short",
-        value: 15.48,
-        valueDelta: -0.1635,
-        valueDeltaPercentage: -0.99,
-      },
-      {
-        id: "3",
-        collateral: 90.19,
-        entryPrice: 16.4,
-        leverage: 15,
-        liquidationPrice: 1458.93,
-        liquidationThreshold: 1400.5,
-        markPrice: 1400.5,
-        pnlDelta: 0.16,
-        pnlDeltaPercent: 1.93,
-        size: 1400.5,
-        timestamp: Date.now(),
-        token: Token.mSOL,
-        type: "long",
-        value: 15.48,
-        valueDelta: 0.1635,
-        valueDeltaPercentage: 0.99,
+        name: "Test pool 2",
+        tokens: [Token.mSOL],
+        positions: [
+          {
+            id: "3",
+            collateral: 90.19,
+            entryPrice: 16.4,
+            leverage: 15,
+            liquidationPrice: 1458.93,
+            liquidationThreshold: 1400.5,
+            markPrice: 1400.5,
+            pnlDelta: 0.16,
+            pnlDeltaPercent: 1.93,
+            size: 1400.5,
+            timestamp: Date.now(),
+            token: Token.mSOL,
+            type: "long",
+            value: 15.48,
+            valueDelta: 0.1635,
+            valueDeltaPercentage: 0.99,
+          },
+        ],
       },
     ],
   };
