@@ -38,7 +38,6 @@ interface Props {
 }
 
 export function CandlestickChart(props: Props) {
-  // TODO replace usd with right comparison currency
   return (
     <div className={props.className}>
       <div className="mb-8 flex items-center">

@@ -3,8 +3,9 @@ import { useRouter } from "next/router";
 import { SidebarLayout } from "@/components/SidebarLayout";
 import { CandlestickChart } from "@/components/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
-import { Token, asToken } from "@/lib/Token";
+import { asToken } from "@/lib/Token";
 import { Positions } from "@/components/Positions";
+import { tokenAddressToToken } from "@/hooks/useDailyPriceStats";
 
 function getToken(pair: string) {
   const [token, _] = pair.split("-");
@@ -23,9 +24,7 @@ export default function Page() {
     return <></>;
   }
 
-  let token: ReturnType<typeof getToken> = getTokenGivenString(
-    pair.split("-")[0]
-  );
+  let token: ReturnType<typeof getToken> = asToken(pair.split("-")[0]);
   // let token = Token.SOL;
   let currency: ReturnType<typeof getComparisonCurrency> =
     getComparisonCurrency(pair);
@@ -39,12 +38,13 @@ export default function Page() {
     }
   }
 
-  // TOOD eur is not supported through token type
   // TODO figure out how to reconcile usdc and usd pairs
+  console.log("token", token);
+  console.log("currency", currency);
   return (
     <SidebarLayout className="pt-11">
       <div>
-        <TradeSidebar inputPayToken={token} outputPayToken={currency} />
+        <TradeSidebar />
       </div>
       <div>
         <CandlestickChart comparisonCurrency={currency} token={token} />

@@ -7,8 +7,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { ProgramAccount } from "@project-serum/anchor";
 import {
-  getTokenGivenAddress,
-  Token,
+  tokenAddressToToken,
   useDailyPriceStats,
 } from "@/hooks/useDailyPriceStats";
 import { usePools } from "@/hooks/usePools";
@@ -27,6 +26,9 @@ export default function Pools() {
   const { pools, custodies } = usePools(wallet);
 
   if (pools.length === 0) {
+    return <p>Loading...</p>;
+  }
+  if (custodies.length === 0) {
     return <p>Loading...</p>;
   }
 
@@ -54,7 +56,7 @@ export default function Pools() {
               <tbody>
                 {custodies[pool.publicKey.toString()] &&
                   custodies[pool.publicKey.toString()].map(function (custody) {
-                    let token = getTokenGivenAddress(custody.mint.toString());
+                    let token = tokenAddressToToken(custody.mint.toString());
 
                     return (
                       <tr>

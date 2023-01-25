@@ -13,17 +13,18 @@ export const TOKEN_LIST = [
   Token.Bonk,
 ];
 
-export function getTokenGivenAddress(address: string) {
+export function tokenAddressToToken(address: string) {
   switch (address) {
     case "So11111111111111111111111111111111111111112":
       return Token.SOL;
     case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
       return Token.USDC;
+    default:
+      return null;
   }
 }
 
-// function that maps token string to token enum
-export function getTokenGivenString(token: string) {
+export function asToken(token: string) {
   switch (token) {
     case "SOL":
       return Token.SOL;
@@ -41,6 +42,8 @@ export function getTokenGivenString(token: string) {
       return Token.ORCA;
     case "Bonk":
       return Token.Bonk;
+    default:
+      throw new Error("not a valid token");
   }
 }
 

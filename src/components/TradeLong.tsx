@@ -31,18 +31,12 @@ const PLACEHOLDER_POOLS = [
 
 interface Props {
   className?: string;
-  inputPayToken: Token;
-  outputPayToken: Token;
-}
-
-function getLiqPrice(entry: number, leverage: number) {
-  return Math.round((entry * leverage) / 100);
 }
 
 export function TradeLong(props: Props) {
-  const [payToken, setPayToken] = useState(props.inputPayToken);
+  const [payToken, setPayToken] = useState(Token.SOL);
   const [payAmount, setPayAmount] = useState(0);
-  const [longToken, setLongToken] = useState(props.outputPayToken);
+  const [longToken, setLongToken] = useState(Token.SOL);
   const [longAmount, setLongAmount] = useState(0);
   const [leverage, setLeverage] = useState(1);
   const [selectedPoolId, setSelectedPoolId] = useState("1");

@@ -35,7 +35,7 @@ export function usePools(wallet) {
       setPools(poolInfos);
     }
     fetchPools();
-  });
+  }, []);
 
   return { pools, custodies };
 }
