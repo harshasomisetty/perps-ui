@@ -11,54 +11,20 @@ import {
   Token,
   useDailyPriceStats,
 } from "@/hooks/useDailyPriceStats";
+import { usePools } from "@/hooks/usePools";
 
 // create starter react page
 
 export default function Pools() {
   const { wallet, publicKey } = useWallet();
   const { connection } = useConnection();
-  const [pools, setPools] = useState<ProgramAccount<T>[]>([]);
-  const [custodies, setCustodies] = useState<Record<string, Object | Null[]>>(
-    {}
-  );
+  // const [pools, setPools] = useState<ProgramAccount<T>[]>([]);
+  // const [custodies, setCustodies] = useState<Record<string, Object | Null[]>>(
+  //   {}
+  // );
 
   const stats = useDailyPriceStats();
-
-  useEffect(() => {
-    async function fetchData() {
-      let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
-
-      let poolInfos = await perpetual_program.account.pool.all();
-
-      Object.values(poolInfos).forEach(async (pool) => {
-        console.log("print pool", pool.account.tokens);
-
-        let c = [];
-        Object.values(pool.account.tokens).forEach((token) => {
-          c.push(token.custody.toString());
-        });
-
-        let fetchedCusto =
-          await perpetual_program.account.custody.fetchMultiple(c);
-        console.log("custody example", fetchedCusto[0]);
-
-        setPools(poolInfos);
-        setCustodies({
-          ...custodies,
-          [pool.publicKey.toString()]: fetchedCusto,
-        });
-      });
-
-      // poolInfos.forEach((pool) => {
-      //   pool.tokens.forEach((token) => {
-      //     c.push(token.custody.toString());
-      //   });
-      // });
-    }
-    if (wallet && publicKey) {
-      fetchData();
-    }
-  }, [wallet, publicKey]);
+  const { pools, custodies } = usePools(wallet);
 
   if (pools.length === 0) {
     return <p>Loading...</p>;
