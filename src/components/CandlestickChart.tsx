@@ -45,7 +45,7 @@ export function CandlestickChart(props: Props) {
           comparisonCurrency={props.comparisonCurrency}
           token={props.token}
         />
-        <DailyStats className="ml-12" />
+        <DailyStats className="ml-12" token={props.token} />
       </div>
       <div className="h-[350px] md:h-[500px]">
         <TradingViewWidget
