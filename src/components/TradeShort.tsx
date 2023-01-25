@@ -10,6 +10,7 @@ import { TradeDetails } from "./TradeDetails";
 import { SolidButton } from "./SolidButton";
 import { TradeShortDetails } from "./TradeShortDetails";
 import { PoolSelector } from "./PoolSelector";
+import { useRouter } from "next/router";
 
 const PLACEHOLDER_POOLS = [
   {
@@ -42,6 +43,7 @@ export function TradeShort(props: Props) {
   const [selectedPoolId, setSelectedPoolId] = useState("1");
 
   const allPriceStats = useDailyPriceStats();
+  const router = useRouter();
 
   const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
@@ -64,7 +66,10 @@ export function TradeShort(props: Props) {
         amount={shortAmount}
         token={shortToken}
         onChangeAmount={setShortAmount}
-        onSelectToken={setShortToken}
+        onSelectToken={(token) => {
+          setShortToken(token);
+          router.push("/trade/" + token + "-USD");
+        }}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
       <PoolSelector
