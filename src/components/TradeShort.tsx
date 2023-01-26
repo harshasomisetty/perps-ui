@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token } from "@/lib/Token";
+import { asToken, Token } from "@/lib/Token";
 
 import { TokenSelector } from "./TokenSelector";
 import { LeverageSlider } from "./LeverageSlider";
@@ -45,8 +45,21 @@ export function TradeShort(props: Props) {
   const allPriceStats = useDailyPriceStats();
   const router = useRouter();
 
+  const { pair } = router.query;
+
+  useEffect(() => {
+    if (!pair) {
+      return;
+    }
+    setShortToken(asToken(pair.split("-")[0]));
+  }, [pair]);
+
   const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
+
+  if (!pair) {
+    return <></>;
+  }
 
   return (
     <div className={props.className}>

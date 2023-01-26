@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token } from "@/lib/Token";
+import { asToken, Token } from "@/lib/Token";
 
 import { TokenSelector } from "./TokenSelector";
 import { LeverageSlider } from "./LeverageSlider";
@@ -37,16 +37,29 @@ interface Props {
 export function TradeLong(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
   const [payAmount, setPayAmount] = useState(0);
-  const [longToken, setLongToken] = useState(Token.SOL);
   const [longAmount, setLongAmount] = useState(0);
   const [leverage, setLeverage] = useState(1);
   const [selectedPoolId, setSelectedPoolId] = useState("1");
+  const [longToken, setLongToken] = useState(Token.SOL);
 
   const allPriceStats = useDailyPriceStats();
   const router = useRouter();
 
+  const { pair } = router.query;
+
+  useEffect(() => {
+    if (!pair) {
+      return;
+    }
+    setLongToken(asToken(pair.split("-")[0]));
+  }, [pair]);
+
   const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
+
+  if (!pair) {
+    return <></>;
+  }
 
   return (
     <div className={props.className}>

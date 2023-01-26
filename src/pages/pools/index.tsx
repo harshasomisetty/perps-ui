@@ -17,10 +17,6 @@ import { usePools } from "@/hooks/usePools";
 export default function Pools() {
   const { wallet, publicKey } = useWallet();
   const { connection } = useConnection();
-  // const [pools, setPools] = useState<ProgramAccount<T>[]>([]);
-  // const [custodies, setCustodies] = useState<Record<string, Object | Null[]>>(
-  //   {}
-  // );
 
   const stats = useDailyPriceStats();
   const { pools, custodies } = usePools(wallet);
