@@ -80,6 +80,10 @@ type AllStats = Record<Token, Stats>;
 const fetchAllStats = (() => {
   let inFlight: null | Promise<AllStats> = null;
 
+  // TODO fix this firstData fetching hack when going to trading view
+
+  let firstData;
+
   return () => {
     if (inFlight) {
       return inFlight;
@@ -94,6 +98,29 @@ const fetchAllStats = (() => {
     )
       .then((resp) => resp.json())
       .then((data) => {
+        if (!firstData) {
+          firstData = data;
+        }
+        const allStats = TOKEN_LIST.reduce((acc, token) => {
+          const tokenData = data[getTokenId(token)];
+
+          acc[token] = {
+            change24hr: tokenData.usd_24h_change,
+            currentPrice: tokenData.usd,
+            high24hr: 0,
+            low24hr: 0,
+          };
+
+          return acc;
+        }, {} as AllStats);
+
+        inFlight = null;
+
+        return allStats;
+      })
+      .catch(() => {
+        console.log("caught fetching error");
+        let data = firstData;
         const allStats = TOKEN_LIST.reduce((acc, token) => {
           const tokenData = data[getTokenId(token)];
 
