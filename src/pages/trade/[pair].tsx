@@ -5,7 +5,6 @@ import { CandlestickChart } from "@/components/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
 import { asToken } from "@/lib/Token";
 import { Positions } from "@/components/Positions";
-import { tokenAddressToToken } from "@/hooks/useDailyPriceStats";
 
 function getToken(pair: string) {
   const [token, _] = pair.split("-");
@@ -38,9 +37,6 @@ export default function Page() {
     }
   }
 
-  // TODO figure out how to reconcile usdc and usd pairs
-  console.log("token", token);
-  console.log("currency", currency);
   return (
     <SidebarLayout className="pt-11">
       <div>

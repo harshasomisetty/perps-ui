@@ -1,11 +1,11 @@
-import { SolanaIconCircle } from "@/components/SolanaIconCircle";
-import { UsdcIconCircle } from "@/components/UsdcIconCircle";
-import { MSolIconCircle } from "@/components/MSolIconCircle";
-import { STSolIconCircle } from "@/components/STSolIconCircle";
-import { RayIconCircle } from "@/components/RayIconCircle";
-import { UsdtIconCircle } from "@/components/UsdtIconCircle";
-import { OrcaIconCircle } from "@/components/OrcaIconCircle";
-import { BonkIconCircle } from "@/components/BonkIconCircle";
+import { SolanaIconCircle } from "@/components/Icons/SolanaIconCircle";
+import { UsdcIconCircle } from "@/components/Icons/UsdcIconCircle";
+import { MSolIconCircle } from "@/components/Icons/MSolIconCircle";
+import { STSolIconCircle } from "@/components/Icons/STSolIconCircle";
+import { RayIconCircle } from "@/components/Icons/RayIconCircle";
+import { UsdtIconCircle } from "@/components/Icons/UsdtIconCircle";
+import { OrcaIconCircle } from "@/components/Icons/OrcaIconCircle";
+import { BonkIconCircle } from "@/components/Icons/BonkIconCircle";
 
 export enum Token {
   SOL = "SOL",
