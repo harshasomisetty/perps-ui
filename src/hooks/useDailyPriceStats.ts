@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Token } from "@/lib/Token";
+import { getTokenId, Token } from "@/lib/Token";
 
 export const TOKEN_LIST = [
   Token.SOL,
@@ -12,62 +12,6 @@ export const TOKEN_LIST = [
   Token.ORCA,
   Token.Bonk,
 ];
-
-export function tokenAddressToToken(address: string) {
-  switch (address) {
-    case "So11111111111111111111111111111111111111112":
-      return Token.SOL;
-    case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
-      return Token.USDC;
-    default:
-      return null;
-  }
-}
-
-export function asToken(token: string) {
-  switch (token) {
-    case "SOL":
-      return Token.SOL;
-    case "mSOL":
-      return Token.mSOL;
-    case "stSOL":
-      return Token.stSOL;
-    case "USDC":
-      return Token.USDC;
-    case "USDT":
-      return Token.USDT;
-    case "RAY":
-      return Token.RAY;
-    case "ORCA":
-      return Token.ORCA;
-    case "Bonk":
-      return Token.Bonk;
-    default:
-      throw new Error("not a valid token");
-  }
-}
-
-function getTokenId(token: Token) {
-  switch (token) {
-    case Token.SOL:
-      return "solana";
-    case Token.mSOL:
-      return "msol";
-    case Token.stSOL:
-      return "lido-staked-sol";
-    case Token.USDC:
-      return "usd-coin";
-    case Token.USDT:
-      return "tether";
-    case Token.RAY:
-      return "raydium";
-    case Token.ORCA:
-      return "orca";
-    case Token.Bonk:
-      return "bonk";
-  }
-}
-
 interface Stats {
   change24hr: number;
   currentPrice: number;

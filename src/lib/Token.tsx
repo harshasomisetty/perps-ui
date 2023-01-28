@@ -82,3 +82,35 @@ export function getTokenIcon(token: Token) {
       return <BonkIconCircle />;
   }
 }
+
+export function getTokenId(token: Token) {
+  switch (token) {
+    case Token.SOL:
+      return "solana";
+    case Token.mSOL:
+      return "msol";
+    case Token.stSOL:
+      return "lido-staked-sol";
+    case Token.USDC:
+      return "usd-coin";
+    case Token.USDT:
+      return "tether";
+    case Token.RAY:
+      return "raydium";
+    case Token.ORCA:
+      return "orca";
+    case Token.Bonk:
+      return "bonk";
+  }
+}
+
+export function tokenAddressToToken(address: string) {
+  switch (address) {
+    case "So11111111111111111111111111111111111111112":
+      return Token.SOL;
+    case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
+      return Token.USDC;
+    default:
+      return null;
+  }
+}
