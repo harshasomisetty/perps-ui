@@ -10,20 +10,11 @@ import {
   tokenAddressToToken,
   useDailyPriceStats,
 } from "@/hooks/useDailyPriceStats";
-import { usePools } from "@/hooks/usePools";
+import { Pool, usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
+import PoolModal from "@/components/PoolModal";
 
 // create starter react page
-
-function PoolModal() {
-  return (
-    <div>
-      <div class="blur-lg ">
-        <p>Pool</p>
-      </div>
-    </div>
-  );
-}
 
 export default function Pools() {
   const { wallet, publicKey } = useWallet();
@@ -31,6 +22,8 @@ export default function Pools() {
 
   const stats = useDailyPriceStats();
   const { pools } = usePools(wallet);
+
+  const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
 
   // console.log("pools", pools);
 
@@ -40,10 +33,13 @@ export default function Pools() {
 
   return (
     <div>
-      <div className="flex flex-row items-end space-x-3">
+      <div className="flex flex-row items-end space-x-3 text-white">
         <h1 className="text-4xl text-white ">Liquidity Pools</h1>
         <p>TVL: ${0}</p>
       </div>
+      {selectedPool && (
+        <PoolModal pool={selectedPool} setPool={setSelectedPool} />
+      )}
       <table className={twMerge("table-auto", "text-white")}>
         <thead
           className={twMerge(
@@ -68,7 +64,11 @@ export default function Pools() {
         </thead>
         <tbody>
           {pools.map((pool, key) => (
-            <tr key={key}>
+            <tr
+              className="cursor-pointer"
+              key={key}
+              onClick={() => setSelectedPool(selectedPool ? null : pool)}
+            >
               <td>{pool.poolName}</td>
             </tr>
             // <>
