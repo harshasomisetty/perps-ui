@@ -6,6 +6,7 @@ import { RayIconCircle } from "@/components/Icons/RayIconCircle";
 import { UsdtIconCircle } from "@/components/Icons/UsdtIconCircle";
 import { OrcaIconCircle } from "@/components/Icons/OrcaIconCircle";
 import { BonkIconCircle } from "@/components/Icons/BonkIconCircle";
+import { Pool } from "@/hooks/usePools";
 
 export enum Token {
   SOL = "SOL",
@@ -108,9 +109,29 @@ export function tokenAddressToToken(address: string) {
   switch (address) {
     case "So11111111111111111111111111111111111111112":
       return Token.SOL;
+    case "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So":
+      return Token.mSOL;
+    case "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj":
+      return Token.stSOL;
     case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
       return Token.USDC;
+    case "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":
+      return Token.USDT;
+    case "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R":
+      return Token.RAY;
+    case "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE":
+      return Token.ORCA;
+    case "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263":
+      return Token.Bonk;
     default:
       return null;
   }
+}
+
+export function getPoolTokenList(pool: Pool) {
+  const tokenList = pool.tokens.map((token) => {
+    return tokenAddressToToken(token.mint);
+  });
+
+  return tokenList;
 }
