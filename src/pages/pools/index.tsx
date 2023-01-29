@@ -27,7 +27,7 @@ export default function Pools() {
 
   // console.log("pools", pools);
 
-  if (pools.length === 0) {
+  if (!pools) {
     return <p className="text-white">Loading...</p>;
   }
 
@@ -63,37 +63,14 @@ export default function Pools() {
           </tr>
         </thead>
         <tbody>
-          {pools.map((pool, key) => (
+          {Object.entries(pools).map(([poolName, pool]) => (
             <tr
               className="cursor-pointer"
-              key={key}
+              key={poolName}
               onClick={() => setSelectedPool(selectedPool ? null : pool)}
             >
-              <td>{pool.poolName}</td>
+              <td>{poolName}</td>
             </tr>
-            // <>
-            //   {custodies[pool.publicKey.toString()] &&
-            //     custodies[pool.publicKey.toString()].map(function (custody) {
-            //       let token = tokenAddressToToken(custody.mint.toString());
-
-            //       return (
-            //         <tr>
-            //           <td>{pool.account.name}</td>
-            //           <td>{pool.publicKey.toString()}</td>
-            //           <td>{token}</td>
-            //           <td>
-            //             {stats[token].currentPrice *
-            //               Number(custody.assets.owned)}
-            //           </td>
-            //           <td>{stats[token].currentPrice}</td>
-            //           <td>{Number(custody.assets.owned)}</td>
-            //           <td>Target Weight</td>
-            //           <td>Utilization</td>
-            //           <td>Fee</td>
-            //         </tr>
-            //       );
-            //     })}
-            // </>
           ))}
         </tbody>
       </table>

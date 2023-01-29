@@ -128,10 +128,23 @@ export function tokenAddressToToken(address: string) {
   }
 }
 
-export function getPoolTokenList(pool: Pool) {
-  const tokenList = pool.tokens.map((token) => {
-    return tokenAddressToToken(token.mint);
-  });
-
-  return tokenList;
+export function getTokenAddress(token: Token) {
+  switch (token) {
+    case Token.SOL:
+      return "So11111111111111111111111111111111111111112";
+    case Token.mSOL:
+      return "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So";
+    case Token.stSOL:
+      return "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj";
+    case Token.USDC:
+      return "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+    case Token.USDT:
+      return "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
+    case Token.RAY:
+      return "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R";
+    case Token.ORCA:
+      return "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE";
+    case Token.Bonk:
+      return "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263";
+  }
 }

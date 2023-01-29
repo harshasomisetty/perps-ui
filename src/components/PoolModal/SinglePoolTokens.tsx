@@ -6,7 +6,7 @@ import { twMerge } from "tailwind-merge";
 interface Props {
   className?: string;
   //   tokens: Token[];
-  pool: Pool | null;
+  pool: Pool;
 }
 
 export default function SinglePoolTokens(props: Props) {
@@ -34,19 +34,18 @@ export default function SinglePoolTokens(props: Props) {
           </tr>
         </thead>
         <tbody>
-          {props.pool.tokens.map((token, ind) => {
-            console.log("token ma", token);
-            const icon = getTokenIcon(tokenAddressToToken(token.mint));
+          {Object.entries(props.pool.tokens).map(([tokenMint, custody]) => {
+            const icon = getTokenIcon(tokenAddressToToken(tokenMint));
             return (
-              <tr key={ind}>
+              <tr key={tokenMint}>
                 <td>
                   <div className="flex flex-row">
                     {cloneElement(icon, {
                       className: "h-10 w-10",
                     })}
                     <div className="flex flex-col">
-                      <p>{tokenAddressToToken(token.mint)}</p>
-                      <p>{getTokenLabel(tokenAddressToToken(token.mint))}</p>
+                      <p>{tokenAddressToToken(tokenMint)}</p>
+                      <p>{getTokenLabel(tokenAddressToToken(tokenMint))}</p>
                     </div>
                   </div>
                 </td>
@@ -58,3 +57,27 @@ export default function SinglePoolTokens(props: Props) {
     </div>
   );
 }
+
+// <>
+//   {custodies[pool.publicKey.toString()] &&
+//     custodies[pool.publicKey.toString()].map(function (custody) {
+//       let token = tokenAddressToToken(custody.mint.toString());
+
+//       return (
+//         <tr>
+//           <td>{pool.account.name}</td>
+//           <td>{pool.publicKey.toString()}</td>
+//           <td>{token}</td>
+//           <td>
+//             {stats[token].currentPrice *
+//               Number(custody.assets.owned)}
+//           </td>
+//           <td>{stats[token].currentPrice}</td>
+//           <td>{Number(custody.assets.owned)}</td>
+//           <td>Target Weight</td>
+//           <td>Utilization</td>
+//           <td>Fee</td>
+//         </tr>
+//       );
+//     })}
+// </>

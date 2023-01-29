@@ -16,8 +16,6 @@ interface Props {
 }
 
 export default function PoolModal(props: Props) {
-  console.log("pool in pool modal", props.pool.tokens);
-
   if (props.pool === null) {
     <></>;
   }
@@ -28,7 +26,7 @@ export default function PoolModal(props: Props) {
         X
       </div>
       <div className="flex flex-row">
-        <LiquidityCard tokenList={getPoolTokenList(props.pool)} />
+        <LiquidityCard pool={props.pool} />
         <SinglePoolTokens pool={props.pool} />
       </div>
     </div>
