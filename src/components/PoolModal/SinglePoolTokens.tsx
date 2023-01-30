@@ -2,6 +2,7 @@ import { Pool } from "@/hooks/usePools";
 import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
+import { PoolTokens } from "../PoolTokens";
 
 interface Props {
   className?: string;
@@ -10,10 +11,26 @@ interface Props {
 }
 
 export default function SinglePoolTokens(props: Props) {
+  console.log("all tokens");
+
   return (
-    <div>
-      <p>{props.pool.poolName}</p>
-      <table className={twMerge("table-auto", "text-white")}>
+    <div className="bg-zinc-900 p-4">
+      <div className="flex flex-row">
+        <PoolTokens tokens={props.pool.tokenNames} />
+        <div>
+          <p className="font-medium">{props.pool.poolName}</p>
+          <div className="flex flex-row text-xs font-medium text-zinc-500 text-white">
+            <p>{tokenAddressToToken(Object.keys(props.pool.tokens)[0])}</p>
+
+            {Object.keys(props.pool.tokens)
+              .slice(1)
+              .map((tokenMint) => (
+                <p>, {tokenAddressToToken(tokenMint)}</p>
+              ))}
+          </div>
+        </div>
+      </div>
+      <table className={twMerge("table-auto", "text-white", "border-t", "p-4")}>
         <thead
           className={twMerge(
             "text-xs",
@@ -45,7 +62,9 @@ export default function SinglePoolTokens(props: Props) {
                     })}
                     <div className="flex flex-col">
                       <p>{tokenAddressToToken(tokenMint)}</p>
-                      <p>{getTokenLabel(tokenAddressToToken(tokenMint))}</p>
+                      <p className={twMerge("text-xs", "text-zinc-500")}>
+                        {getTokenLabel(tokenAddressToToken(tokenMint))}
+                      </p>
                     </div>
                   </div>
                 </td>

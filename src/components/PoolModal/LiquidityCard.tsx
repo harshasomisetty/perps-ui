@@ -1,9 +1,14 @@
 import { getTokenAddress, Token, tokenAddressToToken } from "@/lib/Token";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
 import { TokenSelector } from "@/components/TokenSelector";
-import { LAMPORTS_PER_SOL, PublicKey, Transaction } from "@solana/web3.js";
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+} from "@solana/web3.js";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
@@ -16,6 +21,11 @@ import { Pool, usePools } from "@/hooks/usePools";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import BN from "bn.js";
 import { checkIfAccountExists } from "@/utils/retrieveData";
+import { addLiquidity } from "src/actions/addLiquidity";
+import { SidebarTab } from "../SidebarTab";
+
+import Add from "@carbon/icons-react/lib/Add";
+import Subtract from "@carbon/icons-react/lib/Subtract";
 
 interface Props {
   className?: string;
@@ -26,9 +36,18 @@ interface Props {
   //   onSelectToken?(token: Token): void;
 }
 
+enum Tab {
+  Add,
+  Remove,
+}
+
 export default function LiquidityCard(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
-  const [payAmount, setPayAmount] = useState(0);
+  const [payAmount, setPayAmount] = useState(1);
+
+  const [tab, setTab] = useState(Tab.Add);
+
+  const [payTokenBalance, setPayTokenBalance] = useState(0);
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -37,139 +56,96 @@ export default function LiquidityCard(props: Props) {
     return tokenAddressToToken(token);
   });
 
-  async function addLiq() {
-    let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
-
-    let amount = new BN(1 * LAMPORTS_PER_SOL);
-
-    let transferAuthority = findProgramAddressSync(
-      ["transfer_authority"],
-      perpetual_program.programId
-    )[0];
-
-    let perpetuals = findProgramAddressSync(
-      ["perpetuals"],
-      perpetual_program.programId
-    )[0];
-
-    let lpTokenMint = props.pool.lpTokenMint;
-
-    let poolAddress = props.pool.poolAddress;
-
-    let lpTokenAccount = await getAssociatedTokenAddress(
-      lpTokenMint,
-      publicKey
-    );
-
-    let fundingAccount = await getAssociatedTokenAddress(
-      new PublicKey(getTokenAddress(payToken)),
-      publicKey
-    );
-
-    let custody = props.pool.tokens[getTokenAddress(payToken)]?.custodyAccount;
-    let custodyOracleAccount =
-      props.pool.tokens[getTokenAddress(payToken)]?.oracleAccount;
-    let custodyTokenAccount =
-      props.pool.tokens[getTokenAddress(payToken)]?.tokenAccount;
-
-    let transaction = new Transaction();
-    console.log("funding acc", fundingAccount.toString());
-
-    let custodyMetas = [];
-    custodyMetas.push({
-      isSigner: false,
-      isWritable: false,
-      pubkey: custody,
-    });
-
-    custodyMetas.push({
-      isSigner: false,
-      isWritable: false,
-      pubkey: custodyOracleAccount,
-    });
-
-    try {
-      if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
-        let voucher_wallet_tx = createAssociatedTokenAccountInstruction(
-          publicKey,
-          lpTokenAccount,
-          publicKey,
-          lpTokenMint
-        );
-        transaction = transaction.add(voucher_wallet_tx);
+  useEffect(() => {
+    async function fetchData() {
+      if (payToken === Token.SOL) {
+        let balance = await connection.getBalance(publicKey);
+        setPayTokenBalance(balance / LAMPORTS_PER_SOL);
       } else {
-        console.log("user voucher already created");
+        let bro = await getAssociatedTokenAddress(
+          new PublicKey(getTokenAddress(payToken)),
+          publicKey
+        );
+
+        console.log("bro", bro.toString());
+        let balance = await connection.getTokenAccountBalance(bro);
+        setPayTokenBalance(balance.value.uiAmount);
       }
-
-      let addLiquidityTx = await perpetual_program.methods
-        .addLiquidity({ amount })
-        .accounts({
-          owner: publicKey,
-          fundingAccount, // user token account for custody token account
-          lpTokenAccount,
-          transferAuthority,
-          perpetuals,
-          pool: poolAddress,
-          custody,
-          custodyOracleAccount,
-          custodyTokenAccount,
-          lpTokenMint,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .remainingAccounts(custodyMetas)
-        .transaction();
-
-      transaction = transaction.add(addLiquidityTx);
-      console.log("add liquidity tx", transaction);
-
-      await manualSendTransaction(
-        transaction,
-        publicKey,
-        connection,
-        signTransaction
-      );
-    } catch (err) {
-      console.log(err);
-      throw err;
     }
+    if (wallet && publicKey) {
+      fetchData();
+    }
+  }, [payToken]);
+
+  async function addLiq() {
+    await addLiquidity(
+      props.pool,
+      wallet,
+      publicKey,
+      signTransaction,
+      connection,
+      payToken,
+      payAmount
+    );
 
     // router.reload(window.location.pathname);
   }
 
   return (
     <div className={props.className}>
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-white">You Add</div>
-      </div>
-      <TokenSelector
-        className="mt-2"
-        amount={payAmount}
-        token={payToken}
-        onChangeAmount={setPayAmount}
-        onSelectToken={setPayToken}
-        tokenList={tokenList}
-      />
-      <div className="mt-4 text-sm font-medium text-white">You Receive</div>
-
       <div
-        className={twMerge(
-          "grid-cols-[max-content,1fr]",
-          "bg-zinc-900",
-          "grid",
-          "h-20",
-          "items-center",
-          "p-4",
-          "rounded",
-          "w-full",
-          props.className
-        )}
+        className={twMerge("bg-zinc-800", "p-4", "rounded", "overflow-hidden")}
       >
-        LP Tokens
-      </div>
+        <div className="mb-4 grid grid-cols-2 gap-x-1 rounded bg-black p-1">
+          <SidebarTab
+            selected={tab === Tab.Add}
+            onClick={() => setTab(Tab.Add)}
+          >
+            <Add className="h-4 w-4" />
+            <div>Add</div>
+          </SidebarTab>
+          <SidebarTab
+            selected={tab === Tab.Remove}
+            onClick={() => setTab(Tab.Remove)}
+          >
+            <Subtract className="h-4 w-4" />
+            <div>Remove</div>
+          </SidebarTab>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-white">You Add</div>
+          <div>Balance: {payTokenBalance}</div>
+        </div>
+        <TokenSelector
+          className="mt-2"
+          amount={payAmount}
+          token={payToken}
+          onChangeAmount={setPayAmount}
+          onSelectToken={setPayToken}
+          tokenList={tokenList}
+        />
+        <div className="mt-4 text-sm font-medium text-white">You Receive</div>
 
-      <SolidButton className="mt-6 w-full" onClick={addLiq}>
-        Confirm
-      </SolidButton>
+        <div
+          className={twMerge(
+            "grid-cols-[max-content,1fr]",
+            "bg-zinc-900",
+            "grid",
+            "h-20",
+            "items-center",
+            "p-4",
+            "rounded",
+            "w-full",
+            props.className
+          )}
+        >
+          LP Tokens
+        </div>
+
+        <SolidButton className="mt-6 w-full" onClick={addLiq}>
+          Confirm
+        </SolidButton>
+      </div>
     </div>
   );
 }

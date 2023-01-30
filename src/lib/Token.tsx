@@ -137,7 +137,8 @@ export function getTokenAddress(token: Token) {
     case Token.stSOL:
       return "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj";
     case Token.USDC:
-      return "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+      // return "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+      return "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr";
     case Token.USDT:
       return "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
     case Token.RAY:
