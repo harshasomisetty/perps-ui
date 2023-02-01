@@ -1,4 +1,4 @@
-import { Pool } from "@/hooks/usePools";
+import { Pool } from "@/lib/Pool";
 import { getTokenAddress, Token } from "@/lib/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
@@ -72,12 +72,6 @@ export async function addLiquidity(
     pubkey: custody,
   });
 
-  custodyMetas.push({
-    isSigner: false,
-    isWritable: false,
-    pubkey: custodyOracleAccount,
-  });
-
   let custody1 = pool.tokens[getTokenAddress(Token.USDC)]?.custodyAccount;
   let custodyOracleAccount1 =
     pool.tokens[getTokenAddress(Token.USDC)]?.oracleAccount;
@@ -88,6 +82,12 @@ export async function addLiquidity(
     isSigner: false,
     isWritable: false,
     pubkey: custody1,
+  });
+
+  custodyMetas.push({
+    isSigner: false,
+    isWritable: false,
+    pubkey: custodyOracleAccount,
   });
 
   custodyMetas.push({
