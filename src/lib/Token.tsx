@@ -113,7 +113,8 @@ export function tokenAddressToToken(address: string) {
       return Token.mSOL;
     case "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj":
       return Token.stSOL;
-    case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
+    // case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
+    case "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr":
       return Token.USDC;
     case "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":
       return Token.USDT;

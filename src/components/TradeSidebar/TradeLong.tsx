@@ -85,10 +85,7 @@ export function TradeLong(props: Props) {
         }}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
-      <PoolSelector
-        className="mt-2"
-        onSelect={(pool) => setSelectedPoolId(pool.id)}
-      />
+      <PoolSelector className="mt-2" />
       <LeverageSlider
         className="mt-6"
         value={leverage}

@@ -1477,19 +1477,13 @@
           {
             "name": "signers",
             "type": {
-              "array": [
-                "publicKey",
-                6
-              ]
+              "array": ["publicKey", 6]
             }
           },
           {
             "name": "signed",
             "type": {
-              "array": [
-                "bool",
-                6
-              ]
+              "array": ["bool", 6]
             }
           },
           {

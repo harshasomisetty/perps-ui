@@ -1,5 +1,5 @@
 import { Pool } from "@/hooks/usePools";
-import { getTokenAddress } from "@/lib/Token";
+import { getTokenAddress, Token } from "@/lib/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -30,6 +30,7 @@ export async function addLiquidity(
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
   let tempAmount = new BN(1 * LAMPORTS_PER_SOL);
+  console.log("amount", Number(tempAmount));
 
   let transferAuthority = findProgramAddressSync(
     ["transfer_authority"],
@@ -48,7 +49,7 @@ export async function addLiquidity(
   let lpTokenAccount = await getAssociatedTokenAddress(lpTokenMint, publicKey);
 
   let fundingAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]?.tokenMint,
+    pool.tokens[getTokenAddress(payToken)]?.mintAccount,
     publicKey
   );
 
@@ -61,20 +62,38 @@ export async function addLiquidity(
   let transaction = new Transaction();
   console.log("funding acc", fundingAccount.toString());
 
-  let keypair1 = Keypair.generate();
-  let keypair2 = Keypair.generate();
+  // let keypair1 = Keypair.generate();
+  // let keypair2 = Keypair.generate();
 
   let custodyMetas = [];
   custodyMetas.push({
     isSigner: false,
     isWritable: false,
-    pubkey: keypair1.publicKey,
+    pubkey: custody,
   });
 
   custodyMetas.push({
     isSigner: false,
     isWritable: false,
-    pubkey: keypair2.publicKey,
+    pubkey: custodyOracleAccount,
+  });
+
+  let custody1 = pool.tokens[getTokenAddress(Token.USDC)]?.custodyAccount;
+  let custodyOracleAccount1 =
+    pool.tokens[getTokenAddress(Token.USDC)]?.oracleAccount;
+  // let custodyTokenAccount =
+  // pool.tokens[getTokenAddress(payToken)]?.tokenAccount;
+
+  custodyMetas.push({
+    isSigner: false,
+    isWritable: false,
+    pubkey: custody1,
+  });
+
+  custodyMetas.push({
+    isSigner: false,
+    isWritable: false,
+    pubkey: custodyOracleAccount1,
   });
 
   try {
@@ -91,7 +110,7 @@ export async function addLiquidity(
     }
 
     let addLiquidityTx = await perpetual_program.methods
-      .addLiquidity({ tempAmount })
+      .addLiquidity({ amount: tempAmount })
       .accounts({
         owner: publicKey,
         fundingAccount, // user token account for custody token account

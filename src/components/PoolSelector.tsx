@@ -20,14 +20,12 @@ export function PoolSelector(props: Props) {
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { pools } = usePools(wallet);
+  const [selectedPool, setSelectedPool] = useState<Pool>();
 
-  if (!pools) {
+  if (!pools || !selectedPool) {
     return <p>Loading</p>;
   } else {
-    console.log("all pools in selector ", pools);
-    const selectedPool = Object.values(pools)[0];
-    console.log("selected pool", selectedPool);
-
+    setSelectedPool(Object.values(pools)[0]);
     // return <p>Loaded</p>;
 
     return (
