@@ -1,6 +1,10 @@
 import { Pool } from "@/lib/Pool";
 import { getTokenAddress, Token } from "@/lib/Token";
-import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import {
+  getPerpetualProgramAndProvider,
+  perpetualsAddress,
+  transferAuthorityAddress,
+} from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import { BN, Wallet } from "@project-serum/anchor";
@@ -17,6 +21,7 @@ import {
   PublicKey,
   Transaction,
 } from "@solana/web3.js";
+import { PERPETUALS_PROGRAM_ID } from "@/utils/constants";
 
 export async function addLiquidity(
   pool: Pool,
@@ -30,83 +35,29 @@ export async function addLiquidity(
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
   let tempAmount = new BN(1 * LAMPORTS_PER_SOL);
-  console.log("amount", Number(tempAmount));
 
-  let transferAuthority = findProgramAddressSync(
-    ["transfer_authority"],
-    perpetual_program.programId
-  )[0];
-
-  let perpetuals = findProgramAddressSync(
-    ["perpetuals"],
-    perpetual_program.programId
-  )[0];
-
-  let lpTokenMint = pool.lpTokenMint;
-
-  let poolAddress = pool.poolAddress;
-
-  let lpTokenAccount = await getAssociatedTokenAddress(lpTokenMint, publicKey);
+  let lpTokenAccount = await getAssociatedTokenAddress(
+    pool.lpTokenMint,
+    publicKey
+  );
 
   let fundingAccount = await getAssociatedTokenAddress(
     pool.tokens[getTokenAddress(payToken)]?.mintAccount,
     publicKey
   );
 
-  let custody = pool.tokens[getTokenAddress(payToken)]?.custodyAccount;
-  let custodyOracleAccount =
-    pool.tokens[getTokenAddress(payToken)]?.oracleAccount;
-  let custodyTokenAccount =
-    pool.tokens[getTokenAddress(payToken)]?.tokenAccount;
-
   let transaction = new Transaction();
-  console.log("funding acc", fundingAccount.toString());
-
-  // let keypair1 = Keypair.generate();
-  // let keypair2 = Keypair.generate();
-
-  let custodyMetas = [];
-  custodyMetas.push({
-    isSigner: false,
-    isWritable: false,
-    pubkey: custody,
-  });
-
-  let custody1 = pool.tokens[getTokenAddress(Token.USDC)]?.custodyAccount;
-  let custodyOracleAccount1 =
-    pool.tokens[getTokenAddress(Token.USDC)]?.oracleAccount;
-  // let custodyTokenAccount =
-  // pool.tokens[getTokenAddress(payToken)]?.tokenAccount;
-
-  custodyMetas.push({
-    isSigner: false,
-    isWritable: false,
-    pubkey: custody1,
-  });
-
-  custodyMetas.push({
-    isSigner: false,
-    isWritable: false,
-    pubkey: custodyOracleAccount,
-  });
-
-  custodyMetas.push({
-    isSigner: false,
-    isWritable: false,
-    pubkey: custodyOracleAccount1,
-  });
 
   try {
     if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
-      let voucher_wallet_tx = createAssociatedTokenAccountInstruction(
-        publicKey,
-        lpTokenAccount,
-        publicKey,
-        lpTokenMint
+      transaction = transaction.add(
+        createAssociatedTokenAccountInstruction(
+          publicKey,
+          lpTokenAccount,
+          publicKey,
+          pool.lpTokenMint
+        )
       );
-      transaction = transaction.add(voucher_wallet_tx);
-    } else {
-      console.log("user voucher already created");
     }
 
     let addLiquidityTx = await perpetual_program.methods
@@ -115,28 +66,31 @@ export async function addLiquidity(
         owner: publicKey,
         fundingAccount, // user token account for custody token account
         lpTokenAccount,
-        transferAuthority,
-        perpetuals,
-        pool: poolAddress,
-        custody,
-        custodyOracleAccount,
-        custodyTokenAccount,
-        lpTokenMint,
+        transferAuthority: transferAuthorityAddress,
+        perpetuals: perpetualsAddress,
+        pool: pool.poolAddress,
+        custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
+        custodyOracleAccount:
+          pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
+        custodyTokenAccount:
+          pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
+        lpTokenMint: pool.lpTokenMint,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .remainingAccounts(custodyMetas)
+      .remainingAccounts(pool.custodyMetas)
       .transaction();
 
     transaction = transaction.add(addLiquidityTx);
-    console.log("add liquidity tx", transaction);
-    console.log("tx keys");
-    for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
-      console.log(
-        "key",
-        i,
-        transaction.instructions[0].keys[i]?.pubkey.toString()
-      );
-    }
+
+    // console.log("add liquidity tx", transaction);
+    // console.log("tx keys");
+    // for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
+    //   console.log(
+    //     "key",
+    //     i,
+    //     transaction.instructions[0].keys[i]?.pubkey.toString()
+    //   );
+    // }
 
     await manualSendTransaction(
       transaction,
