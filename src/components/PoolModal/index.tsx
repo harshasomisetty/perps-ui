@@ -1,13 +1,5 @@
-import { Pool } from "@/hooks/usePools";
-import {
-  getPoolTokenList,
-  getTokenIcon,
-  getTokenLabel,
-  tokenAddressToToken,
-} from "@/lib/Token";
-import { cloneElement } from "react";
-import { twMerge } from "tailwind-merge";
 import LiquidityCard from "@/components/PoolModal/LiquidityCard";
+import { Pool } from "@/lib/Pool";
 import SinglePoolTokens from "./SinglePoolTokens";
 
 interface Props {

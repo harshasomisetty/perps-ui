@@ -6,11 +6,12 @@ import { asToken, Token } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { LeverageSlider } from "../LeverageSlider";
-import { TradeDetails } from "../TradeDetails";
+import { TradeDetails } from "./TradeDetails";
 import { SolidButton } from "../SolidButton";
-import { TradeLongDetails } from "../TradeLongDetails";
+import { TradeLongDetails } from "./TradeLongDetails";
 import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
+import { Pool } from "@/lib/Pool";
 
 const PLACEHOLDER_POOLS = [
   {

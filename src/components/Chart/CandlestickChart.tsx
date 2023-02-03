@@ -1,7 +1,6 @@
 import dynamic from "next/dynamic";
 
-import { Token } from "@/lib/Token";
-
+import { getSymbol, Token } from "@/lib/Token";
 import { ChartCurrency } from "./ChartCurrency";
 import { DailyStats } from "./DailyStats";
 
@@ -9,27 +8,6 @@ import { DailyStats } from "./DailyStats";
 const TradingViewWidget = dynamic<any>(import("react-tradingview-widget"), {
   ssr: false,
 });
-
-function getSymbol(token: Token) {
-  switch (token) {
-    case Token.Bonk:
-      return "BONKUSDT";
-    case Token.ORCA:
-      return "ORCAUSD";
-    case Token.RAY:
-      return "RAYUSD";
-    case Token.SOL:
-      return "SOLUSD";
-    case Token.USDC:
-      return "USDCUSD";
-    case Token.USDT:
-      return "USDTUSD";
-    case Token.mSOL:
-      return "MSOLUSD";
-    case Token.stSOL:
-      return "STSOLUSDT";
-  }
-}
 
 interface Props {
   className?: string;

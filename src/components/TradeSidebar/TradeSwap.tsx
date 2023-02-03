@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { Token } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { SolidButton } from "../SolidButton";
-import { TradeSwapDetails } from "../TradeSwapDetails";
+import { TradeSwapDetails } from "./TradeSwapDetails";
 
 interface Props {
   className?: string;

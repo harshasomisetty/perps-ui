@@ -63,6 +63,27 @@ export function getTokenLabel(token: Token) {
   }
 }
 
+export function getSymbol(token: Token) {
+  switch (token) {
+    case Token.Bonk:
+      return "BONKUSDT";
+    case Token.ORCA:
+      return "ORCAUSD";
+    case Token.RAY:
+      return "RAYUSD";
+    case Token.SOL:
+      return "SOLUSD";
+    case Token.USDC:
+      return "USDCUSD";
+    case Token.USDT:
+      return "USDTUSD";
+    case Token.mSOL:
+      return "MSOLUSD";
+    case Token.stSOL:
+      return "STSOLUSDT";
+  }
+}
+
 export function getTokenIcon(token: Token) {
   switch (token) {
     case Token.SOL:

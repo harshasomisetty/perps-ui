@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
 import { SidebarLayout } from "@/components/SidebarLayout";
-import { CandlestickChart } from "@/components/CandlestickChart";
+import { CandlestickChart } from "@/components/Chart/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
 import { asToken } from "@/lib/Token";
 import { Positions } from "@/components/Positions";

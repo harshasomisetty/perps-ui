@@ -6,9 +6,9 @@ import { asToken, Token } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { LeverageSlider } from "../LeverageSlider";
-import { TradeDetails } from "../TradeDetails";
+import { TradeDetails } from "./TradeDetails";
 import { SolidButton } from "../SolidButton";
-import { TradeShortDetails } from "../TradeShortDetails";
+import { TradeShortDetails } from "./TradeShortDetails";
 import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
 

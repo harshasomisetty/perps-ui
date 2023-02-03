@@ -1,4 +1,4 @@
-import { Pool } from "@/hooks/usePools";
+import { Pool } from "@/lib/Pool";
 import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
@@ -19,7 +19,7 @@ export default function SinglePoolTokens(props: Props) {
         <PoolTokens tokens={props.pool.tokenNames} />
         <div>
           <p className="font-medium">{props.pool.poolName}</p>
-          <div className="flex flex-row text-xs font-medium text-zinc-500 text-white">
+          <div className="flex flex-row text-xs font-medium text-zinc-500 ">
             <p>{tokenAddressToToken(Object.keys(props.pool.tokens)[0])}</p>
 
             {Object.keys(props.pool.tokens)

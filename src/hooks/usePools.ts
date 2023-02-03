@@ -55,11 +55,12 @@ export function usePools(wallet) {
           });
 
           let custodyMetas = [];
+          console.log("testing custody accounts", custodyInfos);
 
           for (let token in tokenNames) {
-            let custody = tokens[getTokenAddress(token)]?.custodyAccount;
+            let custody = custodyInfos[getTokenAddress(token)]?.custodyAccount;
             let custodyOracleAccount =
-              pool.tokens[getTokenAddress(token)]?.oracleAccount;
+              custodyInfos[getTokenAddress(token)]?.oracleAccount;
 
             custodyMetas.push({
               pubkey: custody,
