@@ -1,9 +1,4 @@
-// export interface Pool {
-//   id: string;
-//   tokens: Token[];
-//   name: string;
-// }
-
+import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { Token } from "./Token";
 
@@ -13,6 +8,8 @@ export interface TokenCustody {
   mintAccount: PublicKey;
   oracleAccount: PublicKey;
   name: Token;
+  amount: BN;
+  decimals: number;
   // liquidity: number;
 }
 

@@ -36,7 +36,16 @@ export function usePools(wallet) {
               tokenAccount: custody.tokenAccount,
               mintAccount: custody.mint,
               oracleAccount: custody.oracle.oracleAccount,
+              amount: custody.assets.owned,
+              decimals: custody.decimals,
             };
+          });
+
+          fetchedCustodies.forEach((custody) => {
+            console.log(
+              "custody assets",
+              Number(custody.assets.owned) / 10 ** custody.decimals
+            );
           });
 
           let poolAddress = findProgramAddressSync(
@@ -76,11 +85,6 @@ export function usePools(wallet) {
               isWritable: false,
             });
           });
-
-          // for (let tokenName in tokenNames) {
-          //   console.log("tokenName name", tokenName);
-          // }
-          // console.log("use pool custodies", custodyMetas);
 
           poolInfos[pool.account.name] = {
             poolName: pool.account.name,

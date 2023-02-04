@@ -1,5 +1,11 @@
+import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { Pool } from "@/lib/Pool";
-import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
+import {
+  getTokenIcon,
+  getTokenLabel,
+  Token,
+  tokenAddressToToken,
+} from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 import { PoolTokens } from "../PoolTokens";
@@ -11,7 +17,7 @@ interface Props {
 }
 
 export default function SinglePoolTokens(props: Props) {
-  console.log("all tokens");
+  const stats = useDailyPriceStats();
 
   return (
     <div className="bg-zinc-900 p-4">
@@ -52,7 +58,8 @@ export default function SinglePoolTokens(props: Props) {
         </thead>
         <tbody>
           {Object.entries(props.pool.tokens).map(([tokenMint, custody]) => {
-            const icon = getTokenIcon(tokenAddressToToken(tokenMint));
+            const token = tokenAddressToToken(tokenMint);
+            const icon = getTokenIcon(token);
             return (
               <tr key={tokenMint}>
                 <td>
@@ -63,11 +70,13 @@ export default function SinglePoolTokens(props: Props) {
                     <div className="flex flex-col">
                       <p>{tokenAddressToToken(tokenMint)}</p>
                       <p className={twMerge("text-xs", "text-zinc-500")}>
-                        {getTokenLabel(tokenAddressToToken(tokenMint))}
+                        {getTokenLabel(token)}
                       </p>
                     </div>
                   </div>
                 </td>
+                <td>{Number(custody.amount) / 10 ** custody.decimals}</td>
+                <td>{stats[token].currentPrice}</td>
               </tr>
             );
           })}
@@ -76,27 +85,3 @@ export default function SinglePoolTokens(props: Props) {
     </div>
   );
 }
-
-// <>
-//   {custodies[pool.publicKey.toString()] &&
-//     custodies[pool.publicKey.toString()].map(function (custody) {
-//       let token = tokenAddressToToken(custody.mint.toString());
-
-//       return (
-//         <tr>
-//           <td>{pool.account.name}</td>
-//           <td>{pool.publicKey.toString()}</td>
-//           <td>{token}</td>
-//           <td>
-//             {stats[token].currentPrice *
-//               Number(custody.assets.owned)}
-//           </td>
-//           <td>{stats[token].currentPrice}</td>
-//           <td>{Number(custody.assets.owned)}</td>
-//           <td>Target Weight</td>
-//           <td>Utilization</td>
-//           <td>Fee</td>
-//         </tr>
-//       );
-//     })}
-// </>

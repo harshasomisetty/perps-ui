@@ -88,29 +88,8 @@ export default function LiquidityCard(props: Props) {
       tab === Tab.Remove ? liqAmount : 0
     );
 
-    // router.reload(window.location.pathname);
+    router.reload(window.location.pathname);
   }
-
-  // let addLiquidityTx = await perpetual_program.methods
-  //   .addLiquidity({ amount: tempAmount })
-  //   .accounts({
-  //     owner: publicKey,
-  //     fundingAccount, // user token account for custody token account
-  //     lpTokenAccount,
-  //     transferAuthority: transferAuthorityAddress,
-  //     perpetuals: perpetualsAddress,
-  //     pool: pool.poolAddress,
-  //     custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-  //     custodyOracleAccount:
-  //       pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-  //     custodyTokenAccount:
-  //       pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
-  //     lpTokenMint: pool.lpTokenMint,
-  //     tokenProgram: TOKEN_PROGRAM_ID,
-  //   })
-  //   .remainingAccounts(pool.custodyMetas)
-  //   .transaction();
-
   return (
     <div className={props.className}>
       <div

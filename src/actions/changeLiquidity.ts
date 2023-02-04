@@ -32,8 +32,6 @@ export async function changeLiquidity(
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
-  // let tempAmount = new BN(1 * LAMPORTS_PER_SOL);
-
   let lpTokenAccount = await getAssociatedTokenAddress(
     pool.lpTokenMint,
     publicKey
@@ -60,12 +58,12 @@ export async function changeLiquidity(
 
     console.log("custodies", pool.custodyMetas);
     if (tokenAmount) {
-      console.log("in add liq");
+      console.log("in add liq", tokenAmount);
       let amount;
       if (payToken === Token.SOL) {
         amount = new BN(tokenAmount * LAMPORTS_PER_SOL);
       } else {
-        amount = new BN(tokenAmount);
+        amount = new BN(tokenAmount * 10e5);
       }
       let addLiquidityTx = await perpetual_program.methods
         .addLiquidity({ amount })
@@ -89,7 +87,7 @@ export async function changeLiquidity(
       transaction = transaction.add(addLiquidityTx);
     } else {
       console.log("in remove liq", liquidityAmount);
-      let lpAmount = new BN(liquidityAmount);
+      let lpAmount = new BN(liquidityAmount * 10e6);
       console.log("lpAmount", lpAmount.toString());
       let removeLiquidityTx = await perpetual_program.methods
         .removeLiquidity({ lpAmount })
