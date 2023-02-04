@@ -18,8 +18,8 @@ export default function PoolModal(props: Props) {
         X
       </div>
       <div className="flex flex-row">
-        <LiquidityCard pool={props.pool} />
-        <SinglePoolTokens pool={props.pool} />
+        <LiquidityCard pool={props.pool!} />
+        <SinglePoolTokens pool={props.pool!} />
       </div>
     </div>
   );

@@ -55,25 +55,32 @@ export function usePools(wallet) {
           });
 
           let custodyMetas = [];
-          console.log("testing custody accounts", custodyInfos);
 
-          for (let token in tokenNames) {
-            let custody = custodyInfos[getTokenAddress(token)]?.custodyAccount;
-            let custodyOracleAccount =
-              custodyInfos[getTokenAddress(token)]?.oracleAccount;
+          tokenNames.forEach((tokenName) => {
+            let custody =
+              custodyInfos[getTokenAddress(tokenName)]?.custodyAccount;
 
             custodyMetas.push({
               pubkey: custody,
               isSigner: false,
               isWritable: false,
             });
+          });
 
+          tokenNames.forEach((tokenName) => {
+            let custodyOracleAccount =
+              custodyInfos[getTokenAddress(tokenName)]?.oracleAccount;
             custodyMetas.push({
               pubkey: custodyOracleAccount,
               isSigner: false,
               isWritable: false,
             });
-          }
+          });
+
+          // for (let tokenName in tokenNames) {
+          //   console.log("tokenName name", tokenName);
+          // }
+          // console.log("use pool custodies", custodyMetas);
 
           poolInfos[pool.account.name] = {
             poolName: pool.account.name,
