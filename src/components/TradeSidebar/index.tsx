@@ -4,14 +4,13 @@ import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 
 import { SidebarTab } from "../SidebarTab";
-import { TradeLong } from "@/components/TradeSidebar/TradeLong";
-import { TradeShort } from "@/components/TradeSidebar/TradeShort";
 import { TradeSwap } from "@/components/TradeSidebar/TradeSwap";
+import { TradePosition } from "./TradePosition";
 
-enum Tab {
-  Long,
-  Short,
-  Swap,
+export enum Tab {
+  Long = "Long",
+  Short = "Short",
+  Swap = "Swap",
 }
 
 interface Props {
@@ -50,8 +49,10 @@ export function TradeSidebar(props: Props) {
             <div>Swap</div>
           </SidebarTab>
         </div>
-        {tab === Tab.Long && <TradeLong className="mt-6" />}
-        {tab === Tab.Short && <TradeShort className="mt-6" />}
+        {tab === Tab.Long && <TradePosition className="mt-6" side={Tab.Long} />}
+        {tab === Tab.Short && (
+          <TradePosition className="mt-6" side={Tab.Short} />
+        )}
         {tab === Tab.Swap && <TradeSwap className="mt-6" />}
       </div>
     </div>

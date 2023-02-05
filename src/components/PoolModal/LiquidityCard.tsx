@@ -6,13 +6,13 @@ import { TokenSelector } from "@/components/TokenSelector";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
-import { Pool, usePools } from "@/hooks/usePools";
 import { SidebarTab } from "../SidebarTab";
 
 import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
 import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
+import { Pool } from "@/lib/Pool";
 
 interface Props {
   className?: string;

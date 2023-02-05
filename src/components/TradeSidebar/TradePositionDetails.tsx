@@ -2,6 +2,7 @@ import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { Token, getTokenIcon } from "@/lib/Token";
+import { Tab } from ".";
 
 function formatPrice(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -26,15 +27,16 @@ interface Props {
   entryPrice: number;
   exitPrice: number;
   token: Token;
+  side: Tab;
 }
 
-export function TradeLongDetails(props: Props) {
+export function TradePositionDetails(props: Props) {
   const icon = getTokenIcon(props.token);
 
   return (
     <div className={props.className}>
       <header className="mb-4 flex items-center">
-        <div className="text-sm font-medium text-white">Long</div>
+        <div className="text-sm font-medium text-white">{props.side}</div>
         {cloneElement(icon, {
           className: twMerge(icon.props.className, "h-4", "ml-1.5", "w-4"),
         })}

@@ -20,7 +20,7 @@ export interface CustodyMeta {
 }
 
 export interface Pool {
-  name: string;
+  poolName: string;
   poolAddress: PublicKey;
   lpTokenMint: PublicKey;
   tokens: Record<string, TokenCustody>; // string is token mint address

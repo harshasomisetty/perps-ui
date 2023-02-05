@@ -86,13 +86,15 @@ export function usePools(wallet) {
             });
           });
 
+          let lpTokenMint = findProgramAddressSync(
+            ["lp_token_mint", poolAddress.toBuffer()],
+            perpetual_program.programId
+          )[0];
+
           poolInfos[pool.account.name] = {
             poolName: pool.account.name,
             poolAddress: poolAddress,
-            lpTokenMint: findProgramAddressSync(
-              ["lp_token_mint", poolAddress.toBuffer()],
-              perpetual_program.programId
-            )[0],
+            lpTokenMint,
             tokens: custodyInfos,
             tokenNames,
             custodyMetas,
