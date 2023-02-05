@@ -1,5 +1,4 @@
 import { Pool } from "@/lib/Pool";
-import { Side } from "@/lib/Position";
 import { getTokenAddress, Token } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
@@ -24,25 +23,7 @@ import {
   Transaction,
 } from "@solana/web3.js";
 
-// let findProgramAddress = async (label: string, extraSeeds = null) => {
-//   let seeds = [Buffer.from(label)];
-//   if (extraSeeds) {
-//     for (let extraSeed of extraSeeds) {
-//       if (typeof extraSeed === "string") {
-//         seeds.push(Buffer.from(anchor.utils.bytes.utf8.encode(extraSeed)));
-//       } else if (Array.isArray(extraSeed)) {
-//         seeds.push(Buffer.from(extraSeed));
-//       } else {
-//         console.log("extra seed", extraSeed);
-//         seeds.push(extraSeed.toBuffer());
-//       }
-//     }
-//   }
-//   let res = await PublicKey.findProgramAddress(seeds, PERPETUALS_PROGRAM_ID);
-//   return { publicKey: res[0], bump: res[1] };
-// };
-
-export async function openPosition(
+export async function closePosition(
   pool: Pool,
   wallet: Wallet,
   publicKey: PublicKey,
@@ -50,20 +31,9 @@ export async function openPosition(
   connection: Connection,
   payToken: Token,
   positionToken: Token,
-  payAmount: BN,
-  positionAmount: BN,
-  price: BN,
-  side: Side
+  price: BN
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
-
-  console.log(
-    "inputs",
-    Number(payAmount),
-    Number(positionAmount),
-    Number(price),
-    side.toString()
-  );
 
   console.log("pool", pool);
 
@@ -89,11 +59,11 @@ export async function openPosition(
     perpetual_program.programId
   )[0];
 
-  console.log(
-    "left and right",
-    positionAccount.toString(),
-    "ALxjVHPdhi7LCoVc2CUbVvPFmnWWCcnNcNAQ4emPg2tz"
-  );
+  //   console.log(
+  //     "left and right",
+  //     positionAccount.toString(),
+  //     "ALxjVHPdhi7LCoVc2CUbVvPFmnWWCcnNcNAQ4emPg2tz"
+  //   );
 
   let transaction = new Transaction();
 
@@ -112,15 +82,12 @@ export async function openPosition(
     console.log("position account", positionAccount.toString());
 
     let tx = await perpetual_program.methods
-      .openPosition({
+      .closePosition({
         price,
-        collateral: payAmount,
-        size: positionAmount,
-        side: { long: {} },
       })
       .accounts({
         owner: publicKey,
-        fundingAccount: userCustodyTokenAccount,
+        receivingAccount: userCustodyTokenAccount,
         transferAuthority: transferAuthorityAddress,
         perpetuals: perpetualsAddress,
         pool: pool.poolAddress,
@@ -130,13 +97,12 @@ export async function openPosition(
           pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
         custodyTokenAccount:
           pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
-        systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .transaction();
     transaction = transaction.add(tx);
 
-    console.log("open position tx", transaction);
+    console.log("close position tx", transaction);
     console.log("tx keys");
     for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
       console.log(

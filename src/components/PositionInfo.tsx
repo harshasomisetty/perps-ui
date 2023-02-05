@@ -25,7 +25,10 @@ interface Props {
 }
 
 export function PositionInfo(props: Props) {
+  console.log("position info props", props);
   const tokenIcon = getTokenIcon(props.position.token);
+
+  console.log("tokenicon", tokenIcon);
 
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>

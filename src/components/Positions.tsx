@@ -6,13 +6,17 @@ import { LoadingDots } from "./LoadingDots";
 import { Position } from "./Position";
 import { PositionColumn } from "./PositionColumn";
 import { PoolTokens } from "./PoolTokens";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface Props {
   className?: string;
 }
 
 export function Positions(props: Props) {
-  const positions = usePositions();
+  const { wallet } = useWallet();
+  const positions = usePositions(wallet);
+
+  console.log("componenets positions", positions);
 
   return (
     <div className={props.className}>

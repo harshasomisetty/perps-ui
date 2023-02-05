@@ -28,8 +28,8 @@ export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
   const [positionToken, setPositionToken] = useState(Token.SOL);
 
-  const [payAmount, setPayAmount] = useState(0.1);
-  const [positionAmount, setPositionAmount] = useState(0.2);
+  const [payAmount, setPayAmount] = useState(0.05);
+  const [positionAmount, setPositionAmount] = useState(0.1);
 
   const [leverage, setLeverage] = useState(1);
 
