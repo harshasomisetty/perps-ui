@@ -1,17 +1,18 @@
 import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 
-import { Position } from "@/hooks/usePositions";
 import { PositionInfo } from "./PositionInfo";
 import { PositionAdditionalInfo } from "./PositionAdditionalInfo";
+import { Position } from "@/lib/Position";
 
 interface Props {
   className?: string;
   position: Position;
 }
 
-export function Position(props: Props) {
+export function SinglePosition(props: Props) {
   const [expanded, setExpanded] = useState(false);
+  console.log("position props", props);
 
   return (
     <div className={twMerge(expanded && "bg-zinc-800", props.className)}>

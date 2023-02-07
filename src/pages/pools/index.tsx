@@ -1,31 +1,19 @@
-import React, { useState, useEffect } from "react";
-import {
-  getPerpetualProgramAndProvider,
-  PERPETUALS_PROGRAM_ID,
-} from "@/utils/constants";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { ProgramAccount } from "@project-serum/anchor";
-import {
-  tokenAddressToToken,
-  useDailyPriceStats,
-} from "@/hooks/useDailyPriceStats";
-import { Pool, usePools } from "@/hooks/usePools";
+import { useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
 import PoolModal from "@/components/PoolModal";
-
-// create starter react page
+import { Pool } from "@/lib/Pool";
+import { PoolHeader } from "@/components/PoolHeader";
+import { useRouter } from "next/router";
 
 export default function Pools() {
-  const { wallet, publicKey } = useWallet();
-  const { connection } = useConnection();
-
-  const stats = useDailyPriceStats();
+  const { wallet } = useWallet();
   const { pools } = usePools(wallet);
+  const router = useRouter();
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
 
-  // console.log("pools", pools);
 
   if (!pools) {
     return <p className="text-white">Loading...</p>;
@@ -40,15 +28,13 @@ export default function Pools() {
       {selectedPool && (
         <PoolModal pool={selectedPool} setPool={setSelectedPool} />
       )}
-      <table className={twMerge("table-auto", "text-white")}>
+      <table className={twMerge("table-auto", "text-white", "w-full")}>
         <thead
           className={twMerge(
             "text-xs",
             "text-zinc-500",
             "border-b",
-            "border-zinc-700",
-            "flex",
-            "items-center"
+            "border-zinc-700"
           )}
         >
           <tr>
@@ -67,9 +53,11 @@ export default function Pools() {
             <tr
               className="cursor-pointer"
               key={poolName}
-              onClick={() => setSelectedPool(selectedPool ? null : pool)}
+              onClick={() => router.push(`/pools/${poolName}`)}
             >
-              <td>{poolName}</td>
+              <td>
+                <PoolHeader pool={pool} iconClassName="w-10 h-10" />
+              </td>
             </tr>
           ))}
         </tbody>

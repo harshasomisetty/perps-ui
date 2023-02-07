@@ -2,17 +2,21 @@ import { twMerge } from "tailwind-merge";
 
 import { usePositions } from "@/hooks/usePositions";
 
-import { LoadingDots } from "./LoadingDots";
-import { Position } from "./Position";
+import { LoadingDots } from "../LoadingDots";
+import { SinglePosition } from "./SinglePosition";
 import { PositionColumn } from "./PositionColumn";
-import { PoolTokens } from "./PoolTokens";
+import { PoolTokens } from "../PoolTokens";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface Props {
   className?: string;
 }
 
 export function Positions(props: Props) {
-  const positions = usePositions();
+  const { wallet } = useWallet();
+  const positions = usePositions(wallet);
+
+  console.log("componenets positions", positions);
 
   return (
     <div className={props.className}>
@@ -54,7 +58,7 @@ export function Positions(props: Props) {
               <PositionColumn num={7}>Liq. Price</PositionColumn>
             </div>
             {pool.positions.map((position, i) => (
-              <Position
+              <SinglePosition
                 className={twMerge(
                   "border-zinc-700",
                   i < pool.positions.length - 1 && "border-b"
