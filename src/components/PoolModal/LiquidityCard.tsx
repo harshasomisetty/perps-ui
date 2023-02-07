@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
 import { TokenSelector } from "@/components/TokenSelector";
+
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { SidebarTab } from "../SidebarTab";
 
@@ -42,6 +43,7 @@ export default function LiquidityCard(props: Props) {
 
   useEffect(() => {
     async function fetchData() {
+
       let tokenBalance = await fetchTokenBalance(
         payToken,
         publicKey,

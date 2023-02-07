@@ -45,17 +45,20 @@ export function PoolSelector(props: Props) {
           {props.pool.poolName}
         </div>
         <div
+
           className={twMerge(
-            "border-zinc-700",
-            "border",
+            "bg-zinc-900",
+            "gap-x-1",
+            "grid-cols-[24px,1fr,24px]",
             "grid",
-            "h-6",
-            "place-items-center",
-            "rounded-full",
-            "transition-all",
-            "w-6",
-            "group-hover:border-white",
-            open && "-rotate-180"
+            "group",
+            "h-11",
+            "items-center",
+            "px-4",
+            "rounded",
+            "text-left",
+            "w-full",
+            props.className
           )}
         >
           <ChevronDownIcon className="h-4 w-4 fill-white" />

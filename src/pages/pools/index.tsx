@@ -14,6 +14,7 @@ export default function Pools() {
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
 
+
   if (!pools) {
     return <p className="text-white">Loading...</p>;
   }
