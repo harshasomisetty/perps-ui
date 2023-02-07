@@ -4,12 +4,13 @@ import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
 import PoolModal from "@/components/PoolModal";
 import { Pool } from "@/lib/Pool";
+import { PoolHeader } from "@/components/PoolHeader";
+import { useRouter } from "next/router";
 
 export default function Pools() {
   const { wallet } = useWallet();
-
-  // const stats = useDailyPriceStats();
   const { pools } = usePools(wallet);
+  const router = useRouter();
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
 
@@ -26,15 +27,13 @@ export default function Pools() {
       {selectedPool && (
         <PoolModal pool={selectedPool} setPool={setSelectedPool} />
       )}
-      <table className={twMerge("table-auto", "text-white")}>
+      <table className={twMerge("table-auto", "text-white", "w-full")}>
         <thead
           className={twMerge(
             "text-xs",
             "text-zinc-500",
             "border-b",
-            "border-zinc-700",
-            "flex",
-            "items-center"
+            "border-zinc-700"
           )}
         >
           <tr>
@@ -53,9 +52,11 @@ export default function Pools() {
             <tr
               className="cursor-pointer"
               key={poolName}
-              onClick={() => setSelectedPool(selectedPool ? null : pool)}
+              onClick={() => router.push(`/pools/${poolName}`)}
             >
-              <td>{poolName}</td>
+              <td>
+                <PoolHeader pool={pool} iconClassName="w-10 h-10" />
+              </td>
             </tr>
           ))}
         </tbody>

@@ -71,13 +71,6 @@ export function TradePosition(props: Props) {
     setPositionToken(asToken(pair.split("-")[0]));
   }, [pair]);
 
-  // useEffect(() => {
-  //   console.log("use effect pool", pools);
-  //   if (pools && Object.values(pools).length > 0) {
-  //     setPool(Object.values(pools)[0].tokens);
-  //   }
-  // }, [pools]);
-
   const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
 

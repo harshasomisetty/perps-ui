@@ -17,14 +17,13 @@ export function PoolTokens(props: Props) {
         return cloneElement(tokenIcon, {
           className: twMerge(
             tokenIcon.props.className,
+            props.className,
             "border-black",
             "border",
             "rounded-full",
-            "h-4",
-            "relative",
-            "w-4"
+            "relative"
           ),
-          style: { zIndex: 3 - i },
+          style: { zIndex: 3 },
           key: token,
         });
       })}
