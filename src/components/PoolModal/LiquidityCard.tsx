@@ -13,6 +13,7 @@ import Subtract from "@carbon/icons-react/lib/Subtract";
 import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
 import { Pool } from "@/lib/Pool";
+import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
 
 interface Props {
   className?: string;
@@ -47,28 +48,21 @@ export default function LiquidityCard(props: Props) {
 
   useEffect(() => {
     async function fetchData() {
-      if (payToken === Token.SOL) {
-        let balance = await connection.getBalance(publicKey);
-        setPayTokenBalance(balance / LAMPORTS_PER_SOL);
-        // get wrapped sol balance
-      } else {
-        let bro = await getAssociatedTokenAddress(
-          new PublicKey(getTokenAddress(payToken)),
-          publicKey
-        );
-
-        console.log("bro", bro.toString());
-        let balance = await connection.getTokenAccountBalance(bro);
-        setPayTokenBalance(balance.value.uiAmount);
-      }
-
-      let lpTokenAccount = await getAssociatedTokenAddress(
-        props.pool.lpTokenMint,
-        publicKey
+      let tokenBalance = await fetchTokenBalance(
+        payToken,
+        publicKey,
+        connection
       );
-      let balance = await connection.getTokenAccountBalance(lpTokenAccount);
-      console.log("lp balalnce", balance.value.uiAmount);
-      setLiqBalance(balance.value.uiAmount);
+
+      setPayTokenBalance(tokenBalance);
+
+      let lpBalance = await fetchLPBalance(
+        props.pool.lpTokenMint,
+        publicKey,
+        connection
+      );
+
+      setLiqBalance(lpBalance);
     }
     if (wallet && publicKey) {
       fetchData();

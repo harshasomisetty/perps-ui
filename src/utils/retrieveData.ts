@@ -1,4 +1,6 @@
-import { Connection, PublicKey } from "@solana/web3.js";
+import { getTokenAddress, Token } from "@/lib/Token";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 export async function checkIfAccountExists(
   account: PublicKey,
@@ -10,5 +12,42 @@ export async function checkIfAccountExists(
     return true;
   } else {
     return false;
+  }
+}
+
+export async function fetchTokenBalance(
+  payToken: Token,
+  publicKey: PublicKey,
+  connection: Connection
+): Promise<number> {
+  console.log("fetching balance for token", payToken);
+
+  let tokenATA = await getAssociatedTokenAddress(
+    new PublicKey(getTokenAddress(payToken)),
+    publicKey
+  );
+
+  let balance = (await connection.getTokenAccountBalance(tokenATA)).value
+    .uiAmount;
+
+  if (payToken === Token.SOL) {
+    let solBalance = await connection.getBalance(publicKey);
+    balance = balance + solBalance / LAMPORTS_PER_SOL;
+  }
+
+  return balance;
+}
+
+export async function fetchLPBalance(
+  address: PublicKey,
+  publicKey: PublicKey,
+  connection: Connection
+): Promise<number> {
+  let lpTokenAccount = await getAssociatedTokenAddress(address, publicKey);
+  if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
+    return 0;
+  } else {
+    let balance = await connection.getTokenAccountBalance(lpTokenAccount);
+    return balance.value.uiAmount;
   }
 }

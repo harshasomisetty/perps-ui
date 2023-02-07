@@ -10,22 +10,18 @@ import {
   tokenAddressToToken,
   useDailyPriceStats,
 } from "@/hooks/useDailyPriceStats";
-import { Pool, usePools } from "@/hooks/usePools";
+import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
 import PoolModal from "@/components/PoolModal";
-
-// create starter react page
+import { Pool } from "@/lib/Pool";
 
 export default function Pools() {
-  const { wallet, publicKey } = useWallet();
-  const { connection } = useConnection();
+  const { wallet } = useWallet();
 
-  const stats = useDailyPriceStats();
+  // const stats = useDailyPriceStats();
   const { pools } = usePools(wallet);
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
-
-  // console.log("pools", pools);
 
   if (!pools) {
     return <p className="text-white">Loading...</p>;
