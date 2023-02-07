@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 
 import { Token, getTokenIcon, getTokenLabel } from "@/lib/Token";
 
-import { TokenSelectorList } from "./TokenSelectorList";
+import { TokenSelectorList } from "../TokenSelectorList";
 
 interface Props {
   className?: string;

@@ -20,6 +20,7 @@ interface Props {
   token: Token;
   onChangeAmount?(amount: number): void;
   onSelectToken?(token: Token): void;
+  tokenList?: Token[];
 }
 
 export function TokenSelector(props: Props) {
@@ -83,6 +84,7 @@ export function TokenSelector(props: Props) {
         <TokenSelectorList
           onClose={() => setSelectorOpen(false)}
           onSelectToken={props.onSelectToken}
+          tokenList={props.tokenList}
         />
       )}
     </>

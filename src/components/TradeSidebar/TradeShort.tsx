@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token } from "@/lib/Token";
+import { asToken, Token } from "@/lib/Token";
 
-import { TokenSelector } from "./TokenSelector";
-import { LeverageSlider } from "./LeverageSlider";
+import { TokenSelector } from "../TokenSelector";
+import { LeverageSlider } from "../LeverageSlider";
 import { TradeDetails } from "./TradeDetails";
-import { SolidButton } from "./SolidButton";
-import { TradeLongDetails } from "./TradeLongDetails";
-import { PoolSelector } from "./PoolSelector";
+import { SolidButton } from "../SolidButton";
+import { TradeShortDetails } from "./TradeShortDetails";
+import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
 
 const PLACEHOLDER_POOLS = [
@@ -34,19 +34,32 @@ interface Props {
   className?: string;
 }
 
-export function TradeLong(props: Props) {
+export function TradeShort(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
   const [payAmount, setPayAmount] = useState(0);
-  const [longToken, setLongToken] = useState(Token.SOL);
-  const [longAmount, setLongAmount] = useState(0);
+  const [shortToken, setShortToken] = useState(Token.SOL);
+  const [shortAmount, setShortAmount] = useState(0);
   const [leverage, setLeverage] = useState(1);
   const [selectedPoolId, setSelectedPoolId] = useState("1");
 
   const allPriceStats = useDailyPriceStats();
   const router = useRouter();
 
+  const { pair } = router.query;
+
+  useEffect(() => {
+    if (!pair) {
+      return;
+    }
+    setShortToken(asToken(pair.split("-")[0]));
+  }, [pair]);
+
   const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
+
+  if (!pair) {
+    return <></>;
+  }
 
   return (
     <div className={props.className}>
@@ -63,21 +76,16 @@ export function TradeLong(props: Props) {
       <div className="mt-4 text-sm font-medium text-white">Your Long</div>
       <TokenSelector
         className="mt-2"
-        amount={longAmount}
-        token={longToken}
-        onChangeAmount={setLongAmount}
+        amount={shortAmount}
+        token={shortToken}
+        onChangeAmount={setShortAmount}
         onSelectToken={(token) => {
-          setLongToken(token);
+          setShortToken(token);
           router.push("/trade/" + token + "-USD");
         }}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
-      <PoolSelector
-        className="mt-2"
-        pools={PLACEHOLDER_POOLS}
-        selectedPoolId={selectedPoolId}
-        onSelect={(pool) => setSelectedPoolId(pool.id)}
-      />
+      <PoolSelector className="mt-2" />
       <LeverageSlider
         className="mt-6"
         value={leverage}
@@ -91,7 +99,7 @@ export function TradeLong(props: Props) {
         liquidationPrice={liquidationPrice}
         fees={0.05}
       />
-      <TradeLongDetails
+      <TradeShortDetails
         availableLiquidity={3871943.82}
         borrowFee={0.0052}
         className={twMerge(
@@ -105,7 +113,7 @@ export function TradeLong(props: Props) {
         )}
         entryPrice={16.4}
         exitPrice={16.4}
-        token={longToken}
+        token={shortToken}
       />
     </div>
   );

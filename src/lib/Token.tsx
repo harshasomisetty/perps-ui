@@ -1,11 +1,12 @@
-import { SolanaIconCircle } from "@/components/SolanaIconCircle";
-import { UsdcIconCircle } from "@/components/UsdcIconCircle";
-import { MSolIconCircle } from "@/components/MSolIconCircle";
-import { STSolIconCircle } from "@/components/STSolIconCircle";
-import { RayIconCircle } from "@/components/RayIconCircle";
-import { UsdtIconCircle } from "@/components/UsdtIconCircle";
-import { OrcaIconCircle } from "@/components/OrcaIconCircle";
-import { BonkIconCircle } from "@/components/BonkIconCircle";
+import { SolanaIconCircle } from "@/components/Icons/SolanaIconCircle";
+import { UsdcIconCircle } from "@/components/Icons/UsdcIconCircle";
+import { MSolIconCircle } from "@/components/Icons/MSolIconCircle";
+import { STSolIconCircle } from "@/components/Icons/STSolIconCircle";
+import { RayIconCircle } from "@/components/Icons/RayIconCircle";
+import { UsdtIconCircle } from "@/components/Icons/UsdtIconCircle";
+import { OrcaIconCircle } from "@/components/Icons/OrcaIconCircle";
+import { BonkIconCircle } from "@/components/Icons/BonkIconCircle";
+import { Pool } from "@/hooks/usePools";
 
 export enum Token {
   SOL = "SOL",
@@ -62,6 +63,27 @@ export function getTokenLabel(token: Token) {
   }
 }
 
+export function getSymbol(token: Token) {
+  switch (token) {
+    case Token.Bonk:
+      return "BONKUSDT";
+    case Token.ORCA:
+      return "ORCAUSD";
+    case Token.RAY:
+      return "RAYUSD";
+    case Token.SOL:
+      return "SOLUSD";
+    case Token.USDC:
+      return "USDCUSD";
+    case Token.USDT:
+      return "USDTUSD";
+    case Token.mSOL:
+      return "MSOLUSD";
+    case Token.stSOL:
+      return "STSOLUSDT";
+  }
+}
+
 export function getTokenIcon(token: Token) {
   switch (token) {
     case Token.SOL:
@@ -80,5 +102,72 @@ export function getTokenIcon(token: Token) {
       return <OrcaIconCircle />;
     case Token.Bonk:
       return <BonkIconCircle />;
+  }
+}
+
+export function getTokenId(token: Token) {
+  switch (token) {
+    case Token.SOL:
+      return "solana";
+    case Token.mSOL:
+      return "msol";
+    case Token.stSOL:
+      return "lido-staked-sol";
+    case Token.USDC:
+      return "usd-coin";
+    case Token.USDT:
+      return "tether";
+    case Token.RAY:
+      return "raydium";
+    case Token.ORCA:
+      return "orca";
+    case Token.Bonk:
+      return "bonk";
+  }
+}
+
+export function tokenAddressToToken(address: string) {
+  switch (address) {
+    case "So11111111111111111111111111111111111111112":
+      return Token.SOL;
+    case "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So":
+      return Token.mSOL;
+    case "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj":
+      return Token.stSOL;
+    // case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
+    case "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr":
+      return Token.USDC;
+    case "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":
+      return Token.USDT;
+    case "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R":
+      return Token.RAY;
+    case "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE":
+      return Token.ORCA;
+    case "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263":
+      return Token.Bonk;
+    default:
+      return null;
+  }
+}
+
+export function getTokenAddress(token: Token) {
+  switch (token) {
+    case Token.SOL:
+      return "So11111111111111111111111111111111111111112";
+    case Token.mSOL:
+      return "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So";
+    case Token.stSOL:
+      return "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj";
+    case Token.USDC:
+      // return "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+      return "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr";
+    case Token.USDT:
+      return "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
+    case Token.RAY:
+      return "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R";
+    case Token.ORCA:
+      return "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE";
+    case Token.Bonk:
+      return "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263";
   }
 }

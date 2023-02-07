@@ -3,10 +3,10 @@ import { useState } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 
-import { SidebarTab } from "./SidebarTab";
-import { TradeLong } from "./TradeLong";
-import { TradeShort } from "./TradeShort";
-import { TradeSwap } from "./TradeSwap";
+import { SidebarTab } from "../SidebarTab";
+import { TradeLong } from "@/components/TradeSidebar/TradeLong";
+import { TradeShort } from "@/components/TradeSidebar/TradeShort";
+import { TradeSwap } from "@/components/TradeSidebar/TradeSwap";
 
 enum Tab {
   Long,

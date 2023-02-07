@@ -17,6 +17,7 @@ interface Props {
   className?: string;
   onClose?(): void;
   onSelectToken?(token: Token): void;
+  tokenList?: Token[];
 }
 
 export function TokenSelectorList(props: Props) {
@@ -38,7 +39,7 @@ export function TokenSelectorList(props: Props) {
           </button>
         </header>
         <div className="mt-6">
-          {TOKEN_LIST.map((token) => {
+          {(props.tokenList ? props.tokenList : TOKEN_LIST).map((token) => {
             const icon = getTokenIcon(token);
 
             return (
