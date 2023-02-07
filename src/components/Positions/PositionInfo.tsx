@@ -4,10 +4,10 @@ import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 
-import { Position } from "@/hooks/usePositions";
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
+import { Position } from "@/lib/Position";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {

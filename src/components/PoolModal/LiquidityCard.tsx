@@ -1,11 +1,9 @@
-import { getTokenAddress, Token, tokenAddressToToken } from "@/lib/Token";
+import { Token, tokenAddressToToken } from "@/lib/Token";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
 import { TokenSelector } from "@/components/TokenSelector";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { SidebarTab } from "../SidebarTab";
 
 import Add from "@carbon/icons-react/lib/Add";
@@ -18,10 +16,6 @@ import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
 interface Props {
   className?: string;
   pool: Pool;
-  //   amount: number;
-  //   token: Token;
-  //   onChangeAmount?(amount: number): void;
-  //   onSelectToken?(token: Token): void;
 }
 
 enum Tab {

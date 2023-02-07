@@ -1,15 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  getPerpetualProgramAndProvider,
-  PERPETUALS_PROGRAM_ID,
-} from "@/utils/constants";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { ProgramAccount } from "@project-serum/anchor";
-import {
-  tokenAddressToToken,
-  useDailyPriceStats,
-} from "@/hooks/useDailyPriceStats";
+import { useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
 import PoolModal from "@/components/PoolModal";

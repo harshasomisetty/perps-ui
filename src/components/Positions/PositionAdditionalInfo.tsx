@@ -1,17 +1,16 @@
-import { twMerge } from "tailwind-merge";
-import { format } from "date-fns";
-import CloseIcon from "@carbon/icons-react/lib/Close";
-import EditIcon from "@carbon/icons-react/lib/Edit";
-
-import { Position } from "@/hooks/usePositions";
-import { SolidButton } from "./SolidButton";
-import { PositionValueDelta } from "./PositionValueDelta";
-import { closePosition } from "src/actions/closePosition";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { BN } from "@project-serum/anchor";
-import { useState } from "react";
 import { usePools } from "@/hooks/usePools";
 import { Pool } from "@/lib/Pool";
+import { Position } from "@/lib/Position";
+import CloseIcon from "@carbon/icons-react/lib/Close";
+import EditIcon from "@carbon/icons-react/lib/Edit";
+import { BN } from "@project-serum/anchor";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { format } from "date-fns";
+import { useState } from "react";
+import { closePosition } from "src/actions/closePosition";
+import { twMerge } from "tailwind-merge";
+import { PositionValueDelta } from "./PositionValueDelta";
+import { SolidButton } from "../SolidButton";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
