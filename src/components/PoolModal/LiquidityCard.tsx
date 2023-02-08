@@ -13,6 +13,7 @@ import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
 import { Pool } from "@/lib/Pool";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
+import router from "next/router";
 
 interface Props {
   className?: string;
@@ -43,10 +44,9 @@ export default function LiquidityCard(props: Props) {
 
   useEffect(() => {
     async function fetchData() {
-
       let tokenBalance = await fetchTokenBalance(
         payToken,
-        publicKey,
+        publicKey!,
         connection
       );
 
@@ -54,22 +54,20 @@ export default function LiquidityCard(props: Props) {
 
       let lpBalance = await fetchLPBalance(
         props.pool.lpTokenMint,
-        publicKey,
+        publicKey!,
         connection
       );
 
       setLiqBalance(lpBalance);
     }
-    if (wallet && publicKey) {
-      fetchData();
-    }
+    fetchData();
   }, [payToken]);
 
   async function changeLiq() {
     console.log("before change", tab === Tab.Remove, liqAmount);
     await changeLiquidity(
       props.pool,
-      wallet,
+      wallet!,
       publicKey,
       signTransaction,
       connection,

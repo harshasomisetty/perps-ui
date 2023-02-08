@@ -7,12 +7,14 @@ import {
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
-import { BN, Wallet } from "@project-serum/anchor";
+import { BN } from "@project-serum/anchor";
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
+import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
+import { Wallet } from "@solana/wallet-adapter-react";
 import {
   Connection,
   LAMPORTS_PER_SOL,
@@ -24,7 +26,7 @@ export async function changeLiquidity(
   pool: Pool,
   wallet: Wallet,
   publicKey: PublicKey,
-  signTransaction,
+  signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
   payToken: Token,
   tokenAmount?: number,
@@ -38,7 +40,7 @@ export async function changeLiquidity(
   );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]?.mintAccount,
+    pool.tokens[getTokenAddress(payToken)]?.mintAccount!,
     publicKey
   );
 
@@ -85,7 +87,8 @@ export async function changeLiquidity(
         .remainingAccounts(pool.custodyMetas)
         .transaction();
       transaction = transaction.add(addLiquidityTx);
-    } else {
+    }
+    if (liquidityAmount) {
       console.log("in remove liq", liquidityAmount);
       let lpAmount = new BN(liquidityAmount * 10e6);
       console.log("lpAmount", lpAmount.toString());
@@ -113,14 +116,16 @@ export async function changeLiquidity(
 
     console.log("add liquidity tx", transaction);
     console.log("tx keys");
-    for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
-      console.log(
-        "key",
-        i,
-        transaction.instructions[0].keys[i]?.pubkey.toString()
-      );
-    }
 
+    if (transaction.instructions.length > 0) {
+      for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
+        console.log(
+          "key",
+          i,
+          transaction.instructions[0]!.keys[i]?.pubkey.toString()
+        );
+      }
+    }
     await manualSendTransaction(
       transaction,
       publicKey,
