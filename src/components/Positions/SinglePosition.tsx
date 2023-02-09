@@ -12,7 +12,6 @@ interface Props {
 
 export function SinglePosition(props: Props) {
   const [expanded, setExpanded] = useState(false);
-  console.log("position props", props);
 
   return (
     <div className={twMerge(expanded && "bg-zinc-800", props.className)}>

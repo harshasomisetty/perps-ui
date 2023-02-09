@@ -18,6 +18,9 @@ import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { token } from "@metaplex-foundation/js";
+import { fetchTokenBalance } from "@/utils/retrieveData";
+import { LoadingDots } from "../LoadingDots";
 
 interface Props {
   className?: string;
@@ -27,6 +30,7 @@ interface Props {
 export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
   const [positionToken, setPositionToken] = useState(Token.SOL);
+  const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
 
   const [payAmount, setPayAmount] = useState(0.05);
   const [positionAmount, setPositionAmount] = useState(0.1);
@@ -36,7 +40,7 @@ export function TradePosition(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
 
-  const { pools } = usePools(wallet);
+  const { pools } = usePools();
   const [pool, setPool] = useState<Pool | null>(null);
 
   const allPriceStats = useDailyPriceStats();
@@ -45,7 +49,6 @@ export function TradePosition(props: Props) {
   const { pair } = router.query;
 
   async function handleTrade() {
-    console.log("in handle trade", pool);
     await openPosition(
       pool,
       wallet,
@@ -64,12 +67,23 @@ export function TradePosition(props: Props) {
   }
 
   useEffect(() => {
-    if (!pair) {
-      return;
-    }
-    // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
   }, [pair]);
+
+  useEffect(() => {
+    async function fetchData() {
+      let tokenBalance = await fetchTokenBalance(
+        payToken,
+        publicKey,
+        connection
+      );
+
+      setPayTokenBalance(tokenBalance);
+    }
+    if (publicKey) {
+      fetchData();
+    }
+  }, [connection, payToken, publicKey]);
 
   const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
@@ -79,15 +93,22 @@ export function TradePosition(props: Props) {
   }
 
   if (pools === undefined) {
-    return <p>single Pool not loaded</p>;
+    return <LoadingDots />;
   } else if (pool === null) {
     setPool(Object.values(pools)[0]);
-    return <p>multiple Pools not loaded</p>;
+    return <LoadingDots />;
   } else {
     return (
       <div className={props.className}>
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-white">You Pay</div>
+        <div className="flex items-center justify-between text-sm ">
+          <div className="font-medium text-white">You Pay</div>
+          {payTokenBalance && (
+            <div className="flex flex-row space-x-1 font-medium text-white">
+              <p>{payTokenBalance.toFixed(3)}</p>
+              <p className="font-normal">{payToken}</p>
+              <p className="text-zinc-400"> Balance</p>
+            </div>
+          )}
         </div>
         <TokenSelector
           className="mt-2"

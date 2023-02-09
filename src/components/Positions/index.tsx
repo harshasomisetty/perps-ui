@@ -16,8 +16,6 @@ export function Positions(props: Props) {
   const { wallet } = useWallet();
   const positions = usePositions(wallet);
 
-  console.log("componenets positions", positions);
-
   return (
     <div className={props.className}>
       <header className="mb-5 flex items-center space-x-4">

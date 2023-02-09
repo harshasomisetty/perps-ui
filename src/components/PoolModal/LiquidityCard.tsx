@@ -37,7 +37,6 @@ export default function LiquidityCard(props: Props) {
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
-
   let tokenList = Object.keys(props.pool?.tokens).map((token) => {
     return tokenAddressToToken(token);
   });
@@ -60,7 +59,9 @@ export default function LiquidityCard(props: Props) {
 
       setLiqBalance(lpBalance);
     }
-    fetchData();
+    if (publicKey) {
+      fetchData();
+    }
   }, [payToken]);
 
   async function changeLiq() {
