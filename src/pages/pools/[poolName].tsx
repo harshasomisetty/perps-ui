@@ -1,3 +1,5 @@
+import PoolBackButton from "@/components/Atoms/PoolBackButton";
+import { PoolLayout } from "@/components/Layouts/PoolLayout";
 import { TitleHeader } from "@/components/Molecules/PoolHeaders/TitleHeader";
 import LiquidityCard from "@/components/PoolModal/LiquidityCard";
 import PoolStats from "@/components/PoolModal/PoolStats";
@@ -20,25 +22,16 @@ export default function SinglePool(props: Props) {
 
   let pool = Object.values(pools)[0];
   return (
-    <div className="p-10 text-white">
-      <div
-        className="flex cursor-pointer flex-row align-bottom"
-        onClick={() => router.push("/pools")}
-      >
-        <ChevronLeft className="h-8 w-8" />
-
-        <p className="text-zinc-400">Back To Pools</p>
+    <PoolLayout className="text-white">
+      <div>
+        <PoolBackButton />
+        <TitleHeader pool={pool!} iconClassName="w-10 h-10" />
       </div>
-      <div className="flex flex-col space-y-8">
-        <TitleHeader pool={pool} iconClassName="w-10 h-10" />
-        <div className="flex flex-row justify-between">
-          <div className="flex w-full flex-col">
-            <PoolStats pool={pool} />
-            <SinglePoolTokens pool={pool!} />
-          </div>
-          <LiquidityCard pool={pool!} />
-        </div>
+      <div className="flex w-full flex-col">
+        <PoolStats pool={pool!} />
+        <SinglePoolTokens pool={pool!} />
       </div>
-    </div>
+      <LiquidityCard pool={pool!} />
+    </PoolLayout>
   );
 }
