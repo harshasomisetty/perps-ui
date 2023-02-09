@@ -63,9 +63,12 @@ const fetchAllStats = (() => {
         return allStats;
       })
       .catch(() => {
-        console.log("caught fetching error");
+        console.log("caught data fetching error");
         let data = firstData;
         const allStats = TOKEN_LIST.reduce((acc, token) => {
+          console.log("fetching data all stats");
+          console.log("token", token);
+          console.log("data", data);
           const tokenData = data[getTokenId(token)];
 
           acc[token] = {

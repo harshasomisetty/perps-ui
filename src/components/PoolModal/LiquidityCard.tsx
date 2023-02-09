@@ -112,7 +112,7 @@ export default function LiquidityCard(props: Props) {
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Add</div>
-            <div>Balance: {payTokenBalance}</div>
+            {publicKey && <div>Balance: {payTokenBalance}</div>}
           </div>
           {tab === Tab.Add ? (
             <TokenSelector
@@ -134,7 +134,7 @@ export default function LiquidityCard(props: Props) {
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Receive</div>
-            <div>Balance: {liqBalance}</div>
+            {publicKey && <div>Balance: {liqBalance}</div>}
           </div>
 
           {tab === Tab.Add ? (

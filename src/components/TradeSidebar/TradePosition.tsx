@@ -102,7 +102,7 @@ export function TradePosition(props: Props) {
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">
           <div className="font-medium text-white">You Pay</div>
-          {payTokenBalance && (
+          {publicKey && (
             <div className="flex flex-row space-x-1 font-medium text-white">
               <p>{payTokenBalance.toFixed(3)}</p>
               <p className="font-normal">{payToken}</p>
