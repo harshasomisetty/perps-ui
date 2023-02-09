@@ -1,9 +1,8 @@
-import { PoolHeader } from "@/components/PoolHeader";
+import { TitleHeader } from "@/components/Molecules/PoolHeaders/TitleHeader";
 import LiquidityCard from "@/components/PoolModal/LiquidityCard";
 import PoolStats from "@/components/PoolModal/PoolStats";
 import SinglePoolTokens from "@/components/PoolModal/SinglePoolTokens";
 import { usePools } from "@/hooks/usePools";
-import { Pool } from "@/lib/Pool";
 import { ChevronLeft } from "@carbon/icons-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
@@ -30,8 +29,8 @@ export default function SinglePool(props: Props) {
 
         <p className="text-zinc-400">Back To Pools</p>
       </div>
-      <div className="flex flex-col">
-        <PoolHeader pool={pool} iconClassName="w-10 h-10" />
+      <div className="flex flex-col space-y-8">
+        <TitleHeader pool={pool} iconClassName="w-10 h-10" />
         <div className="flex flex-row justify-between">
           <div className="flex w-full flex-col">
             <PoolStats pool={pool} />
