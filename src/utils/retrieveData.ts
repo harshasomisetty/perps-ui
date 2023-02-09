@@ -26,15 +26,18 @@ export async function fetchTokenBalance(
     new PublicKey(getTokenAddress(payToken)),
     publicKey
   );
+  let balance = 0;
 
-  let balance = (await connection.getTokenAccountBalance(tokenATA)).value
-    .uiAmount;
-
-  if (payToken === Token.SOL) {
-    let solBalance = await connection.getBalance(publicKey);
-    balance = balance + solBalance / LAMPORTS_PER_SOL;
+  if (await checkIfAccountExists(tokenATA, connection)) {
+    balance = (await connection.getTokenAccountBalance(tokenATA)).value
+      .uiAmount;
   }
 
+  let solBalance = (await connection.getBalance(publicKey)) / LAMPORTS_PER_SOL;
+
+  if (payToken === Token.SOL) {
+    return balance + solBalance;
+  }
   return balance;
 }
 

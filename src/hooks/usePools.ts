@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
-import { ProgramAccount } from "@project-serum/anchor";
-import { getTokenAddress, Token, tokenAddressToToken } from "@/lib/Token";
+import { getTokenAddress, tokenAddressToToken } from "@/lib/Token";
 import { PublicKey } from "@solana/web3.js";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { Pool, TokenCustody } from "@/lib/Pool";
 
-export function usePools(wallet) {
+export function usePools() {
   const [pools, setPools] = useState<Record<string, Pool>>();
 
   let poolInfos = {};
 
   useEffect(() => {
     async function fetchPools() {
-      let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
+      let { perpetual_program } = await getPerpetualProgramAndProvider();
 
       let fetchedPools = await perpetual_program.account.pool.all();
 
@@ -36,28 +35,23 @@ export function usePools(wallet) {
               tokenAccount: custody.tokenAccount,
               mintAccount: custody.mint,
               oracleAccount: custody.oracle.oracleAccount,
+              name: tokenAddressToToken(custody.mint.toString()),
               amount: custody.assets.owned,
               decimals: custody.decimals,
             };
           });
 
-          fetchedCustodies.forEach((custody) => {
-            console.log(
-              "custody assets",
-              Number(custody.assets.owned) / 10 ** custody.decimals
-            );
-          });
+          // fetchedCustodies.forEach((custody) => {
+          //   console.log(
+          //     "custody assets",
+          //     Number(custody.assets.owned) / 10 ** custody.decimals
+          //   );
+          // });
 
           let poolAddress = findProgramAddressSync(
             ["pool", pool.account.name],
             perpetual_program.programId
           )[0];
-
-          console.log(
-            "account name",
-            typeof pool.account.name,
-            pool.account.name
-          );
 
           let tokenNames = Object.values(custodyInfos).map((custody) => {
             return tokenAddressToToken(custody.mintAccount.toString());

@@ -29,7 +29,7 @@ export function PositionAdditionalInfo(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
 
-  const { pools } = usePools(wallet);
+  const { pools } = usePools();
 
   const [pool, setPool] = useState<Pool | null>(null);
 

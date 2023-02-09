@@ -12,7 +12,7 @@ interface Props {}
 
 export default function SinglePool(props: Props) {
   const { wallet } = useWallet();
-  const { pools } = usePools(wallet);
+  const { pools } = usePools();
   const router = useRouter();
 
   if (!pools) {

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
 import PoolModal from "@/components/PoolModal";
@@ -8,12 +7,10 @@ import { PoolHeader } from "@/components/PoolHeader";
 import { useRouter } from "next/router";
 
 export default function Pools() {
-  const { wallet } = useWallet();
-  const { pools } = usePools(wallet);
+  const { pools } = usePools();
   const router = useRouter();
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
-
 
   if (!pools) {
     return <p className="text-white">Loading...</p>;

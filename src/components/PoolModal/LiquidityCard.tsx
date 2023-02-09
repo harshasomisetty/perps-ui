@@ -13,6 +13,7 @@ import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
 import { Pool } from "@/lib/Pool";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
+import router from "next/router";
 
 interface Props {
   className?: string;
@@ -36,17 +37,15 @@ export default function LiquidityCard(props: Props) {
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
-
   let tokenList = Object.keys(props.pool?.tokens).map((token) => {
     return tokenAddressToToken(token);
   });
 
   useEffect(() => {
     async function fetchData() {
-
       let tokenBalance = await fetchTokenBalance(
         payToken,
-        publicKey,
+        publicKey!,
         connection
       );
 
@@ -54,13 +53,13 @@ export default function LiquidityCard(props: Props) {
 
       let lpBalance = await fetchLPBalance(
         props.pool.lpTokenMint,
-        publicKey,
+        publicKey!,
         connection
       );
 
       setLiqBalance(lpBalance);
     }
-    if (wallet && publicKey) {
+    if (publicKey) {
       fetchData();
     }
   }, [payToken]);
@@ -69,7 +68,7 @@ export default function LiquidityCard(props: Props) {
     console.log("before change", tab === Tab.Remove, liqAmount);
     await changeLiquidity(
       props.pool,
-      wallet,
+      wallet!,
       publicKey,
       signTransaction,
       connection,
@@ -113,7 +112,7 @@ export default function LiquidityCard(props: Props) {
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Add</div>
-            <div>Balance: {payTokenBalance}</div>
+            {publicKey && <div>Balance: {payTokenBalance}</div>}
           </div>
           {tab === Tab.Add ? (
             <TokenSelector
@@ -135,7 +134,7 @@ export default function LiquidityCard(props: Props) {
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Receive</div>
-            <div>Balance: {liqBalance}</div>
+            {publicKey && <div>Balance: {liqBalance}</div>}
           </div>
 
           {tab === Tab.Add ? (
