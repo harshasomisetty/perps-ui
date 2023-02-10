@@ -77,7 +77,7 @@ export default function LiquidityCard(props: Props) {
       tab === Tab.Remove ? liqAmount : 0
     );
 
-    router.reload(window.location.pathname);
+    // router.reload(window.location.pathname);
   }
   return (
     <div className={props.className}>
