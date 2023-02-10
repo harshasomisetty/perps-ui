@@ -6,8 +6,15 @@ export enum Side {
   Short,
 }
 
+export class TradeSide {
+  static Long = { long: {} };
+  static Short = { short: {} };
+}
+
 export interface Position {
   id: string;
+  positionAccountAddress : string;
+  poolAddress: string;
   collateral: number;
   entryPrice: number;
   leverage: number;
@@ -19,7 +26,7 @@ export interface Position {
   size: number;
   timestamp: number;
   token: Token;
-  type: "long" | "short";
+  type: Side;
   value: number;
   valueDelta: number;
   valueDeltaPercentage: number;

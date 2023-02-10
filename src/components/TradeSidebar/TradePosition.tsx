@@ -59,8 +59,8 @@ export function TradePosition(props: Props) {
       positionToken,
       new BN(payAmount * LAMPORTS_PER_SOL),
       new BN(positionAmount * LAMPORTS_PER_SOL),
-      new BN(allPriceStats[payToken]?.currentPrice * LAMPORTS_PER_SOL),
-      props.side
+      new BN(allPriceStats[payToken]?.currentPrice * 10**6),
+      props.side 
     );
 
     // router.reload(window.location.pathname);
@@ -104,7 +104,7 @@ export function TradePosition(props: Props) {
           <div className="font-medium text-white">You Pay</div>
           {publicKey && (
             <div className="flex flex-row space-x-1 font-medium text-white">
-              <p>{payTokenBalance.toFixed(3)}</p>
+              <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
               <p className="font-normal">{payToken}</p>
               <p className="text-zinc-400"> Balance</p>
             </div>

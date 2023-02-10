@@ -103,7 +103,7 @@ export function useDailyPriceStats(token?: Token) {
 
       timer.current = window.setInterval(async () => {
         fetchAllStats().then(setAllStats);
-      }, 10000);
+      }, 30000);
     }
 
     return () => {

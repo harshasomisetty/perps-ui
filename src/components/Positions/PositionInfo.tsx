@@ -64,18 +64,18 @@ export function PositionInfo(props: Props) {
             "items-center",
             "mt-1",
             "space-x-1",
-            props.position.type === "long"
+            props.position.type === "Long"
               ? "text-emerald-400"
               : "text-rose-400"
           )}
         >
-          {props.position.type === "long" ? (
+          {props.position.type === "Long" ? (
             <GrowthIcon className="h-3 w-3 fill-current" />
           ) : (
             <GrowthIcon className="h-3 w-3 -scale-y-100 fill-current" />
           )}
           <div className="text-sm">
-            {props.position.type === "long" ? "Long" : "Short"}
+            {props.position.type === "Long" ? "Long" : "Short"}
           </div>
         </div>
       </PositionColumn>
