@@ -21,10 +21,11 @@ export async function manualSendTransaction(
     transaction = await signTransaction(transaction);
     const rawTransaction = transaction.serialize();
 
-    let signature = await connection.sendRawTransaction(rawTransaction);
-    console.log("sent raw, waiting");
+    let signature = await connection.sendRawTransaction(rawTransaction, { skipPreflight : true});
+    console.log(`sent raw, waiting : https://explorer.solana.com/tx/${signature}?cluster=devnet`);
     await connection.confirmTransaction(signature, "confirmed");
-    console.log("sent tx!!!");
+    console.log(`sent tx!!! : https://solscan.io/tx/${signature}?cluster=devnet`);
+
   } catch (error) {
     console.log("man error?", error);
   }

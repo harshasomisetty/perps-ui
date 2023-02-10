@@ -11,6 +11,7 @@ import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
+import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -28,15 +29,17 @@ interface Props {
 export function PositionAdditionalInfo(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
+  const allPriceStats = useDailyPriceStats();
 
   const { pools } = usePools();
 
   const [pool, setPool] = useState<Pool | null>(null);
+  
 
   let payToken = props.position.token;
   let positionToken = props.position.token;
 
-  // TODO: select correct pool
+  // TODO: select correct pool and also refetch usePositions after the transaction 
   async function handleCloseTrade() {
     console.log("in close trade");
     await closePosition(
@@ -47,7 +50,9 @@ export function PositionAdditionalInfo(props: Props) {
       connection,
       payToken,
       positionToken,
-      new BN(1)
+      props.position.positionAccountAddress,
+      props.position.type,
+      new BN(allPriceStats[payToken]?.currentPrice * 10**6)
     );
   }
 

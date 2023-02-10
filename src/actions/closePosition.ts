@@ -1,4 +1,5 @@
 import { Pool } from "@/lib/Pool";
+import { Side } from "@/lib/Position";
 import { getTokenAddress, Token } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
@@ -31,16 +32,23 @@ export async function closePosition(
   connection: Connection,
   payToken: Token,
   positionToken: Token,
+  positionAccountAddress: String,
+  side : Side,
   price: BN
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
   console.log("pool", pool);
+  console.log("side:",side)
 
-  let lpTokenAccount = await getAssociatedTokenAddress(
-    pool.lpTokenMint,
-    publicKey
-  );
+  // TODO: need to take slippage as param , this is now for testing 
+  const adjustedPrice = side.toString() == 'Long' ? price.mul(new BN(80)).div(new BN(100)) : price.mul(new BN(110)).div(new BN(100));
+  console.log("adjustedPrice, coingeckoPrice:",adjustedPrice.toString(), price.toString());
+
+  // let lpTokenAccount = await getAssociatedTokenAddress(
+  //   pool.lpTokenMint,
+  //   publicKey
+  // );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
     pool.tokens[getTokenAddress(payToken)]?.mintAccount,
@@ -48,16 +56,16 @@ export async function closePosition(
   );
 
   console.log("tokens", payToken, positionToken);
-  let positionAccount = findProgramAddressSync(
-    [
-      "position",
-      publicKey.toBuffer(),
-      pool.poolAddress.toBuffer(),
-      pool.tokens[getTokenAddress(payToken)]?.custodyAccount.toBuffer(),
-      [1],
-    ],
-    perpetual_program.programId
-  )[0];
+  // let positionAccount = findProgramAddressSync(
+  //   [
+  //     "position",
+  //     publicKey.toBuffer(),
+  //     pool.poolAddress.toBuffer(),
+  //     pool.tokens[getTokenAddress(payToken)]?.custodyAccount.toBuffer(),
+  //     side == 'Long' ? [1] : [2],
+  //   ],
+  //   perpetual_program.programId
+  // )[0];
 
   //   console.log(
   //     "left and right",
@@ -68,22 +76,24 @@ export async function closePosition(
   let transaction = new Transaction();
 
   try {
-    if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
-      transaction = transaction.add(
-        createAssociatedTokenAccountInstruction(
-          publicKey,
-          lpTokenAccount,
-          publicKey,
-          pool.lpTokenMint
-        )
-      );
-    }
+    // if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
+    //   transaction = transaction.add(
+    //     createAssociatedTokenAccountInstruction(
+    //       publicKey,
+    //       lpTokenAccount,
+    //       publicKey,
+    //       pool.lpTokenMint
+    //     )
+    //   );
+    // }
 
+    const positionAccount = new PublicKey(positionAccountAddress);
+    
     console.log("position account", positionAccount.toString());
 
     let tx = await perpetual_program.methods
       .closePosition({
-        price,
+        price : adjustedPrice,
       })
       .accounts({
         owner: publicKey,

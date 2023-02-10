@@ -1,5 +1,5 @@
 import { Pool } from "@/lib/Pool";
-import { Side } from "@/lib/Position";
+import { Side, TradeSide } from "@/lib/Position";
 import { getTokenAddress, Token } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
@@ -57,20 +57,25 @@ export async function openPosition(
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
+  // TODO: need to take slippage as param , this is now for testing 
+  const newPrice = side.toString() == 'Long' ? price.mul(new BN(115)).div(new BN(100)) : price.mul(new BN(90)).div(new BN(100))
   console.log(
     "inputs",
     Number(payAmount),
     Number(positionAmount),
     Number(price),
+    Number(newPrice),
+    payToken,
+    side, 
     side.toString()
   );
 
   console.log("pool", pool);
 
-  let lpTokenAccount = await getAssociatedTokenAddress(
-    pool.lpTokenMint,
-    publicKey
-  );
+  // let lpTokenAccount = await getAssociatedTokenAddress(
+  //   pool.lpTokenMint,
+  //   publicKey
+  // );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
     pool.tokens[getTokenAddress(payToken)]?.mintAccount,
@@ -84,40 +89,41 @@ export async function openPosition(
       publicKey.toBuffer(),
       pool.poolAddress.toBuffer(),
       pool.tokens[getTokenAddress(payToken)]?.custodyAccount.toBuffer(),
-      [1],
+      side.toString() == 'Long' ? [1] : [2],
     ],
     perpetual_program.programId
   )[0];
 
-  console.log(
-    "left and right",
-    positionAccount.toString(),
-    "ALxjVHPdhi7LCoVc2CUbVvPFmnWWCcnNcNAQ4emPg2tz"
-  );
+  // console.log(
+  //   "left and right",
+  //   positionAccount.toString(),
+  //   "ALxjVHPdhi7LCoVc2CUbVvPFmnWWCcnNcNAQ4emPg2tz"
+  // );
 
   let transaction = new Transaction();
 
   try {
-    if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
-      transaction = transaction.add(
-        createAssociatedTokenAccountInstruction(
-          publicKey,
-          lpTokenAccount,
-          publicKey,
-          pool.lpTokenMint
-        )
-      );
-    }
+    // if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
+    //   transaction = transaction.add(
+    //     createAssociatedTokenAccountInstruction(
+    //       publicKey,
+    //       lpTokenAccount,
+    //       publicKey,
+    //       pool.lpTokenMint
+    //     )
+    //   );
+    // }
 
     console.log("position account", positionAccount.toString());
 
+    const params : any = {
+      price : newPrice, 
+    collateral: payAmount,
+    size: positionAmount,
+    side : side.toString() == 'Long' ? TradeSide.Long : TradeSide.Short,
+  }
     let tx = await perpetual_program.methods
-      .openPosition({
-        price,
-        collateral: payAmount,
-        size: positionAmount,
-        side: { long: {} },
-      })
+      .openPosition(params)
       .accounts({
         owner: publicKey,
         fundingAccount: userCustodyTokenAccount,
