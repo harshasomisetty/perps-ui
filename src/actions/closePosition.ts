@@ -51,11 +51,11 @@ export async function closePosition(
   // );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]?.mintAccount,
+    pool.tokens[getTokenAddress(payToken)]!.mintAccount,
     publicKey
   );
-
   console.log("tokens", payToken, positionToken);
+  
   // let positionAccount = findProgramAddressSync(
   //   [
   //     "position",
@@ -114,11 +114,11 @@ export async function closePosition(
 
     console.log("close position tx", transaction);
     console.log("tx keys");
-    for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
+    for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
       console.log(
         "key",
         i,
-        transaction.instructions[0].keys[i]?.pubkey.toString()
+        transaction.instructions[0]!.keys[i]?.pubkey.toString()
       );
     }
 

@@ -32,7 +32,6 @@ export function PositionAdditionalInfo(props: Props) {
   const allPriceStats = useDailyPriceStats();
 
   const { pools } = usePools();
-
   const [pool, setPool] = useState<Pool | null>(null);
   
 
@@ -60,8 +59,15 @@ export function PositionAdditionalInfo(props: Props) {
   if (pools === undefined) {
     return <p>single Pool not loaded</p>;
   } else if (pool === null) {
-    setPool(Object.values(pools)[0]);
-    return <p>multiple Pools not loaded</p>;
+    //  FIXED : fetch pool from position 
+    const pool1 = Object.values(pools).filter(i => i.poolAddress.toBase58() == props.position.poolAddress);
+    if(pool1.length){
+      setPool(pool1[0]);
+      return <p>multiple Pools not loaded</p>;
+    } else {
+      return <p>single Pool not loaded</p>;
+    }
+    
   } else {
     return (
       <div

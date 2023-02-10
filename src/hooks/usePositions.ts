@@ -189,6 +189,7 @@ export function usePositions(wallet: Wallet) {
         return {
           id: index.toString(),
           positionAccountAddress: position.publicKey.toBase58(),
+          poolAddress : position.account.pool.toBase58(),
           collateral: position.account.collateralUsd.toNumber(),
 
           entryPrice: position.account.openTime.toNumber(),

@@ -14,6 +14,7 @@ export class TradeSide {
 export interface Position {
   id: string;
   positionAccountAddress : string;
+  poolAddress: string;
   collateral: number;
   entryPrice: number;
   leverage: number;
