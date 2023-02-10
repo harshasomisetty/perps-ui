@@ -159,7 +159,7 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "addToken",
+      "name": "addCustody",
       "accounts": [
         {
           "name": "admin",
@@ -221,14 +221,14 @@ export type Perpetuals = {
         {
           "name": "params",
           "type": {
-            "defined": "AddTokenParams"
+            "defined": "AddCustodyParams"
           }
         }
       ],
       "returns": "u8"
     },
     {
-      "name": "removeToken",
+      "name": "removeCustody",
       "accounts": [
         {
           "name": "admin",
@@ -280,7 +280,7 @@ export type Perpetuals = {
         {
           "name": "params",
           "type": {
-            "defined": "RemoveTokenParams"
+            "defined": "RemoveCustodyParams"
           }
         }
       ],
@@ -311,7 +311,7 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "setTokenConfig",
+      "name": "setCustodyConfig",
       "accounts": [
         {
           "name": "admin",
@@ -338,7 +338,7 @@ export type Perpetuals = {
         {
           "name": "params",
           "type": {
-            "defined": "SetTokenConfigParams"
+            "defined": "SetCustodyConfigParams"
           }
         }
       ],
@@ -466,6 +466,45 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "upgradeCustody",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpgradeCustodyParams"
           }
         }
       ],
@@ -1309,6 +1348,89 @@ export type Perpetuals = {
       "returns": "u64"
     },
     {
+      "name": "getLiquidationState",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetLiquidationStateParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "getOraclePrice",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetOraclePriceParams"
+          }
+        }
+      ],
+      "returns": "u64"
+    },
+    {
       "name": "getSwapAmountAndFees",
       "accounts": [
         {
@@ -1363,6 +1485,98 @@ export type Perpetuals = {
   "accounts": [
     {
       "name": "custody",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "name": "oracle",
+            "type": {
+              "defined": "OracleParams"
+            }
+          },
+          {
+            "name": "pricing",
+            "type": {
+              "defined": "PricingParams"
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "defined": "Permissions"
+            }
+          },
+          {
+            "name": "fees",
+            "type": {
+              "defined": "Fees"
+            }
+          },
+          {
+            "name": "borrowRate",
+            "type": "u64"
+          },
+          {
+            "name": "borrowRateSum",
+            "type": "u64"
+          },
+          {
+            "name": "assets",
+            "type": {
+              "defined": "Assets"
+            }
+          },
+          {
+            "name": "collectedFees",
+            "type": {
+              "defined": "FeesStats"
+            }
+          },
+          {
+            "name": "volumeStats",
+            "type": {
+              "defined": "VolumeStats"
+            }
+          },
+          {
+            "name": "tradeStats",
+            "type": {
+              "defined": "TradeStats"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenAccountBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "deprecatedCustody",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1672,34 +1886,14 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "AddLiquidityParams",
+      "name": "AddCustodyParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AddPoolParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AddTokenParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
+            "name": "isStable",
+            "type": "bool"
+          },
           {
             "name": "oracle",
             "type": {
@@ -1735,6 +1929,30 @@ export type Perpetuals = {
           {
             "name": "maxRatio",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddLiquidityParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddPoolParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
           }
         ]
       }
@@ -1785,6 +2003,25 @@ export type Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "GetLiquidationStateParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "GetOraclePriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ema",
+            "type": "bool"
+          }
+        ]
       }
     },
     {
@@ -1896,6 +2133,13 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "RemoveCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "RemoveLiquidityParams",
       "type": {
         "kind": "struct",
@@ -1909,13 +2153,6 @@ export type Perpetuals = {
     },
     {
       "name": "RemovePoolParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "RemoveTokenParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -1944,6 +2181,54 @@ export type Perpetuals = {
           },
           {
             "name": "borrowRateSum",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetCustodyConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "name": "oracle",
+            "type": {
+              "defined": "OracleParams"
+            }
+          },
+          {
+            "name": "pricing",
+            "type": {
+              "defined": "PricingParams"
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "defined": "Permissions"
+            }
+          },
+          {
+            "name": "fees",
+            "type": {
+              "defined": "Fees"
+            }
+          },
+          {
+            "name": "targetRatio",
+            "type": "u64"
+          },
+          {
+            "name": "minRatio",
+            "type": "u64"
+          },
+          {
+            "name": "maxRatio",
             "type": "u64"
           }
         ]
@@ -2026,44 +2311,6 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "SetTokenConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "oracle",
-            "type": {
-              "defined": "OracleParams"
-            }
-          },
-          {
-            "name": "permissions",
-            "type": {
-              "defined": "Permissions"
-            }
-          },
-          {
-            "name": "fees",
-            "type": {
-              "defined": "Fees"
-            }
-          },
-          {
-            "name": "targetRatio",
-            "type": "u64"
-          },
-          {
-            "name": "minRatio",
-            "type": "u64"
-          },
-          {
-            "name": "maxRatio",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "SwapParams",
       "type": {
         "kind": "struct",
@@ -2118,6 +2365,18 @@ export type Perpetuals = {
           },
           {
             "name": "allowSizeChange",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStable",
             "type": "bool"
           }
         ]
@@ -2517,19 +2776,22 @@ export type Perpetuals = {
             "name": "RemovePool"
           },
           {
-            "name": "AddToken"
+            "name": "AddCustody"
           },
           {
-            "name": "RemoveToken"
+            "name": "RemoveCustody"
           },
           {
             "name": "SetAdminSigners"
           },
           {
-            "name": "SetTokenConfig"
+            "name": "SetCustodyConfig"
           },
           {
             "name": "SetPermissions"
+          },
+          {
+            "name": "SetBorrowRate"
           },
           {
             "name": "WithdrawFees"
@@ -2539,6 +2801,9 @@ export type Perpetuals = {
           },
           {
             "name": "SetTestTime"
+          },
+          {
+            "name": "UpgradeCustody"
           }
         ]
       }
@@ -2668,13 +2933,13 @@ export type Perpetuals = {
     },
     {
       "code": 6014,
-      "name": "InvalidTokenConfig",
-      "msg": "Invalid token config"
+      "name": "InvalidCustodyConfig",
+      "msg": "Invalid custody config"
     },
     {
       "code": 6015,
       "name": "InsufficientAmountReturned",
-      "msg": "Not enough tokens returned"
+      "msg": "Insufficient token amount returned"
     },
     {
       "code": 6016,
@@ -2865,7 +3130,7 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "addToken",
+      "name": "addCustody",
       "accounts": [
         {
           "name": "admin",
@@ -2927,14 +3192,14 @@ export const IDL: Perpetuals = {
         {
           "name": "params",
           "type": {
-            "defined": "AddTokenParams"
+            "defined": "AddCustodyParams"
           }
         }
       ],
       "returns": "u8"
     },
     {
-      "name": "removeToken",
+      "name": "removeCustody",
       "accounts": [
         {
           "name": "admin",
@@ -2986,7 +3251,7 @@ export const IDL: Perpetuals = {
         {
           "name": "params",
           "type": {
-            "defined": "RemoveTokenParams"
+            "defined": "RemoveCustodyParams"
           }
         }
       ],
@@ -3017,7 +3282,7 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "setTokenConfig",
+      "name": "setCustodyConfig",
       "accounts": [
         {
           "name": "admin",
@@ -3044,7 +3309,7 @@ export const IDL: Perpetuals = {
         {
           "name": "params",
           "type": {
-            "defined": "SetTokenConfigParams"
+            "defined": "SetCustodyConfigParams"
           }
         }
       ],
@@ -3172,6 +3437,45 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "upgradeCustody",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpgradeCustodyParams"
           }
         }
       ],
@@ -4015,6 +4319,89 @@ export const IDL: Perpetuals = {
       "returns": "u64"
     },
     {
+      "name": "getLiquidationState",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetLiquidationStateParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "getOraclePrice",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetOraclePriceParams"
+          }
+        }
+      ],
+      "returns": "u64"
+    },
+    {
       "name": "getSwapAmountAndFees",
       "accounts": [
         {
@@ -4069,6 +4456,98 @@ export const IDL: Perpetuals = {
   "accounts": [
     {
       "name": "custody",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "name": "oracle",
+            "type": {
+              "defined": "OracleParams"
+            }
+          },
+          {
+            "name": "pricing",
+            "type": {
+              "defined": "PricingParams"
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "defined": "Permissions"
+            }
+          },
+          {
+            "name": "fees",
+            "type": {
+              "defined": "Fees"
+            }
+          },
+          {
+            "name": "borrowRate",
+            "type": "u64"
+          },
+          {
+            "name": "borrowRateSum",
+            "type": "u64"
+          },
+          {
+            "name": "assets",
+            "type": {
+              "defined": "Assets"
+            }
+          },
+          {
+            "name": "collectedFees",
+            "type": {
+              "defined": "FeesStats"
+            }
+          },
+          {
+            "name": "volumeStats",
+            "type": {
+              "defined": "VolumeStats"
+            }
+          },
+          {
+            "name": "tradeStats",
+            "type": {
+              "defined": "TradeStats"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenAccountBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "deprecatedCustody",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4378,34 +4857,14 @@ export const IDL: Perpetuals = {
       }
     },
     {
-      "name": "AddLiquidityParams",
+      "name": "AddCustodyParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AddPoolParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AddTokenParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
+            "name": "isStable",
+            "type": "bool"
+          },
           {
             "name": "oracle",
             "type": {
@@ -4441,6 +4900,30 @@ export const IDL: Perpetuals = {
           {
             "name": "maxRatio",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddLiquidityParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddPoolParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
           }
         ]
       }
@@ -4491,6 +4974,25 @@ export const IDL: Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "GetLiquidationStateParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "GetOraclePriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ema",
+            "type": "bool"
+          }
+        ]
       }
     },
     {
@@ -4602,6 +5104,13 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "RemoveCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "RemoveLiquidityParams",
       "type": {
         "kind": "struct",
@@ -4615,13 +5124,6 @@ export const IDL: Perpetuals = {
     },
     {
       "name": "RemovePoolParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "RemoveTokenParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -4650,6 +5152,54 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "borrowRateSum",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetCustodyConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "name": "oracle",
+            "type": {
+              "defined": "OracleParams"
+            }
+          },
+          {
+            "name": "pricing",
+            "type": {
+              "defined": "PricingParams"
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "defined": "Permissions"
+            }
+          },
+          {
+            "name": "fees",
+            "type": {
+              "defined": "Fees"
+            }
+          },
+          {
+            "name": "targetRatio",
+            "type": "u64"
+          },
+          {
+            "name": "minRatio",
+            "type": "u64"
+          },
+          {
+            "name": "maxRatio",
             "type": "u64"
           }
         ]
@@ -4732,44 +5282,6 @@ export const IDL: Perpetuals = {
       }
     },
     {
-      "name": "SetTokenConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "oracle",
-            "type": {
-              "defined": "OracleParams"
-            }
-          },
-          {
-            "name": "permissions",
-            "type": {
-              "defined": "Permissions"
-            }
-          },
-          {
-            "name": "fees",
-            "type": {
-              "defined": "Fees"
-            }
-          },
-          {
-            "name": "targetRatio",
-            "type": "u64"
-          },
-          {
-            "name": "minRatio",
-            "type": "u64"
-          },
-          {
-            "name": "maxRatio",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "SwapParams",
       "type": {
         "kind": "struct",
@@ -4824,6 +5336,18 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "allowSizeChange",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStable",
             "type": "bool"
           }
         ]
@@ -5223,19 +5747,22 @@ export const IDL: Perpetuals = {
             "name": "RemovePool"
           },
           {
-            "name": "AddToken"
+            "name": "AddCustody"
           },
           {
-            "name": "RemoveToken"
+            "name": "RemoveCustody"
           },
           {
             "name": "SetAdminSigners"
           },
           {
-            "name": "SetTokenConfig"
+            "name": "SetCustodyConfig"
           },
           {
             "name": "SetPermissions"
+          },
+          {
+            "name": "SetBorrowRate"
           },
           {
             "name": "WithdrawFees"
@@ -5245,6 +5772,9 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "SetTestTime"
+          },
+          {
+            "name": "UpgradeCustody"
           }
         ]
       }
@@ -5374,13 +5904,13 @@ export const IDL: Perpetuals = {
     },
     {
       "code": 6014,
-      "name": "InvalidTokenConfig",
-      "msg": "Invalid token config"
+      "name": "InvalidCustodyConfig",
+      "msg": "Invalid custody config"
     },
     {
       "code": 6015,
       "name": "InsufficientAmountReturned",
-      "msg": "Not enough tokens returned"
+      "msg": "Insufficient token amount returned"
     },
     {
       "code": 6016,

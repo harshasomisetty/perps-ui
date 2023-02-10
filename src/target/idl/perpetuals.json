@@ -159,7 +159,7 @@
       "returns": "u8"
     },
     {
-      "name": "addToken",
+      "name": "addCustody",
       "accounts": [
         {
           "name": "admin",
@@ -221,14 +221,14 @@
         {
           "name": "params",
           "type": {
-            "defined": "AddTokenParams"
+            "defined": "AddCustodyParams"
           }
         }
       ],
       "returns": "u8"
     },
     {
-      "name": "removeToken",
+      "name": "removeCustody",
       "accounts": [
         {
           "name": "admin",
@@ -280,7 +280,7 @@
         {
           "name": "params",
           "type": {
-            "defined": "RemoveTokenParams"
+            "defined": "RemoveCustodyParams"
           }
         }
       ],
@@ -311,7 +311,7 @@
       "returns": "u8"
     },
     {
-      "name": "setTokenConfig",
+      "name": "setCustodyConfig",
       "accounts": [
         {
           "name": "admin",
@@ -338,7 +338,7 @@
         {
           "name": "params",
           "type": {
-            "defined": "SetTokenConfigParams"
+            "defined": "SetCustodyConfigParams"
           }
         }
       ],
@@ -466,6 +466,45 @@
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "upgradeCustody",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpgradeCustodyParams"
           }
         }
       ],
@@ -1309,6 +1348,89 @@
       "returns": "u64"
     },
     {
+      "name": "getLiquidationState",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetLiquidationStateParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "getOraclePrice",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetOraclePriceParams"
+          }
+        }
+      ],
+      "returns": "u64"
+    },
+    {
       "name": "getSwapAmountAndFees",
       "accounts": [
         {
@@ -1363,6 +1485,98 @@
   "accounts": [
     {
       "name": "Custody",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "name": "oracle",
+            "type": {
+              "defined": "OracleParams"
+            }
+          },
+          {
+            "name": "pricing",
+            "type": {
+              "defined": "PricingParams"
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "defined": "Permissions"
+            }
+          },
+          {
+            "name": "fees",
+            "type": {
+              "defined": "Fees"
+            }
+          },
+          {
+            "name": "borrowRate",
+            "type": "u64"
+          },
+          {
+            "name": "borrowRateSum",
+            "type": "u64"
+          },
+          {
+            "name": "assets",
+            "type": {
+              "defined": "Assets"
+            }
+          },
+          {
+            "name": "collectedFees",
+            "type": {
+              "defined": "FeesStats"
+            }
+          },
+          {
+            "name": "volumeStats",
+            "type": {
+              "defined": "VolumeStats"
+            }
+          },
+          {
+            "name": "tradeStats",
+            "type": {
+              "defined": "TradeStats"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenAccountBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeprecatedCustody",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1477,13 +1691,19 @@
           {
             "name": "signers",
             "type": {
-              "array": ["publicKey", 6]
+              "array": [
+                "publicKey",
+                6
+              ]
             }
           },
           {
             "name": "signed",
             "type": {
-              "array": ["bool", 6]
+              "array": [
+                "bool",
+                6
+              ]
             }
           },
           {
@@ -1666,34 +1886,14 @@
       }
     },
     {
-      "name": "AddLiquidityParams",
+      "name": "AddCustodyParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AddPoolParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AddTokenParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
+            "name": "isStable",
+            "type": "bool"
+          },
           {
             "name": "oracle",
             "type": {
@@ -1729,6 +1929,30 @@
           {
             "name": "maxRatio",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddLiquidityParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddPoolParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
           }
         ]
       }
@@ -1779,6 +2003,25 @@
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "GetLiquidationStateParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "GetOraclePriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ema",
+            "type": "bool"
+          }
+        ]
       }
     },
     {
@@ -1890,6 +2133,13 @@
       }
     },
     {
+      "name": "RemoveCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "RemoveLiquidityParams",
       "type": {
         "kind": "struct",
@@ -1903,13 +2153,6 @@
     },
     {
       "name": "RemovePoolParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "RemoveTokenParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -1938,6 +2181,54 @@
           },
           {
             "name": "borrowRateSum",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetCustodyConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "name": "oracle",
+            "type": {
+              "defined": "OracleParams"
+            }
+          },
+          {
+            "name": "pricing",
+            "type": {
+              "defined": "PricingParams"
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "defined": "Permissions"
+            }
+          },
+          {
+            "name": "fees",
+            "type": {
+              "defined": "Fees"
+            }
+          },
+          {
+            "name": "targetRatio",
+            "type": "u64"
+          },
+          {
+            "name": "minRatio",
+            "type": "u64"
+          },
+          {
+            "name": "maxRatio",
             "type": "u64"
           }
         ]
@@ -2020,44 +2311,6 @@
       }
     },
     {
-      "name": "SetTokenConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "oracle",
-            "type": {
-              "defined": "OracleParams"
-            }
-          },
-          {
-            "name": "permissions",
-            "type": {
-              "defined": "Permissions"
-            }
-          },
-          {
-            "name": "fees",
-            "type": {
-              "defined": "Fees"
-            }
-          },
-          {
-            "name": "targetRatio",
-            "type": "u64"
-          },
-          {
-            "name": "minRatio",
-            "type": "u64"
-          },
-          {
-            "name": "maxRatio",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "SwapParams",
       "type": {
         "kind": "struct",
@@ -2112,6 +2365,18 @@
           },
           {
             "name": "allowSizeChange",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStable",
             "type": "bool"
           }
         ]
@@ -2511,19 +2776,22 @@
             "name": "RemovePool"
           },
           {
-            "name": "AddToken"
+            "name": "AddCustody"
           },
           {
-            "name": "RemoveToken"
+            "name": "RemoveCustody"
           },
           {
             "name": "SetAdminSigners"
           },
           {
-            "name": "SetTokenConfig"
+            "name": "SetCustodyConfig"
           },
           {
             "name": "SetPermissions"
+          },
+          {
+            "name": "SetBorrowRate"
           },
           {
             "name": "WithdrawFees"
@@ -2533,6 +2801,9 @@
           },
           {
             "name": "SetTestTime"
+          },
+          {
+            "name": "UpgradeCustody"
           }
         ]
       }
@@ -2662,13 +2933,13 @@
     },
     {
       "code": 6014,
-      "name": "InvalidTokenConfig",
-      "msg": "Invalid token config"
+      "name": "InvalidCustodyConfig",
+      "msg": "Invalid custody config"
     },
     {
       "code": 6015,
       "name": "InsufficientAmountReturned",
-      "msg": "Not enough tokens returned"
+      "msg": "Insufficient token amount returned"
     },
     {
       "code": 6016,
