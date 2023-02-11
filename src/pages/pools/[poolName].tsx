@@ -1,9 +1,10 @@
-import { PoolHeader } from "@/components/PoolHeader";
+import PoolBackButton from "@/components/Atoms/PoolBackButton";
+import { PoolLayout } from "@/components/Layouts/PoolLayout";
+import { TitleHeader } from "@/components/Molecules/PoolHeaders/TitleHeader";
 import LiquidityCard from "@/components/PoolModal/LiquidityCard";
 import PoolStats from "@/components/PoolModal/PoolStats";
 import SinglePoolTokens from "@/components/PoolModal/SinglePoolTokens";
 import { usePools } from "@/hooks/usePools";
-import { Pool } from "@/lib/Pool";
 import { ChevronLeft } from "@carbon/icons-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
@@ -21,25 +22,16 @@ export default function SinglePool(props: Props) {
 
   let pool = Object.values(pools)[0];
   return (
-    <div className="p-10 text-white">
-      <div
-        className="flex cursor-pointer flex-row align-bottom"
-        onClick={() => router.push("/pools")}
-      >
-        <ChevronLeft className="h-8 w-8" />
-
-        <p className="text-zinc-400">Back To Pools</p>
+    <PoolLayout className="text-white">
+      <div>
+        <PoolBackButton />
+        <TitleHeader pool={pool!} iconClassName="w-10 h-10" />
       </div>
-      <div className="flex flex-col">
-        <PoolHeader pool={pool} iconClassName="w-10 h-10" />
-        <div className="flex flex-row justify-between">
-          <div className="flex w-full flex-col">
-            <PoolStats pool={pool} />
-            <SinglePoolTokens pool={pool!} />
-          </div>
-          <LiquidityCard pool={pool!} />
-        </div>
+      <div className="flex w-full flex-col">
+        <PoolStats pool={pool!} />
+        <SinglePoolTokens pool={pool!} />
       </div>
-    </div>
+      <LiquidityCard pool={pool!} />
+    </PoolLayout>
   );
 }

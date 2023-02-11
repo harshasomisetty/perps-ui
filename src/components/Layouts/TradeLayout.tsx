@@ -5,7 +5,7 @@ interface Props {
   children: [React.ReactNode, React.ReactNode];
 }
 
-export function SidebarLayout(props: Props) {
+export function TradeLayout(props: Props) {
   return (
     <div
       className={twMerge(
