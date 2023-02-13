@@ -14,6 +14,7 @@ import { changeLiquidity } from "src/actions/changeLiquidity";
 import { Pool } from "@/lib/Pool";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
 import router from "next/router";
+import AirdropPanel from "../AirdropPanel";
 
 interface Props {
   className?: string;
@@ -40,6 +41,8 @@ export default function LiquidityCard(props: Props) {
   let tokenList = Object.keys(props.pool?.tokens).map((token) => {
     return tokenAddressToToken(token);
   });
+
+  const poolName = router.query.poolName as string;
 
   useEffect(() => {
     async function fetchData() {
@@ -108,6 +111,8 @@ export default function LiquidityCard(props: Props) {
             <div>Remove</div>
           </SidebarTab>
         </div>
+
+        {poolName === "internal_labs" && <AirdropPanel pool={props.pool} />}
 
         <div>
           <div className="flex items-center justify-between">
