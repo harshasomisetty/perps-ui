@@ -1,4 +1,4 @@
-import { Token, tokenAddressToToken } from "@/lib/Token";
+import { getTokenAddress, Token, tokenAddressToToken } from "@/lib/Token";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
@@ -14,7 +14,7 @@ import { changeLiquidity } from "src/actions/changeLiquidity";
 import { Pool } from "@/lib/Pool";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
 import router from "next/router";
-import AirdropPanel from "../AirdropPanel";
+import AirdropButton from "../AirdropButton";
 
 interface Props {
   className?: string;
@@ -112,8 +112,6 @@ export default function LiquidityCard(props: Props) {
           </SidebarTab>
         </div>
 
-        {poolName === "internal_test" && <AirdropPanel pool={props.pool} />}
-
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Add</div>
@@ -154,6 +152,8 @@ export default function LiquidityCard(props: Props) {
             />
           )}
         </div>
+
+        <AirdropButton mint={getTokenAddress(payToken)} />
 
         <SolidButton className="mt-6 w-full" onClick={changeLiq}>
           Confirm

@@ -2,44 +2,27 @@ import { getTokenLabel } from "@/lib/Token";
 import { perpsUser } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
-import { BN } from "@project-serum/anchor";
 import {
   createAssociatedTokenAccountInstruction,
   createMintToCheckedInstruction,
   getAssociatedTokenAddress,
-  mintTo,
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import { Transaction } from "@solana/web3.js";
+import { SolidButton } from "./SolidButton";
 
 interface Props {
   className?: string;
   mint: string;
-  amount?: number;
 }
 export default function AirdropButton(props: Props) {
-  console.log("airdrop props", props);
-  let amount = 0;
-
-  let mint = new PublicKey(props.mint);
-  if (!props.amount) {
-    amount = 10 * 10 ** 9;
-  } else {
-    amount = props.amount;
-  }
-
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
 
-  console.log("amount", amount);
-
   async function handleAirdrop() {
     if (mint.toString() === "So11111111111111111111111111111111111111112") {
-      // airdrop soll
-      await connection.requestAirdrop(publicKey!, amount);
+      await connection.requestAirdrop(publicKey!, 1 * 10 ** 9);
     } else {
-      console.log("mitn", mint, props.mint);
-      console.log("publicKey", publicKey);
       let transaction = new Transaction();
 
       let associatedAccount = await getAssociatedTokenAddress(mint, publicKey);
@@ -60,7 +43,7 @@ export default function AirdropButton(props: Props) {
           mint, // mint
           associatedAccount, // ata
           perpsUser.publicKey, // payer
-          amount,
+          100,
           9 // decimals
         )
       );
@@ -76,6 +59,8 @@ export default function AirdropButton(props: Props) {
   }
 
   return (
-    <button onClick={handleAirdrop}>Airdrop {getTokenLabel(props.mint)}</button>
+    <SolidButton className="mt-6 w-full" onClick={handleAirdrop}>
+      Airdrop {getTokenLabel(props.mint)}
+    </SolidButton>
   );
 }
