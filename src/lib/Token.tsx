@@ -17,12 +17,25 @@ export enum Token {
   RAY = "RAY",
   ORCA = "ORCA",
   Bonk = "Bonk",
+  TEST = "Test",
 }
+export const TOKEN_LIST = [
+  Token.SOL,
+  Token.mSOL,
+  Token.stSOL,
+  Token.USDC,
+  Token.USDT,
+  Token.RAY,
+  Token.ORCA,
+  Token.Bonk,
+  Token.TEST,
+];
 
 export function asToken(tokenStr: string): Token {
   switch (tokenStr) {
     case "SOL":
       return Token.SOL;
+
     case "mSOL":
       return Token.mSOL;
     case "stSOL":
@@ -37,6 +50,8 @@ export function asToken(tokenStr: string): Token {
       return Token.ORCA;
     case "Bonk":
       return Token.Bonk;
+    case "Test":
+      return Token.TEST;
     default:
       throw new Error("Not a valid token string");
   }
@@ -60,6 +75,8 @@ export function getTokenLabel(token: Token) {
       return "Orca";
     case Token.Bonk:
       return "BonkCoin";
+    case Token.TEST:
+      return "Test Token";
   }
 }
 
@@ -81,6 +98,8 @@ export function getSymbol(token: Token) {
       return "MSOLUSD";
     case Token.stSOL:
       return "STSOLUSDT";
+    case Token.TEST:
+      return "BARUSD";
   }
 }
 
@@ -101,6 +120,8 @@ export function getTokenIcon(token: Token) {
     case Token.ORCA:
       return <OrcaIconCircle />;
     case Token.Bonk:
+      return <BonkIconCircle />;
+    case Token.TEST:
       return <BonkIconCircle />;
   }
 }
@@ -123,6 +144,8 @@ export function getTokenId(token: Token) {
       return "orca";
     case Token.Bonk:
       return "bonk";
+    case Token.TEST:
+      return "bar";
   }
 }
 
@@ -145,6 +168,8 @@ export function tokenAddressToToken(address: string) {
       return Token.ORCA;
     case "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263":
       return Token.Bonk;
+    case "6QGdQbaZEgpXqqbGwXJZXwbZ9xJnthfyYNZ92ARzTdAX":
+      return Token.TEST;
     default:
       return null;
   }
@@ -169,5 +194,7 @@ export function getTokenAddress(token: Token) {
       return "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE";
     case Token.Bonk:
       return "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263";
+    case Token.TEST:
+      return "6QGdQbaZEgpXqqbGwXJZXwbZ9xJnthfyYNZ92ARzTdAX";
   }
 }

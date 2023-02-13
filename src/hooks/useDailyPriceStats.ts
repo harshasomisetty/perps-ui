@@ -1,17 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-import { getTokenId, Token } from "@/lib/Token";
+import { getTokenId, Token, TOKEN_LIST } from "@/lib/Token";
 
-export const TOKEN_LIST = [
-  Token.SOL,
-  Token.mSOL,
-  Token.stSOL,
-  Token.USDC,
-  Token.USDT,
-  Token.RAY,
-  Token.ORCA,
-  Token.Bonk,
-];
 interface Stats {
   change24hr: number;
   currentPrice: number;
@@ -45,6 +35,7 @@ const fetchAllStats = (() => {
         if (!firstData) {
           firstData = data;
         }
+        console.log("data", data);
         const allStats = TOKEN_LIST.reduce((acc, token) => {
           const tokenData = data[getTokenId(token)];
 
