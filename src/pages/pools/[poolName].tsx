@@ -20,7 +20,7 @@ export default function SinglePool(props: Props) {
     return <p className="text-white">Loading...</p>;
   }
 
-  let pool = Object.values(pools)[0];
+  let pool = pools[router.query.poolName as string];
   return (
     <PoolLayout className="text-white">
       <div>
