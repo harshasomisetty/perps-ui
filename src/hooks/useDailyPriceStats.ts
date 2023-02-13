@@ -35,7 +35,6 @@ const fetchAllStats = (() => {
         if (!firstData) {
           firstData = data;
         }
-        console.log("data", data);
         const allStats = TOKEN_LIST.reduce((acc, token) => {
           const tokenData = data[getTokenId(token)];
 

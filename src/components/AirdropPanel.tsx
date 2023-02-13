@@ -15,7 +15,7 @@ export default function AirdropPanel(props: Props) {
   return (
     <div className="flex w-full flex-col">
       {tokenList.map((token, key) => (
-        <AirdropButton key={key} mint={new PublicKey(getTokenAddress(token))} />
+        <AirdropButton key={key} mint={getTokenAddress(token)} />
       ))}
     </div>
   );

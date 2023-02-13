@@ -22,7 +22,6 @@ export default function SinglePoolTokens(props: Props) {
   if (Object.keys(stats).length === 0) {
     return <>Loading stats</>;
   } else {
-    console.log("got stats", stats);
     return (
       <div className="w-full border p-10">
         <div className="bg-zinc-900 p-8">
@@ -74,5 +73,4 @@ export default function SinglePoolTokens(props: Props) {
       </div>
     );
   }
-
 }

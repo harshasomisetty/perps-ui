@@ -112,7 +112,7 @@ export default function LiquidityCard(props: Props) {
           </SidebarTab>
         </div>
 
-        {poolName === "internal_labs" && <AirdropPanel pool={props.pool} />}
+        {poolName === "internal_test" && <AirdropPanel pool={props.pool} />}
 
         <div>
           <div className="flex items-center justify-between">
