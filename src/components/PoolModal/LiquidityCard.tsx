@@ -27,10 +27,9 @@ enum Tab {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [payToken, setPayToken] = useState(Token.SOL);
   const [tokenAmount, setTokenAmount] = useState(0.2);
 
-  const [tab, setTab] = useState(Tab.Remove);
+  const [tab, setTab] = useState(Tab.Add);
 
   const [payTokenBalance, setPayTokenBalance] = useState(0);
   const [liqBalance, setLiqBalance] = useState(0);
@@ -41,6 +40,8 @@ export default function LiquidityCard(props: Props) {
   let tokenList = Object.keys(props.pool?.tokens).map((token) => {
     return tokenAddressToToken(token);
   });
+
+  const [payToken, setPayToken] = useState(tokenList[0]);
 
   const poolName = router.query.poolName as string;
 
