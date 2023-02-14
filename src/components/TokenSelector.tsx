@@ -75,8 +75,7 @@ export function TokenSelector(props: Props) {
             value={props.amount || ""}
             onChange={(e) => {
               const text = e.currentTarget.value;
-              const number = parseFloat(text);
-              props.onChangeAmount?.(Number.isNaN(number) ? 0 : number);
+              props.onChangeAmount?.(text ? Number(text) : 0);
             }}
           />
           {!!stats[props.token]?.currentPrice && (

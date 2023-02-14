@@ -10,6 +10,8 @@ export interface TokenCustody {
   name: Token;
   amount: BN;
   decimals: number;
+  minRatio: number;
+  maxRatio: number;
   // liquidity: number;
 }
 
@@ -26,6 +28,7 @@ export interface Pool {
   tokens: Record<string, TokenCustody>; // string is token mint address
   tokenNames: Token[];
   custodyMetas: CustodyMeta[];
+  lpDecimals: number;
   // volume: number;
   // fees: number; // 7 days
   // oiLong: number;

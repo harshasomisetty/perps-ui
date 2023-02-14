@@ -4,6 +4,7 @@ import { getTokenAddress, tokenAddressToToken } from "@/lib/Token";
 import { PublicKey } from "@solana/web3.js";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { Pool, TokenCustody } from "@/lib/Pool";
+import { getMint } from "@solana/spl-token";
 
 export function usePools() {
   const [pools, setPools] = useState<Record<string, Pool>>();
@@ -12,9 +13,11 @@ export function usePools() {
 
   useEffect(() => {
     async function fetchPools() {
-      let { perpetual_program } = await getPerpetualProgramAndProvider();
+      let { perpetual_program, provider } =
+        await getPerpetualProgramAndProvider();
 
       let fetchedPools = await perpetual_program.account.pool.all();
+      console.log("fetchedPools", fetchedPools);
 
       await Promise.all(
         Object.values(fetchedPools).map(async (pool) => {
@@ -38,6 +41,8 @@ export function usePools() {
               name: tokenAddressToToken(custody.mint.toString()),
               amount: custody.assets.owned,
               decimals: custody.decimals,
+              minRatio: Number(pool.account.tokens[ind].minRatio),
+              maxRatio: Number(pool.account.tokens[ind].maxRatio),
             };
           });
 
@@ -85,6 +90,9 @@ export function usePools() {
             perpetual_program.programId
           )[0];
 
+          const lpDecimals = (await getMint(provider.connection, lpTokenMint))
+            .decimals;
+
           poolInfos[pool.account.name] = {
             poolName: pool.account.name,
             poolAddress: poolAddress,
@@ -92,6 +100,7 @@ export function usePools() {
             tokens: custodyInfos,
             tokenNames,
             custodyMetas,
+            lpDecimals,
           };
         })
       );

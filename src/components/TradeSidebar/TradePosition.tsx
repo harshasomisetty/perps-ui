@@ -32,8 +32,8 @@ export function TradePosition(props: Props) {
   const [positionToken, setPositionToken] = useState(Token.SOL);
   const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
 
-  const [payAmount, setPayAmount] = useState(0.05);
-  const [positionAmount, setPositionAmount] = useState(0.1);
+  const [payAmount, setPayAmount] = useState(0.1);
+  const [positionAmount, setPositionAmount] = useState(0.2);
 
   const [leverage, setLeverage] = useState(1);
 
@@ -65,7 +65,7 @@ export function TradePosition(props: Props) {
       props.side
     );
 
-    router.reload(window.location.pathname);
+    // router.reload(window.location.pathname);
   }
 
   useEffect(() => {

@@ -7,7 +7,6 @@ interface Props {
 }
 
 export const LpSelector = (props: Props) => {
-  console.log("on change amt exists");
   return (
     <div>
       <div
@@ -47,8 +46,8 @@ export const LpSelector = (props: Props) => {
             value={props.amount || ""}
             onChange={(e) => {
               const text = e.currentTarget.value;
-              const number = parseFloat(text);
-              props.onChangeAmount?.(Number.isNaN(number) ? 0 : number);
+              console.log("lp text", text);
+              props.onChangeAmount?.(text ? Number(text) : 0);
             }}
           />
         </div>

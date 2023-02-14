@@ -129,9 +129,7 @@ export async function changeLiquidity(
       transaction = transaction.add(addLiquidityTx);
     }
     if (liquidityAmount) {
-      console.log("in remove liq", liquidityAmount);
-      let lpAmount = new BN(liquidityAmount * 10e6);
-      console.log("lpAmount", lpAmount.toString());
+      let lpAmount = new BN(liquidityAmount * 10 ** pool.lpDecimals);
       let removeLiquidityTx = await perpetual_program.methods
         .removeLiquidity({ lpAmount })
         .accounts({
