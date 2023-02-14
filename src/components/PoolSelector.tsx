@@ -27,6 +27,7 @@ export function PoolSelector(props: Props) {
       <Dropdown.Trigger
         className={twMerge(
           "bg-zinc-900",
+          "border",
           "gap-x-1",
           "grid-cols-[24px,1fr,24px]",
           "grid",
@@ -45,10 +46,8 @@ export function PoolSelector(props: Props) {
           {props.pool.poolName}
         </div>
         <div
-
           className={twMerge(
             "bg-zinc-900",
-            "gap-x-1",
             "grid-cols-[24px,1fr,24px]",
             "grid",
             "group",
@@ -58,10 +57,11 @@ export function PoolSelector(props: Props) {
             "rounded",
             "text-left",
             "w-full",
+            "border",
             props.className
           )}
         >
-          <ChevronDownIcon className="h-4 w-4 fill-white" />
+          <ChevronDownIcon className="border fill-white" />
         </div>
       </Dropdown.Trigger>
       <Dropdown.Portal>
