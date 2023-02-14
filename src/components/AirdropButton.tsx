@@ -62,7 +62,9 @@ export default function AirdropButton(props: Props) {
 
   return (
     <SolidButton className="mt-6 w-full" onClick={handleAirdrop}>
-      Airdrop "{getTokenLabel(tokenAddressToToken(props.mint))}"
+      Airdrop {'"'}
+      {getTokenLabel(tokenAddressToToken(props.mint))}
+      {'"'}
     </SolidButton>
   );
 }
