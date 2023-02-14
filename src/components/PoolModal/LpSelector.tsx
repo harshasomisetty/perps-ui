@@ -7,6 +7,7 @@ interface Props {
 }
 
 export const LpSelector = (props: Props) => {
+  console.log("on change amt exists");
   return (
     <div>
       <div
@@ -33,7 +34,13 @@ export const LpSelector = (props: Props) => {
               "text-white",
               "top-0",
               "w-full",
-              "focus:outline-none"
+              "focus:outline-none",
+              typeof props.onChangeAmount === "function"
+                ? "cursor-pointer"
+                : "cursor-none",
+              typeof props.onChangeAmount === "function"
+                ? "pointer-events-auto"
+                : "pointer-events-none"
             )}
             placeholder="0"
             type="number"
@@ -44,12 +51,6 @@ export const LpSelector = (props: Props) => {
               props.onChangeAmount?.(Number.isNaN(number) ? 0 : number);
             }}
           />
-          <div className="mt-0.5 text-right text-xs text-zinc-500">place</div>
-          {/* {!!stats[props.token]?.currentPrice && (
-              <div className="mt-0.5 text-right text-xs text-zinc-500">
-                ${formatNumber(props.amount * stats[props.token].currentPrice)}
-              </div>
-            )} */}
         </div>
       </div>
     </div>

@@ -62,7 +62,13 @@ export function TokenSelector(props: Props) {
               "text-white",
               "top-0",
               "w-full",
-              "focus:outline-none"
+              "focus:outline-none",
+              typeof props.onChangeAmount === "function"
+                ? "cursor-pointer"
+                : "cursor-none",
+              typeof props.onChangeAmount === "function"
+                ? "pointer-events-auto"
+                : "pointer-events-none"
             )}
             placeholder="0"
             type="number"
