@@ -27,7 +27,7 @@ enum Tab {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [tokenAmount, setTokenAmount] = useState(0.2);
+  const [tokenAmount, setTokenAmount] = useState(10);
 
   const [tab, setTab] = useState(Tab.Add);
 

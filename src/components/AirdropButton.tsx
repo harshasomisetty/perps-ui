@@ -8,7 +8,7 @@ import {
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Transaction } from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 import { SolidButton } from "./SolidButton";
 
 interface Props {
@@ -18,6 +18,8 @@ interface Props {
 export default function AirdropButton(props: Props) {
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
+
+  let mint = new PublicKey(props.mint);
 
   async function handleAirdrop() {
     if (mint.toString() === "So11111111111111111111111111111111111111112") {
@@ -43,7 +45,7 @@ export default function AirdropButton(props: Props) {
           mint, // mint
           associatedAccount, // ata
           perpsUser.publicKey, // payer
-          100,
+          100 * 10 ** 9, // amount
           9 // decimals
         )
       );
