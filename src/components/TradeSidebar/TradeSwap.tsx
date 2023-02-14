@@ -11,6 +11,7 @@ import { usePools } from "@/hooks/usePools";
 import { Pool } from "@/lib/Pool";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
+import { useRouter } from "next/router";
 
 interface Props {
   className?: string;
@@ -26,11 +27,11 @@ export function TradeSwap(props: Props) {
 
   const { pools } = usePools();
   const { connection } = useConnection();
+  const router = useRouter();
 
   const [pool, setPool] = useState<Pool | null>(null);
 
   const { publicKey, signTransaction, wallet } = useWallet();
-
 
   useEffect(() => {
     const payTokenPrice = allPriceStats[payToken]?.currentPrice || 0;
@@ -53,24 +54,24 @@ export function TradeSwap(props: Props) {
   //   setPayAmount(payAmount);
   // }, [receiveAmount, payToken, receiveToken, allPriceStats]);
 
-
   // TODO: add pool selection for swap if need , for now fixing it to POOL1
   useEffect(() => {
     if (pools === undefined || pools === null) {
       return;
     } else {
-      const pool1 = Object.values(pools).filter(i => i.poolName == 'TestPool1');
-      console.log("selected pool:",pool1);
+      const pool1 = Object.values(pools).filter(
+        (i) => i.poolName == "TestPool1"
+      );
+      console.log("selected pool:", pool1);
       setPool(pool1[0]);
     }
-
-  }, [pools])
-  
-
+  }, [pools]);
 
   async function handleSwap() {
-    // TODO: need to take slippage as param , this is now for testing 
-  const newPrice =  (new BN(receiveAmount * 10**6)).mul(new BN(90)).div(new BN(100))
+    // TODO: need to take slippage as param , this is now for testing
+    const newPrice = new BN(receiveAmount * 10 ** 6)
+      .mul(new BN(90))
+      .div(new BN(100));
 
     await swap(
       pool,
@@ -80,12 +81,12 @@ export function TradeSwap(props: Props) {
       connection,
       receiveToken,
       payToken,
-      new BN(payAmount* 10**9),
+      new BN(payAmount * 10 ** 9),
       newPrice
     );
 
+    router.reload(window.location.pathname);
   }
-
 
   return (
     <div className={props.className}>
@@ -107,7 +108,9 @@ export function TradeSwap(props: Props) {
         onChangeAmount={setReceiveAmount}
         onSelectToken={setReceiveToken}
       />
-      <SolidButton className="mt-6 w-full" onClick={handleSwap} >Swap</SolidButton>
+      <SolidButton className="mt-6 w-full" onClick={handleSwap}>
+        Swap
+      </SolidButton>
       <TradeSwapDetails
         availableLiquidity={3871943.82}
         className="mt-4"

@@ -13,7 +13,9 @@ import { BN, Wallet } from "@project-serum/anchor";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import {
   createAssociatedTokenAccountInstruction,
+  createSyncNativeInstruction,
   getAssociatedTokenAddress,
+  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
@@ -93,16 +95,43 @@ export async function openPosition(
   let transaction = new Transaction();
 
   try {
-    // if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
-    //   transaction = transaction.add(
-    //     createAssociatedTokenAccountInstruction(
-    //       publicKey,
-    //       lpTokenAccount,
-    //       publicKey,
-    //       pool.lpTokenMint
-    //     )
-    //   );
-    // }
+    // wrap sol if needed
+    if (payToken == Token.SOL) {
+      console.log("pay token name is sol", payToken);
+
+      const associatedTokenAccount = await getAssociatedTokenAddress(
+        NATIVE_MINT,
+        publicKey
+      );
+
+      if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
+        console.log("sol ata does not exist", NATIVE_MINT.toString());
+
+        transaction = transaction.add(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            associatedTokenAccount,
+            publicKey,
+            NATIVE_MINT
+          )
+        );
+      }
+
+      // get balance of associated token account
+      console.log("sol ata exists");
+      const balance = await connection.getBalance(associatedTokenAccount);
+      if (balance < payAmount.toNumber()) {
+        console.log("balance insufficient");
+        transaction = transaction.add(
+          SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: associatedTokenAccount,
+            lamports: LAMPORTS_PER_SOL,
+          }),
+          createSyncNativeInstruction(associatedTokenAccount)
+        );
+      }
+    }
 
     console.log("position account", positionAccount.toString());
 

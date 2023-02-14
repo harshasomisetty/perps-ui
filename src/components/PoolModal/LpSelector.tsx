@@ -33,23 +33,23 @@ export const LpSelector = (props: Props) => {
               "text-white",
               "top-0",
               "w-full",
-              "focus:outline-none"
+              "focus:outline-none",
+              typeof props.onChangeAmount === "function"
+                ? "cursor-pointer"
+                : "cursor-none",
+              typeof props.onChangeAmount === "function"
+                ? "pointer-events-auto"
+                : "pointer-events-none"
             )}
             placeholder="0"
             type="number"
             value={props.amount || ""}
             onChange={(e) => {
               const text = e.currentTarget.value;
-              const number = parseFloat(text);
-              props.onChangeAmount?.(Number.isNaN(number) ? 0 : number);
+              console.log("lp text", text);
+              props.onChangeAmount?.(text ? Number(text) : 0);
             }}
           />
-          <div className="mt-0.5 text-right text-xs text-zinc-500">place</div>
-          {/* {!!stats[props.token]?.currentPrice && (
-              <div className="mt-0.5 text-right text-xs text-zinc-500">
-                ${formatNumber(props.amount * stats[props.token].currentPrice)}
-              </div>
-            )} */}
         </div>
       </div>
     </div>

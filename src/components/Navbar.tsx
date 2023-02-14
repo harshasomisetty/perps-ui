@@ -41,7 +41,8 @@ export const Navbar = () => {
           Pools
         </NavbarLink>
       </div>
-      <div>
+      <div className="flex flex-row items-center">
+        <p className="text-white">Connect to DEVNET!</p>
         <WalletMultiButtonDynamic className="bg-transparent" />
       </div>
     </nav>

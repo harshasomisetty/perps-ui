@@ -10,7 +10,9 @@ import { checkIfAccountExists } from "@/utils/retrieveData";
 import { BN } from "@project-serum/anchor";
 import {
   createAssociatedTokenAccountInstruction,
+  createSyncNativeInstruction,
   getAssociatedTokenAddress,
+  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
@@ -19,6 +21,7 @@ import {
   Connection,
   LAMPORTS_PER_SOL,
   PublicKey,
+  SystemProgram,
   Transaction,
 } from "@solana/web3.js";
 
@@ -58,6 +61,43 @@ export async function changeLiquidity(
       );
     }
 
+    if (payToken == Token.SOL) {
+      console.log("pay token name is sol", payToken);
+
+      const associatedTokenAccount = await getAssociatedTokenAddress(
+        NATIVE_MINT,
+        publicKey
+      );
+
+      if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
+        console.log("sol ata does not exist", NATIVE_MINT.toString());
+
+        transaction = transaction.add(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            associatedTokenAccount,
+            publicKey,
+            NATIVE_MINT
+          )
+        );
+      }
+
+      // get balance of associated token account
+      console.log("sol ata exists");
+      const balance = await connection.getBalance(associatedTokenAccount);
+      if (balance < tokenAmount * LAMPORTS_PER_SOL) {
+        console.log("balance insufficient");
+        transaction = transaction.add(
+          SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: associatedTokenAccount,
+            lamports: tokenAmount * LAMPORTS_PER_SOL,
+          }),
+          createSyncNativeInstruction(associatedTokenAccount)
+        );
+      }
+    }
+
     console.log("custodies", pool.custodyMetas);
     if (tokenAmount) {
       console.log("in add liq", tokenAmount);
@@ -89,9 +129,7 @@ export async function changeLiquidity(
       transaction = transaction.add(addLiquidityTx);
     }
     if (liquidityAmount) {
-      console.log("in remove liq", liquidityAmount);
-      let lpAmount = new BN(liquidityAmount * 10e6);
-      console.log("lpAmount", lpAmount.toString());
+      let lpAmount = new BN(liquidityAmount * 10 ** pool.lpDecimals);
       let removeLiquidityTx = await perpetual_program.methods
         .removeLiquidity({ lpAmount })
         .accounts({

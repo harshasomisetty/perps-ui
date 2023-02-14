@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { asToken, Token } from "@/lib/Token";
+import { asToken, Token, tokenAddressToToken } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { LeverageSlider } from "../LeverageSlider";
@@ -27,13 +27,20 @@ interface Props {
   side: Tab;
 }
 
+enum Input {
+  Pay = "pay",
+  Position = "position",
+}
+
 export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
   const [positionToken, setPositionToken] = useState(Token.SOL);
   const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
 
-  const [payAmount, setPayAmount] = useState(0.05);
-  const [positionAmount, setPositionAmount] = useState(0.1);
+  const [payAmount, setPayAmount] = useState(0.1);
+  const [positionAmount, setPositionAmount] = useState(0.2);
+
+  const [lastChanged, setLastChanged] = useState<Input>(Input.Pay);
 
   const [leverage, setLeverage] = useState(1);
 
@@ -48,6 +55,8 @@ export function TradePosition(props: Props) {
 
   const { pair } = router.query;
 
+  let tokenList: Token[] = [];
+
   async function handleTrade() {
     await openPosition(
       pool,
@@ -59,8 +68,8 @@ export function TradePosition(props: Props) {
       positionToken,
       new BN(payAmount * LAMPORTS_PER_SOL),
       new BN(positionAmount * LAMPORTS_PER_SOL),
-      new BN(allPriceStats[payToken]?.currentPrice * 10**6),
-      props.side 
+      new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6),
+      props.side
     );
 
     // router.reload(window.location.pathname);
@@ -114,8 +123,16 @@ export function TradePosition(props: Props) {
           className="mt-2"
           amount={payAmount}
           token={payToken}
-          onChangeAmount={setPayAmount}
+          onChangeAmount={(e) => {
+            console.log("token selector wrp on change", e);
+            setPayAmount(e);
+            setPositionAmount(e * leverage);
+            setLastChanged(Input.Pay);
+          }}
           onSelectToken={setPayToken}
+          tokenList={Object.keys(pool.tokens).map((token) => {
+            return tokenAddressToToken(token);
+          })}
         />
         <div className="mt-4 text-sm font-medium text-white">
           Your {props.side}
@@ -124,11 +141,18 @@ export function TradePosition(props: Props) {
           className="mt-2"
           amount={positionAmount}
           token={positionToken}
-          onChangeAmount={setPositionAmount}
+          onChangeAmount={(e) => {
+            setPayAmount(e / leverage);
+            setPositionAmount(e);
+            setLastChanged(Input.Position);
+          }}
           onSelectToken={(token) => {
             setPositionToken(token);
             router.push("/trade/" + token + "-USD");
           }}
+          tokenList={Object.keys(pool.tokens).map((token) => {
+            return tokenAddressToToken(token);
+          })}
         />
         <div className="mt-4 text-xs text-zinc-400">Pool</div>
         <PoolSelector
@@ -140,7 +164,14 @@ export function TradePosition(props: Props) {
         <LeverageSlider
           className="mt-6"
           value={leverage}
-          onChange={setLeverage}
+          onChange={(e) => {
+            if (lastChanged === Input.Pay) {
+              setPositionAmount(payAmount * e);
+            } else {
+              setPayAmount(positionAmount / e);
+            }
+            setLeverage(e);
+          }}
         />
         <SolidButton className="mt-6 w-full" onClick={handleTrade}>
           Place Order
