@@ -66,13 +66,13 @@ export default function Pools() {
                   poolClassName="text-xs"
                 />
               </td>
-              <td>${1234456}</td>
-              <td>${1234456}</td>
-              <td>${1234}</td>
-              <td>${12.34}</td>
-              <td>${12.34}</td>
-              <td>${1234}</td>
-              <td>{0.012}%</td>
+              <td>${}</td>
+              <td>${}</td>
+              <td>${}</td>
+              <td>${}</td>
+              <td>${}</td>
+              <td>${}</td>
+              <td>{}%</td>
             </tr>
           ))}
         </tbody>
