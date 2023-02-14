@@ -11,36 +11,36 @@ export default function PoolStats(props: Props) {
       {[
         {
           label: "Liquidity",
-          value: `$${124}`,
+          value: `{}`,
         },
         {
           label: "Volume",
-          value: `$${123}`,
+          value: `{}`,
         },
         {
           label: "OI Long",
           value: (
             <>
-              {`${123}% `}
+              {`{}% `}
               <span className="text-zinc-500"> / hr</span>
             </>
           ),
         },
         {
           label: "OI Short",
-          value: `$${123}`,
+          value: `{}`,
         },
         {
           label: "Fees",
-          value: `$${123}`,
+          value: `{}`,
         },
         {
           label: "Your Liquidity",
-          value: `$${123}`,
+          value: `{}`,
         },
         {
           label: "Your Share",
-          value: `$${123}`,
+          value: `{}`,
         },
       ].map(({ label, value }, i) => (
         <div className={twMerge("border-zinc-700", "pb-4", "border-t")} key={i}>

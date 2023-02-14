@@ -22,7 +22,6 @@ export default function SinglePoolTokens(props: Props) {
   if (Object.keys(stats).length === 0) {
     return <>Loading stats</>;
   } else {
-    console.log("got stats", stats);
     return (
       <div className="w-full border p-10">
         <div className="bg-zinc-900 p-8">
@@ -59,12 +58,17 @@ export default function SinglePoolTokens(props: Props) {
                         </div>
                       </div>
                     </td>
-                    <td>0.20%</td>
-                    <td>{Number(custody.amount) / 10 ** custody.decimals}</td>
-                    <td>{stats[token].currentPrice}</td>
-                    <td>123</td>
-                    <td>32.09% / 35.00%</td>
-                    <td>65.23%</td>
+                    <td>%</td>
+                    <td></td>
+                    <td>{stats[token].currentPrice.toFixed(2)}</td>
+                    <td>
+                      {(
+                        Number(custody.amount) /
+                        10 ** custody.decimals
+                      ).toFixed(2)}
+                    </td>
+                    <td>% / %</td>
+                    <td>%</td>
                   </tr>
                 );
               })}
@@ -74,5 +78,4 @@ export default function SinglePoolTokens(props: Props) {
       </div>
     );
   }
-
 }

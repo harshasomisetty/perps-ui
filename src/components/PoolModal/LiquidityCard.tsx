@@ -1,4 +1,4 @@
-import { Token, tokenAddressToToken } from "@/lib/Token";
+import { getTokenAddress, Token, tokenAddressToToken } from "@/lib/Token";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
@@ -14,6 +14,7 @@ import { changeLiquidity } from "src/actions/changeLiquidity";
 import { Pool } from "@/lib/Pool";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
 import router from "next/router";
+import AirdropButton from "../AirdropButton";
 
 interface Props {
   className?: string;
@@ -26,10 +27,9 @@ enum Tab {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [payToken, setPayToken] = useState(Token.SOL);
-  const [tokenAmount, setTokenAmount] = useState(0.2);
+  const [tokenAmount, setTokenAmount] = useState(10);
 
-  const [tab, setTab] = useState(Tab.Remove);
+  const [tab, setTab] = useState(Tab.Add);
 
   const [payTokenBalance, setPayTokenBalance] = useState(0);
   const [liqBalance, setLiqBalance] = useState(0);
@@ -40,6 +40,10 @@ export default function LiquidityCard(props: Props) {
   let tokenList = Object.keys(props.pool?.tokens).map((token) => {
     return tokenAddressToToken(token);
   });
+
+  const [payToken, setPayToken] = useState(tokenList[0]);
+
+  const poolName = router.query.poolName as string;
 
   useEffect(() => {
     async function fetchData() {
@@ -149,6 +153,8 @@ export default function LiquidityCard(props: Props) {
             />
           )}
         </div>
+
+        <AirdropButton mint={getTokenAddress(payToken)} />
 
         <SolidButton className="mt-6 w-full" onClick={changeLiq}>
           Confirm

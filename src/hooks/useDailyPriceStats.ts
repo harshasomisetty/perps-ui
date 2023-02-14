@@ -1,17 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-import { getTokenId, Token } from "@/lib/Token";
+import { getTokenId, Token, TOKEN_LIST } from "@/lib/Token";
 
-export const TOKEN_LIST = [
-  Token.SOL,
-  Token.mSOL,
-  Token.stSOL,
-  Token.USDC,
-  Token.USDT,
-  Token.RAY,
-  Token.ORCA,
-  Token.Bonk,
-];
 interface Stats {
   change24hr: number;
   currentPrice: number;
@@ -103,7 +93,7 @@ export function useDailyPriceStats(token?: Token) {
 
       timer.current = window.setInterval(async () => {
         fetchAllStats().then(setAllStats);
-      }, 30000);
+      }, 300000);
     }
 
     return () => {
