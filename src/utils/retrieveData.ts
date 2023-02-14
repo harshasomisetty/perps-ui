@@ -20,8 +20,6 @@ export async function fetchTokenBalance(
   publicKey: PublicKey,
   connection: Connection
 ): Promise<number> {
-  console.log("fetching balance for token", payToken);
-
   let tokenATA = await getAssociatedTokenAddress(
     new PublicKey(getTokenAddress(payToken)),
     publicKey

@@ -113,6 +113,10 @@ export default function LiquidityCard(props: Props) {
           </SidebarTab>
         </div>
 
+        {Object.keys(props.pool.tokens).map((token) => {
+          return <AirdropButton key={token} mint={token} />;
+        })}
+
         <div>
           <div className="flex items-center justify-between">
             {tab === Tab.Add ? (
@@ -164,8 +168,6 @@ export default function LiquidityCard(props: Props) {
             />
           )}
         </div>
-
-        <AirdropButton mint={getTokenAddress(payToken)} />
 
         <SolidButton className="mt-6 w-full" onClick={changeLiq}>
           Confirm

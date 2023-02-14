@@ -65,7 +65,10 @@ export default function AirdropButton(props: Props) {
   }
 
   return (
-    <SolidButton className="mt-6 w-full" onClick={handleAirdrop}>
+    <SolidButton
+      className="my-6 w-full bg-slate-500 hover:bg-slate-200"
+      onClick={handleAirdrop}
+    >
       Airdrop {'"'}
       {getTokenLabel(tokenAddressToToken(props.mint))}
       {'"'}
