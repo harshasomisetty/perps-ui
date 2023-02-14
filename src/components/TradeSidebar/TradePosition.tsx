@@ -27,6 +27,11 @@ interface Props {
   side: Tab;
 }
 
+enum Input {
+  Pay = "pay",
+  Position = "position",
+}
+
 export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState(Token.SOL);
   const [positionToken, setPositionToken] = useState(Token.SOL);
@@ -34,6 +39,8 @@ export function TradePosition(props: Props) {
 
   const [payAmount, setPayAmount] = useState(0.1);
   const [positionAmount, setPositionAmount] = useState(0.2);
+
+  const [lastChanged, setLastChanged] = useState<Input>(Input.Pay);
 
   const [leverage, setLeverage] = useState(1);
 
@@ -116,7 +123,12 @@ export function TradePosition(props: Props) {
           className="mt-2"
           amount={payAmount}
           token={payToken}
-          onChangeAmount={setPayAmount}
+          onChangeAmount={(e) => {
+            console.log("token selector wrp on change", e);
+            setPayAmount(e);
+            setPositionAmount(e * leverage);
+            setLastChanged(Input.Pay);
+          }}
           onSelectToken={setPayToken}
           tokenList={Object.keys(pool.tokens).map((token) => {
             return tokenAddressToToken(token);
@@ -129,7 +141,11 @@ export function TradePosition(props: Props) {
           className="mt-2"
           amount={positionAmount}
           token={positionToken}
-          onChangeAmount={setPositionAmount}
+          onChangeAmount={(e) => {
+            setPayAmount(e / leverage);
+            setPositionAmount(e);
+            setLastChanged(Input.Position);
+          }}
           onSelectToken={(token) => {
             setPositionToken(token);
             router.push("/trade/" + token + "-USD");
@@ -148,7 +164,14 @@ export function TradePosition(props: Props) {
         <LeverageSlider
           className="mt-6"
           value={leverage}
-          onChange={setLeverage}
+          onChange={(e) => {
+            if (lastChanged === Input.Pay) {
+              setPositionAmount(payAmount * e);
+            } else {
+              setPayAmount(positionAmount / e);
+            }
+            setLeverage(e);
+          }}
         />
         <SolidButton className="mt-6 w-full" onClick={handleTrade}>
           Place Order
