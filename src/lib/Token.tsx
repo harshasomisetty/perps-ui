@@ -99,7 +99,7 @@ export function getSymbol(token: Token) {
     case Token.stSOL:
       return "STSOLUSDT";
     case Token.TEST:
-      return "BARUSD";
+      return "BTCUSD";
   }
 }
 
@@ -145,7 +145,7 @@ export function getTokenId(token: Token) {
     case Token.Bonk:
       return "bonk";
     case Token.TEST:
-      return "bar";
+      return "bitcoin";
   }
 }
 
