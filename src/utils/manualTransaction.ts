@@ -22,7 +22,7 @@ export async function manualSendTransaction(
     const rawTransaction = transaction.serialize();
 
     let signature = await connection.sendRawTransaction(rawTransaction, {
-      skipPreflight: true,
+      skipPreflight: false,
     });
     console.log(
       `sent raw, waiting : https://explorer.solana.com/tx/${signature}?cluster=devnet`
