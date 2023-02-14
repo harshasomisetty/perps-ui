@@ -1819,8 +1819,8 @@ export type Perpetuals = {
             "type": "publicKey"
           },
           {
-            "name": "tokenId",
-            "type": "u16"
+            "name": "custody",
+            "type": "publicKey"
           },
           {
             "name": "openTime",
@@ -4790,8 +4790,8 @@ export const IDL: Perpetuals = {
             "type": "publicKey"
           },
           {
-            "name": "tokenId",
-            "type": "u16"
+            "name": "custody",
+            "type": "publicKey"
           },
           {
             "name": "openTime",
