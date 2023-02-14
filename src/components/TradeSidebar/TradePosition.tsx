@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { asToken, Token } from "@/lib/Token";
+import { asToken, Token, tokenAddressToToken } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { LeverageSlider } from "../LeverageSlider";
@@ -47,6 +47,8 @@ export function TradePosition(props: Props) {
   const router = useRouter();
 
   const { pair } = router.query;
+
+  let tokenList: Token[] = [];
 
   async function handleTrade() {
     await openPosition(
@@ -116,6 +118,9 @@ export function TradePosition(props: Props) {
           token={payToken}
           onChangeAmount={setPayAmount}
           onSelectToken={setPayToken}
+          tokenList={Object.keys(pool.tokens).map((token) => {
+            return tokenAddressToToken(token);
+          })}
         />
         <div className="mt-4 text-sm font-medium text-white">
           Your {props.side}
@@ -129,6 +134,9 @@ export function TradePosition(props: Props) {
             setPositionToken(token);
             router.push("/trade/" + token + "-USD");
           }}
+          tokenList={Object.keys(pool.tokens).map((token) => {
+            return tokenAddressToToken(token);
+          })}
         />
         <div className="mt-4 text-xs text-zinc-400">Pool</div>
         <PoolSelector
