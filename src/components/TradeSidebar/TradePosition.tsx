@@ -59,11 +59,11 @@ export function TradePosition(props: Props) {
       positionToken,
       new BN(payAmount * LAMPORTS_PER_SOL),
       new BN(positionAmount * LAMPORTS_PER_SOL),
-      new BN(allPriceStats[payToken]?.currentPrice * 10**6),
-      props.side 
+      new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6),
+      props.side
     );
 
-    // router.reload(window.location.pathname);
+    router.reload(window.location.pathname);
   }
 
   useEffect(() => {

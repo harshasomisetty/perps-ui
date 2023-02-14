@@ -9,6 +9,7 @@ import {
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction } from "@solana/web3.js";
+import { useRouter } from "next/router";
 import { SolidButton } from "./SolidButton";
 
 interface Props {
@@ -20,6 +21,8 @@ export default function AirdropButton(props: Props) {
   const { connection } = useConnection();
 
   let mint = new PublicKey(props.mint);
+
+  const router = useRouter();
 
   async function handleAirdrop() {
     if (mint.toString() === "So11111111111111111111111111111111111111112") {
@@ -58,6 +61,7 @@ export default function AirdropButton(props: Props) {
         perpsUser
       );
     }
+    router.reload(window.location.pathname);
   }
 
   return (

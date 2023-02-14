@@ -12,6 +12,7 @@ import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
+import { useRouter } from "next/router";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -33,12 +34,12 @@ export function PositionAdditionalInfo(props: Props) {
 
   const { pools } = usePools();
   const [pool, setPool] = useState<Pool | null>(null);
-  
+  const router = useRouter();
 
   let payToken = props.position.token;
   let positionToken = props.position.token;
 
-  // TODO: select correct pool and also refetch usePositions after the transaction 
+  // TODO: select correct pool and also refetch usePositions after the transaction
   async function handleCloseTrade() {
     console.log("in close trade");
     await closePosition(
@@ -51,23 +52,26 @@ export function PositionAdditionalInfo(props: Props) {
       positionToken,
       props.position.positionAccountAddress,
       props.position.type,
-      new BN(allPriceStats[payToken]?.currentPrice * 10**6)
+      new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6)
     );
+
+    router.reload(window.location.pathname);
   }
 
   // router.reload(window.location.pathname);
   if (pools === undefined) {
     return <p>single Pool not loaded</p>;
   } else if (pool === null) {
-    //  FIXED : fetch pool from position 
-    const pool1 = Object.values(pools).filter(i => i.poolAddress.toBase58() == props.position.poolAddress);
-    if(pool1.length){
+    //  FIXED : fetch pool from position
+    const pool1 = Object.values(pools).filter(
+      (i) => i.poolAddress.toBase58() == props.position.poolAddress
+    );
+    if (pool1.length) {
       setPool(pool1[0]);
       return <p>multiple Pools not loaded</p>;
     } else {
       return <p>single Pool not loaded</p>;
     }
-    
   } else {
     return (
       <div
