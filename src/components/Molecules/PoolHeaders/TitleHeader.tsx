@@ -4,6 +4,7 @@ import { tokenAddressToToken } from "@/lib/Token";
 import { twMerge } from "tailwind-merge";
 
 interface Props {
+  className?: string;
   iconClassName?: string;
   poolClassName?: string;
   pool: Pool;
@@ -11,7 +12,7 @@ interface Props {
 
 export function TitleHeader(props: Props) {
   return (
-    <div className="flex flex-col space-x-1">
+    <div className={twMerge("flex", "flex-col", "space-x-1", props.className)}>
       <div className="flex flex-row">
         <PoolTokens
           tokens={props.pool.tokenNames}

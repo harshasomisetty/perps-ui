@@ -13,7 +13,7 @@ export function PoolLayout(props: Props) {
         "flex-col",
         "px-4",
         "lg:px-16",
-        "mx-auto",
+        "mt-7",
         props.className
       )}
     >
