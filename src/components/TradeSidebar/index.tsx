@@ -50,7 +50,9 @@ export function TradeSidebar(props: Props) {
           </SidebarTab>
         </div>
         {tab === Tab.Long && <TradePosition className="mt-6" side={Tab.Long} />}
-        {tab === Tab.Short && <TradePosition className="mt-6" side={Tab.Short} />}
+        {tab === Tab.Short && (
+          <TradePosition className="mt-6" side={Tab.Short} />
+        )}
         {tab === Tab.Swap && <TradeSwap className="mt-6" />}
       </div>
     </div>
