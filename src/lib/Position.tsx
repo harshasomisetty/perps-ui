@@ -26,7 +26,7 @@ export interface Position {
   size: number;
   timestamp: number;
   token: Token;
-  type: Side;
+  side: Side;
   value: number;
   valueDelta: number;
   valueDeltaPercentage: number;

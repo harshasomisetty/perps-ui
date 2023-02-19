@@ -7,7 +7,7 @@ import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
-import { Position } from "@/lib/Position";
+import { Position, Side } from "@/lib/Position";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -64,18 +64,18 @@ export function PositionInfo(props: Props) {
             "items-center",
             "mt-1",
             "space-x-1",
-            props.position.type === "Long"
+            props.position.side === Side.Long
               ? "text-emerald-400"
               : "text-rose-400"
           )}
         >
-          {props.position.type === "Long" ? (
+          {props.position.side === Side.Long ? (
             <GrowthIcon className="h-3 w-3 fill-current" />
           ) : (
             <GrowthIcon className="h-3 w-3 -scale-y-100 fill-current" />
           )}
           <div className="text-sm">
-            {props.position.type === "Long" ? "Long" : "Short"}
+            {props.position.side === Side.Long ? "Long" : "Short"}
           </div>
         </div>
       </PositionColumn>

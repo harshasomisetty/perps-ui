@@ -52,7 +52,7 @@ export function usePositions() {
       },
     ]);
 
-    // console.log("fetched positons", fetchedPositions);
+    console.log("fetched positons", fetchedPositions);
 
     let custodyAccounts = fetchedPositions.map(
       (position) => position.account.custody
@@ -85,13 +85,14 @@ export function usePositions() {
         size: position.account.sizeUsd.toNumber(),
         timestamp: Date.now(),
         token: tokenAddressToToken(fetchedCustodies[index].mint.toString()),
-        type: position.account.side.hasOwnProperty("long")
+        side: position.account.side.hasOwnProperty("long")
           ? Side.Long
           : Side.Short,
         value: 0,
         valueDelta: 0,
         valueDeltaPercentage: 0,
       };
+
       organizedPositions[poolAddress]!.push(cleanedPosition);
     });
 
@@ -99,6 +100,9 @@ export function usePositions() {
       status: "success",
       data: Object.entries(organizedPositions).map(
         ([poolAddress, positions]) => {
+          positions.forEach((position) =>
+            console.log("position", position.side)
+          );
           return {
             name: poolNames[poolAddress],
             tokens: positions.map((position) => position.token),
@@ -108,7 +112,7 @@ export function usePositions() {
       ),
     };
 
-    console.log("positionObject:", organizedPositionsObject);
+    console.log("finalPositionObject:", organizedPositionsObject);
     setPositions(organizedPositionsObject);
   };
 

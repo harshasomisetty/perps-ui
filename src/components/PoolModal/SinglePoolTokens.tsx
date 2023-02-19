@@ -1,18 +1,11 @@
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { Pool } from "@/lib/Pool";
-import {
-  getTokenIcon,
-  getTokenLabel,
-  Token,
-  tokenAddressToToken,
-} from "@/lib/Token";
+import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
-import { PoolTokens } from "../PoolTokens";
 
 interface Props {
   className?: string;
-  //   tokens: Token[];
   pool: Pool;
 }
 
