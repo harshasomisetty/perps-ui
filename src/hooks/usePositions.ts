@@ -28,7 +28,7 @@ interface Success {
 
 type PositionRequest = Pending | Failure | Success;
 
-export function usePositions(wallet: Wallet) {
+export function usePositions() {
   const [positions, setPositions] = useState<PositionRequest>({
     status: "pending",
   });
