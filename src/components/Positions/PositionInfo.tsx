@@ -132,7 +132,7 @@ export function PositionInfo(props: Props) {
                 props.position.positionAccountAddress.toString()
               )}`}
             >
-              <NewTab />
+              <NewTab className="fill-white" />
             </a>
             <button
               className={twMerge(
