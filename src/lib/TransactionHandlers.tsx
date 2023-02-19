@@ -4,6 +4,9 @@ import { Connection, Transaction } from "@solana/web3.js";
 export const TRX_URL = (txid: string) =>
   `https://explorer.solana.com/tx/${txid}?cluster=devnet`;
 
+export const ACCOUNT_URL = (address: string) =>
+  `https://explorer.solana.com/address/${address}?cluster=devnet`;
+
 export async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
