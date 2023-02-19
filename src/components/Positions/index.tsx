@@ -24,8 +24,8 @@ export function Positions(props: Props) {
         )}
       </header>
       {positions.status === "success" &&
-        positions.data.map((pool) => (
-          <ExistingPosition pool={pool} key={pool.id} />
+        positions.data.map((pool, index) => (
+          <ExistingPosition poolPositions={pool} key={index} />
         ))}
 
       <NoPositions />
