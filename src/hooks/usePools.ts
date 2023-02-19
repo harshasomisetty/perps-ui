@@ -21,7 +21,7 @@ export function usePools() {
 
       await Promise.all(
         Object.values(fetchedPools).map(async (pool) => {
-          let custodyAccounts = Object.values(pool.account.tokens).map(
+          let custodyAccounts = (pool.account.tokens as Array<any>).map(
             (token) => token.custody.toString()
           );
 

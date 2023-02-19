@@ -1,7 +1,10 @@
-import { forwardRef } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { forwardRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { LoadingSpinner } from "./Icons/LoadingSpinner";
 
 import { LoadingDots } from "./LoadingDots";
+import { notify } from "./Notify";
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   pending?: boolean;
@@ -9,7 +12,23 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const SolidButton = forwardRef<HTMLButtonElement, Props>(
   function SolidButton(props, ref) {
-    const { pending, ...rest } = props;
+    const { ...rest } = props;
+    const [loading, setLoading] = useState(false);
+    const { publicKey } = useWallet()
+
+    const handleClick = async (e) => {
+      if (!publicKey) {
+          notify('Connect Wallet', 'warn')
+          return
+      }
+      setLoading(true)
+      try {
+          await rest.onClick?.(e);
+      } catch (error) {
+          console.error("ButtonWithLoading onClick error:", error)
+      }
+      setLoading(false)
+  }
 
     return (
       <button
@@ -29,16 +48,18 @@ export const SolidButton = forwardRef<HTMLButtonElement, Props>(
           "tracking-normal",
           "transition-colors",
           rest.className,
-          !pending && "active:bg-purple-500",
+          !loading && "active:bg-purple-500",
           "disabled:bg-zinc-300",
           "disabled:cursor-not-allowed",
-          !pending && "hover:bg-purple-400",
-          pending && "cursor-not-allowed"
+          !loading && "hover:bg-purple-400",
+          loading && "cursor-not-allowed"
         )}
         onClick={(e) => {
-          if (!pending && !rest.disabled) {
-            rest.onClick?.(e);
-          }
+
+          handleClick(e)
+          // if (!loading && !rest.disabled) {
+          //   rest.onClick?.(e);
+          // }
         }}
       >
         <div
@@ -50,13 +71,14 @@ export const SolidButton = forwardRef<HTMLButtonElement, Props>(
             "text-sm",
             "transition-all",
             "group-disabled:text-neutral-400",
-            pending ? "opacity-0" : "opacity-100"
+            loading ? "opacity-0" : "opacity-100"
           )}
         >
+         
           {rest.children}
         </div>
-        {pending && (
-          <LoadingDots className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+        {loading && (
+          <LoadingSpinner className="absolute text-4xl"/>
         )}
       </button>
     );
