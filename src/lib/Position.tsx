@@ -33,6 +33,7 @@ export interface Position {
 }
 
 export interface UserPoolPositions {
-  positions: Position[];
+  name: string;
   tokens: Token[];
+  positions: Position[];
 }

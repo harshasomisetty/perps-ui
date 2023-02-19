@@ -33,17 +33,24 @@ export async function closePosition(
   payToken: Token,
   positionToken: Token,
   positionAccountAddress: String,
-  side : Side,
+  side: Side,
   price: BN
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
   console.log("pool", pool);
-  console.log("side:",side)
+  console.log("side:", side);
 
-  // TODO: need to take slippage as param , this is now for testing 
-  const adjustedPrice = side.toString() == 'Long' ? price.mul(new BN(80)).div(new BN(100)) : price.mul(new BN(110)).div(new BN(100));
-  console.log("adjustedPrice, coingeckoPrice:",adjustedPrice.toString(), price.toString());
+  // TODO: need to take slippage as param , this is now for testing
+  const adjustedPrice =
+    side.toString() == "Long"
+      ? price.mul(new BN(50)).div(new BN(100))
+      : price.mul(new BN(50)).div(new BN(100));
+  console.log(
+    "adjustedPrice, coingeckoPrice:",
+    adjustedPrice.toString(),
+    price.toString()
+  );
 
   // let lpTokenAccount = await getAssociatedTokenAddress(
   //   pool.lpTokenMint,
@@ -55,7 +62,7 @@ export async function closePosition(
     publicKey
   );
   console.log("tokens", payToken, positionToken);
-  
+
   // let positionAccount = findProgramAddressSync(
   //   [
   //     "position",
@@ -88,12 +95,12 @@ export async function closePosition(
     // }
 
     const positionAccount = new PublicKey(positionAccountAddress);
-    
+
     console.log("position account", positionAccount.toString());
 
     let tx = await perpetual_program.methods
       .closePosition({
-        price : adjustedPrice,
+        price: adjustedPrice,
       })
       .accounts({
         owner: publicKey,
