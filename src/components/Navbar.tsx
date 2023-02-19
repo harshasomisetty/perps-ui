@@ -27,7 +27,7 @@ export const Navbar = () => {
         "px-4",
         "right-0",
         "top-0",
-        "z-50"
+        "z-20"
       )}
     >
       <Link className="hidden items-center space-x-2 md:flex" href="/">

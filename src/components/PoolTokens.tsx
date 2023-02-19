@@ -10,7 +10,7 @@ interface Props {
 
 export function PoolTokens(props: Props) {
   return (
-    <div className="flex items-center -space-x-3">
+    <div className="flex items-center -space-x-6">
       {props.tokens.slice(0, 3).map((token, i) => {
         const tokenIcon = getTokenIcon(token);
 
@@ -23,7 +23,7 @@ export function PoolTokens(props: Props) {
             "rounded-full",
             "relative"
           ),
-          style: { zIndex: 3 },
+          style: { zIndex: 3 - i },
           key: token,
         });
       })}

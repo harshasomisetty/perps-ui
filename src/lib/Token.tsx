@@ -149,7 +149,7 @@ export function getTokenId(token: Token) {
   }
 }
 
-export function tokenAddressToToken(address: string) {
+export function tokenAddressToToken(address: string): Token {
   switch (address) {
     case "So11111111111111111111111111111111111111112":
       return Token.SOL;

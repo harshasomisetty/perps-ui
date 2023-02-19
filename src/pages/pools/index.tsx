@@ -20,10 +20,10 @@ export default function Pools() {
   // TODO align title by baseline
   return (
     <div className="px-16 py-6">
-      <div className="flex items-end space-x-3 pb-8">
-        <h1 className="text-4xl text-white">Liquidity Pools</h1>
+      <div className="flex items-baseline space-x-3 pb-8 ">
+        <h1 className="m-0 text-4xl text-white">Liquidity Pools</h1>
         <div className="flex flex-row space-x-2 text-sm">
-          <p className="text-zinc-500">TVL</p>
+          <p className="text-zinc-500 ">TVL</p>
           <p className="text-white">${0}</p>
         </div>
       </div>

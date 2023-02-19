@@ -24,11 +24,11 @@ export default function SinglePool(props: Props) {
   return (
     <PoolLayout className="text-white">
       <div>
-        <PoolBackButton />
-        <TitleHeader pool={pool!} iconClassName="w-10 h-10" />
+        <PoolBackButton className="mb-6" />
+        <TitleHeader pool={pool!} iconClassName="w-10 h-10" className="mb-8" />
       </div>
       <div className="flex w-full flex-col">
-        <PoolStats pool={pool!} />
+        <PoolStats pool={pool!} className="mb-4" />
         <SinglePoolTokens pool={pool!} />
       </div>
       <LiquidityCard pool={pool!} />
