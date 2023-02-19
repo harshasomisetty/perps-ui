@@ -16,6 +16,9 @@ import { clusterApiUrl } from "@solana/web3.js";
 import { AppProps } from "next/app";
 import { FC, useMemo } from "react";
 
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 import { Navbar } from "@/components/Navbar";
@@ -23,6 +26,17 @@ import { Navbar } from "@/components/Navbar";
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Context>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Navbar />
       <Component {...pageProps} />
     </Context>

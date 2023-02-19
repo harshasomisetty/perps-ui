@@ -13,8 +13,8 @@ interface Props {
 }
 
 export function Positions(props: Props) {
-  const { wallet } = useWallet();
-  const positions = usePositions(wallet);
+
+  const {positions} = usePositions();
 
   return (
     <div className={props.className}>

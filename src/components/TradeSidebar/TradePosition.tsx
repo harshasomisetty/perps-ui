@@ -21,6 +21,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { token } from "@metaplex-foundation/js";
 import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
+import { usePositions } from "@/hooks/usePositions";
 
 interface Props {
   className?: string;
@@ -47,6 +48,8 @@ export function TradePosition(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
 
+  const {fetchPositions} = usePositions()
+
   const { pools } = usePools();
   const [pool, setPool] = useState<Pool | null>(null);
 
@@ -71,7 +74,7 @@ export function TradePosition(props: Props) {
       new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6),
       props.side
     );
-
+    fetchPositions()
     // router.reload(window.location.pathname);
   }
 
@@ -112,7 +115,9 @@ export function TradePosition(props: Props) {
         <div className="flex items-center justify-between text-sm ">
           <div className="font-medium text-white">You Pay</div>
           {publicKey && (
-            <div className="flex flex-row space-x-1 font-medium text-white">
+            <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
+            onClick={() => setPayAmount(payTokenBalance)}
+            >
               <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
               <p className="font-normal">{payToken}</p>
               <p className="text-zinc-400"> Balance</p>

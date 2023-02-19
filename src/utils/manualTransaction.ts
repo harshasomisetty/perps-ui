@@ -1,3 +1,4 @@
+import { sendSignedTransactionAndNotify } from "@/lib/TransactionHandlers";
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 
 export async function manualSendTransaction(
@@ -5,33 +6,45 @@ export async function manualSendTransaction(
   publicKey: PublicKey,
   connection: Connection,
   signTransaction: any,
-  otherSigner?: Keypair
+  otherSigner?: Keypair,
+  successMessage?: string,
+  failMessage? :string
 ) {
-  try {
-    console.log("in man send tx");
+  // try {
     transaction.feePayer = publicKey;
     transaction.recentBlockhash = (
       await connection.getRecentBlockhash("finalized")
     ).blockhash;
 
-    if (otherSigner) {
-      transaction.sign(otherSigner);
-    }
+    await sendSignedTransactionAndNotify({
+      connection,
+      transaction,
+      successMessage: successMessage ?? "",
+      failMessage: failMessage ?? "",
+      signTransaction,
+      enableSigning: true
+    })
+  //   console.log("in man send tx");
 
-    transaction = await signTransaction(transaction);
-    const rawTransaction = transaction.serialize();
 
-    let signature = await connection.sendRawTransaction(rawTransaction, {
-      skipPreflight: false,
-    });
-    console.log(
-      `sent raw, waiting : https://explorer.solana.com/tx/${signature}?cluster=devnet`
-    );
-    await connection.confirmTransaction(signature, "confirmed");
-    console.log(
-      `sent tx!!! :https://explorer.solana.com/tx/${signature}?cluster=devnet`
-    );
-  } catch (error) {
-    console.log("man error?", error);
-  }
+  //   if (otherSigner) {
+  //     transaction.sign(otherSigner);
+  //   }
+
+  //   transaction = await signTransaction(transaction);
+  //   const rawTransaction = transaction.serialize();
+
+  //   let signature = await connection.sendRawTransaction(rawTransaction, {
+  //     skipPreflight: false,
+  //   });
+  //   console.log(
+  //     `sent raw, waiting : https://explorer.solana.com/tx/${signature}?cluster=devnet`
+  //   );
+  //   await connection.confirmTransaction(signature, "confirmed");
+  //   console.log(
+  //     `sent tx!!! :https://explorer.solana.com/tx/${signature}?cluster=devnet`
+  //   );
+  // } catch (error) {
+  //   console.log("man error?", error);
+  // }
 }
