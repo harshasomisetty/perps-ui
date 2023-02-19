@@ -23,7 +23,7 @@ export default function SinglePoolTokens(props: Props) {
     return <>Loading stats</>;
   } else {
     return (
-      <div className="w-full border p-10">
+      <div className="w-full border">
         <div className="bg-zinc-900 p-8">
           <table className={twMerge("table-auto", "text-white", "w-full")}>
             <thead className={twMerge("text-xs", "text-zinc-500", "p-10")}>

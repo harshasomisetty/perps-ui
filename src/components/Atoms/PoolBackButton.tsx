@@ -1,17 +1,27 @@
 import { ChevronLeft } from "@carbon/icons-react";
 import { useRouter } from "next/router";
+import { twMerge } from "tailwind-merge";
 
-export default function PoolBackButton() {
+interface Props {
+  className?: string;
+}
+export default function PoolBackButton(props: Props) {
   const router = useRouter();
 
   return (
     <div
-      className="flex cursor-pointer flex-row align-bottom"
+      className={twMerge(
+        "flex",
+        "cursor-pointer",
+        "items-center",
+        "space-x-1.5",
+        props.className
+      )}
       onClick={() => router.push("/pools")}
     >
-      <ChevronLeft className="h-8 w-8" />
+      <ChevronLeft className="h-4 w-4 fill-zinc-500" />
 
-      <p className="text-zinc-400">Back To Pools</p>
+      <p className="text-sm font-medium text-zinc-500">Back To Pools</p>
     </div>
   );
 }

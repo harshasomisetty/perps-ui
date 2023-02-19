@@ -1861,7 +1861,11 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "lockedFunds",
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "collateralAmount",
             "type": "u64"
           },
           {
@@ -2126,7 +2130,7 @@ export type Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "collateral",
+            "name": "collateralUsd",
             "type": "u64"
           }
         ]
@@ -2614,6 +2618,10 @@ export type Perpetuals = {
           {
             "name": "maxLeverage",
             "type": "u64"
+          },
+          {
+            "name": "maxPayoffMult",
+            "type": "u64"
           }
         ]
       }
@@ -2958,11 +2966,16 @@ export type Perpetuals = {
     },
     {
       "code": 6019,
+      "name": "TokenRatioOutOfRange",
+      "msg": "Token ratio out of range"
+    },
+    {
+      "code": 6020,
       "name": "UnsupportedToken",
       "msg": "Token is not supported"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "InstructionNotAllowed",
       "msg": "Instruction is not allowed at this time"
     }
@@ -4832,7 +4845,11 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "lockedFunds",
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "collateralAmount",
             "type": "u64"
           },
           {
@@ -5097,7 +5114,7 @@ export const IDL: Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "collateral",
+            "name": "collateralUsd",
             "type": "u64"
           }
         ]
@@ -5585,6 +5602,10 @@ export const IDL: Perpetuals = {
           {
             "name": "maxLeverage",
             "type": "u64"
+          },
+          {
+            "name": "maxPayoffMult",
+            "type": "u64"
           }
         ]
       }
@@ -5929,11 +5950,16 @@ export const IDL: Perpetuals = {
     },
     {
       "code": 6019,
+      "name": "TokenRatioOutOfRange",
+      "msg": "Token ratio out of range"
+    },
+    {
+      "code": 6020,
       "name": "UnsupportedToken",
       "msg": "Token is not supported"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "InstructionNotAllowed",
       "msg": "Instruction is not allowed at this time"
     }
