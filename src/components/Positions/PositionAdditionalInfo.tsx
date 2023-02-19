@@ -78,7 +78,7 @@ export function PositionAdditionalInfo(props: Props) {
         className={twMerge(
           "overflow-hidden",
           "grid",
-          "grid-cols-[12%,1fr,max-content]",
+          "grid-cols-[12%,1fr,1fr,max-content]",
           "gap-x-8",
           "items-center",
           "pr-4",

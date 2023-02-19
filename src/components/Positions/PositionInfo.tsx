@@ -3,11 +3,13 @@ import { cloneElement } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
+import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
+import NewTab from "@carbon/icons-react/lib/NewTab";
 
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
-import { Position } from "@/lib/Position";
+import { Position, Side } from "@/lib/Position";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -64,18 +66,18 @@ export function PositionInfo(props: Props) {
             "items-center",
             "mt-1",
             "space-x-1",
-            props.position.type === "Long"
+            props.position.side === Side.Long
               ? "text-emerald-400"
               : "text-rose-400"
           )}
         >
-          {props.position.type === "Long" ? (
+          {props.position.side === Side.Long ? (
             <GrowthIcon className="h-3 w-3 fill-current" />
           ) : (
             <GrowthIcon className="h-3 w-3 -scale-y-100 fill-current" />
           )}
           <div className="text-sm">
-            {props.position.type === "Long" ? "Long" : "Short"}
+            {props.position.side === Side.Long ? "Long" : "Short"}
           </div>
         </div>
       </PositionColumn>
@@ -122,22 +124,33 @@ export function PositionInfo(props: Props) {
           <div className="text-sm text-white">
             ${formatPrice(props.position.liquidationPrice)}
           </div>
-          <button
-            className={twMerge(
-              "bg-zinc-900",
-              "grid",
-              "h-6",
-              "place-items-center",
-              "rounded-full",
-              "transition-all",
-              "w-6",
-              "hover:bg-zinc-700",
-              props.expanded && "-rotate-180"
-            )}
-            onClick={() => props.onClickExpand?.()}
-          >
-            <ChevronDownIcon className="h-4 w-4 fill-white" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`${ACCOUNT_URL(
+                props.position.positionAccountAddress.toString()
+              )}`}
+            >
+              <NewTab className="fill-white" />
+            </a>
+            <button
+              className={twMerge(
+                "bg-zinc-900",
+                "grid",
+                "h-6",
+                "place-items-center",
+                "rounded-full",
+                "transition-all",
+                "w-6",
+                "hover:bg-zinc-700",
+                props.expanded && "-rotate-180"
+              )}
+              onClick={() => props.onClickExpand?.()}
+            >
+              <ChevronDownIcon className="h-4 w-4 fill-white" />
+            </button>
+          </div>
         </div>
       </PositionColumn>
     </div>

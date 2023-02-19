@@ -28,14 +28,14 @@ export function ExistingPosition(props: Props) {
                 percentages. */}
         <PoolPositionHeader poolPositions={props.poolPositions} />
       </div>
-      {props.poolPositions.positions.map((position, i) => (
+      {props.poolPositions.positions.map((position, index) => (
         <PoolPositionRow
           className={twMerge(
             "border-zinc-700",
-            i < props.poolPositions.positions.length - 1 && "border-b"
+            index < props.poolPositions.positions.length - 1 && "border-b"
           )}
           position={position}
-          key={position.id}
+          key={index}
         />
       ))}
     </div>

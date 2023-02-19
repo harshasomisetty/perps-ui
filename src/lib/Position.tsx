@@ -13,7 +13,7 @@ export class TradeSide {
 
 export interface Position {
   id: string;
-  positionAccountAddress : string;
+  positionAccountAddress: string;
   poolAddress: string;
   collateral: number;
   entryPrice: number;
@@ -26,14 +26,13 @@ export interface Position {
   size: number;
   timestamp: number;
   token: Token;
-  type: Side;
+  side: Side;
   value: number;
   valueDelta: number;
   valueDeltaPercentage: number;
 }
 
-export interface PositionPool {
-  id: string;
+export interface UserPoolPositions {
   name: string;
   tokens: Token[];
   positions: Position[];
