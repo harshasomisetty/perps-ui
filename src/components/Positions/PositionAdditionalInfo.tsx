@@ -13,8 +13,6 @@ import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useRouter } from "next/router";
-import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
-import Launch from "@carbon/icons-react/lib/Close";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -142,15 +140,6 @@ export function PositionAdditionalInfo(props: Props) {
             </div>
           </div>
         </div>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`${ACCOUNT_URL(
-            props.position.positionAccountAddress.toString()
-          )}`}
-        >
-          <Launch />
-        </a>
         <SolidButton className="h-9 w-36" onClick={handleCloseTrade}>
           <CloseIcon className="mr-2 h-4 w-4" />
           <div>Close Position</div>

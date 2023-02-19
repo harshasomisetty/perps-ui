@@ -3,6 +3,8 @@ import { Pool } from "@/lib/Pool";
 import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
+import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
+import NewTab from "@carbon/icons-react/lib/NewTab";
 
 interface Props {
   className?: string;
@@ -28,6 +30,7 @@ export default function SinglePoolTokens(props: Props) {
                 <td>Amount</td>
                 <td>Current/Target Weight</td>
                 <td>Utilization</td>
+                <thead></thead>
               </tr>
             </thead>
             <tbody className={twMerge("text-xs")}>
@@ -37,7 +40,7 @@ export default function SinglePoolTokens(props: Props) {
                 return (
                   <tr key={tokenMint} className="my-2 border-t border-zinc-700">
                     <td>
-                      <div className="flex flex-row space-x-1">
+                      <div className="flex flex-row items-center space-x-1">
                         {cloneElement(icon, {
                           className: "h-10 w-10",
                         })}
@@ -49,6 +52,15 @@ export default function SinglePoolTokens(props: Props) {
                             {getTokenLabel(token)}
                           </p>
                         </div>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`${ACCOUNT_URL(
+                            custody.mintAccount.toString()
+                          )}`}
+                        >
+                          <NewTab />
+                        </a>
                       </div>
                     </td>
                     <td>%</td>
@@ -67,6 +79,17 @@ export default function SinglePoolTokens(props: Props) {
                     </td>
                     <td>% / %</td>
                     <td>%</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${ACCOUNT_URL(
+                          custody.custodyAccount.toString()
+                        )}`}
+                      >
+                        <NewTab />
+                      </a>
+                    </td>
                   </tr>
                 );
               })}
