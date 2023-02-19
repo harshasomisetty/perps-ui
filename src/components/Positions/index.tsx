@@ -10,8 +10,7 @@ interface Props {
 }
 
 export function Positions(props: Props) {
-
-  const {positions} = usePositions();
+  const { positions } = usePositions();
 
   console.log("positons", positions);
 
@@ -28,8 +27,7 @@ export function Positions(props: Props) {
           <ExistingPosition poolPositions={pool} key={index} />
         ))}
 
-      <NoPositions />
-      {/* {positions.status != "success" && <NoPositions />} */}
+      {positions.status != "success" && <NoPositions />}
     </div>
   );
 }
