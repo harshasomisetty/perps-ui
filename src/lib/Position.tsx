@@ -13,7 +13,7 @@ export class TradeSide {
 
 export interface Position {
   id: string;
-  positionAccountAddress : string;
+  positionAccountAddress: string;
   poolAddress: string;
   collateral: number;
   entryPrice: number;
@@ -32,9 +32,7 @@ export interface Position {
   valueDeltaPercentage: number;
 }
 
-export interface PositionPool {
-  id: string;
-  name: string;
-  tokens: Token[];
+export interface UserPoolPositions {
   positions: Position[];
+  tokens: Token[];
 }

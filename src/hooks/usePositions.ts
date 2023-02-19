@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 
 import { Token, tokenAddressToToken } from "@/lib/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
-import { Position, PositionPool } from "@/lib/Position";
+import {
+  Position,
+  PoolPositions,
+  UserPoolPositions,
+  Side,
+} from "@/lib/Position";
 import { Wallet } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
@@ -18,18 +23,20 @@ interface Failure {
 
 interface Success {
   status: "success";
-  data: PositionPool[];
+  data: Record<string, UserPoolPositions[]>;
 }
 
-type Positions = Pending | Failure | Success;
+type PositionRequest = Pending | Failure | Success;
 
-export function usePositions() {
-  const [positions, setPositions] = useState<Positions>({ status: "pending" });
+export function usePositions(wallet: Wallet) {
+  const [positions, setPositions] = useState<PositionRequest>({
+    status: "pending",
+  });
 
-  const { publicKey, wallet} = useWallet();
+  const { publicKey, wallet } = useWallet();
 
   const fetchPositions = async () => {
-    if(!wallet) return;
+    if (!wallet) return;
     let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
     // const owner = new PublicKey('HKU5tpotzMbhABVtnvsrStu5gxZt82q67rWpCUJQf439');
@@ -77,9 +84,7 @@ export function usePositions() {
           size: position.account.sizeUsd.toNumber(),
           timestamp: Date.now(),
           token: tokenAddressToToken(fetchedCustodies[index].mint.toString()),
-          type: position.account.side.hasOwnProperty("long")
-            ? "Long"
-            : "Short",
+          type: position.account.side.hasOwnProperty("long") ? "Long" : "Short",
           value: 0,
           valueDelta: 0,
           valueDeltaPercentage: 0,
@@ -99,11 +104,11 @@ export function usePositions() {
     };
     console.log("positionObject:", positionsObject);
     setPositions(positionsObject);
-  }
+  };
 
   useEffect(() => {
     fetchPositions();
   }, [publicKey]);
 
-  return {positions, fetchPositions};
+  return { positions, fetchPositions };
 }
