@@ -7,11 +7,12 @@ interface StoreState {
     setStorePositions: (position: PositionRequest) => void
 }
 
-const store = (set: Function): StoreState => ({
-    storePositions: {
-        status: "pending",
-    },
-    setStorePositions: (position: PositionRequest) => set({ storePositions: position })
-})
-
-export const useAppStore = create(process.env.NODE_ENV == 'production'? store : devtools(store));
+export const useAppStore = create<StoreState>()(
+    devtools((set) => ({
+        devtools: false,
+        storePositions: {
+            status: "pending",
+        },
+        setStorePositions: (position: PositionRequest) => set({ storePositions: position })
+    }))
+)
