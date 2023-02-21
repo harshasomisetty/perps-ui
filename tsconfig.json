@@ -37,7 +37,8 @@
       "@/styles/*": ["./src/styles/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/target/*": ["./src/target/*"],
-      "@/lib/*": ["src/lib/*"]
+      "@/lib/*": ["src/lib/*"],
+      "@/stores/*": ["src/stores/*"],
     }
   },
   "exclude": ["./out/**/*", "./node_modules/**/*", "**/*.test.ts"],

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { tokenAddressToToken } from "@/lib/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { Position, UserPoolPositions, Side } from "@/lib/Position";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useAppStore } from "@/stores/store";
+import { shallow } from 'zustand/shallow'
 
 interface Pending {
   status: "pending";
@@ -19,12 +21,20 @@ interface Success {
   data: UserPoolPositions[];
 }
 
-type PositionRequest = Pending | Failure | Success;
+export type PositionRequest = Pending | Failure | Success;
 
 export function usePositions() {
-  const [positions, setPositions] = useState<PositionRequest>({
-    status: "pending",
-  });
+
+  const { 
+    positions, 
+    setStorePositions
+  } = useAppStore(
+    (state) => ({ 
+      positions: state.storePositions,
+      setStorePositions: state.setStorePositions 
+    }),
+    shallow
+  )
 
   const { publicKey, wallet } = useWallet();
 
@@ -113,7 +123,8 @@ export function usePositions() {
     };
 
     console.log("finalPositionObject:", organizedPositionsObject);
-    setPositions(organizedPositionsObject);
+    setStorePositions(organizedPositionsObject)
+
   };
 
   useEffect(() => {

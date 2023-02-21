@@ -13,6 +13,7 @@ import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useRouter } from "next/router";
+import { usePositions } from "@/hooks/usePositions";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -38,7 +39,7 @@ export function PositionAdditionalInfo(props: Props) {
 
   let payToken = props.position.token;
   let positionToken = props.position.token;
-
+  const {fetchPositions} = usePositions()
   // TODO: select correct pool and also refetch usePositions after the transaction
   async function handleCloseTrade() {
     console.log("in close trade");
@@ -51,11 +52,11 @@ export function PositionAdditionalInfo(props: Props) {
       payToken,
       positionToken,
       props.position.positionAccountAddress,
-      props.position.type,
+      props.position.side,
       new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6)
     );
 
-    router.reload(window.location.pathname);
+    fetchPositions()
   }
 
   // router.reload(window.location.pathname);
