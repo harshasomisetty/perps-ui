@@ -31,7 +31,7 @@ export function TitleHeader(props: Props) {
           <NewTab />
         </a>
       </div>
-      <div className="flex flex-row text-xs font-medium text-zinc-500 ">
+      <div className="text-s mt-3 flex flex-row font-medium text-zinc-500">
         <p>{tokenAddressToToken(Object.keys(props.pool.tokens)[0]!)}</p>
 
         {Object.keys(props.pool.tokens)

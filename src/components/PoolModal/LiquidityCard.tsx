@@ -113,9 +113,10 @@ export default function LiquidityCard(props: Props) {
           </SidebarTab>
         </div>
 
-        {Object.keys(props.pool.tokens).map((token) => {
-          return <AirdropButton key={token} mint={token} />;
-        })}
+        {poolName == "internal_test" &&
+          Object.keys(props.pool.tokens).map((token) => {
+            return <AirdropButton key={token} mint={token} />;
+          })}
 
         <div>
           <div className="flex items-center justify-between">

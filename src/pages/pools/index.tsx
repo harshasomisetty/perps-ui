@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
-import PoolModal from "@/components/PoolModal";
 import { Pool } from "@/lib/Pool";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
@@ -28,9 +27,6 @@ export default function Pools() {
         </div>
       </div>
 
-      {selectedPool && (
-        <PoolModal pool={selectedPool} setPool={setSelectedPool} />
-      )}
       <table className={twMerge("table-auto", "text-white", "w-full")}>
         <thead
           className={twMerge(

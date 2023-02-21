@@ -14,8 +14,6 @@ export default function PoolStats(props: Props) {
         "grid-cols-4",
         "gap-x-4",
         "gap-y-8",
-        "border",
-        "border-red-600",
         props.className
       )}
     >

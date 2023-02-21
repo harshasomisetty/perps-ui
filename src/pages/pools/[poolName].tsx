@@ -28,7 +28,7 @@ export default function SinglePool(props: Props) {
         <TitleHeader pool={pool!} iconClassName="w-10 h-10" className="mb-8" />
       </div>
       <div className="flex w-full flex-col">
-        <PoolStats pool={pool!} className="mb-4" />
+        <PoolStats pool={pool!} className="mb-8" />
         <SinglePoolTokens pool={pool!} />
       </div>
       <LiquidityCard pool={pool!} />
