@@ -10,11 +10,11 @@ export async function getProvider(wallet: Wallet, network: string = "devnet") {
   }
 
   const connection = new Connection(network_url, {
-    commitment: "confirmed",
+    commitment: "processed",
   });
 
   const provider = new AnchorProvider(connection, wallet, {
-    commitment: "confirmed",
+    commitment: "processed",
     skipPreflight: true,
   });
   return provider;
