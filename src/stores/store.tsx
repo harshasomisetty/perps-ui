@@ -8,7 +8,7 @@ interface StoreState {
 }
 
 export const useAppStore = create<StoreState>()(
-    devtools((set) => ({
+    devtools((set, get) => ({
         devtools: false,
         storePositions: {
             status: "pending",
