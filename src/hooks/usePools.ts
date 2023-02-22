@@ -43,15 +43,10 @@ export function usePools() {
               decimals: custody.decimals,
               minRatio: Number(pool.account.tokens[ind].minRatio),
               maxRatio: Number(pool.account.tokens[ind].maxRatio),
+              openPositionUsd: Number(custody.volumeStats.openPositionUsd),
+              closePositionUsd: Number(custody.volumeStats.closePositionUsd),
             };
           });
-
-          // fetchedCustodies.forEach((custody) => {
-          //   console.log(
-          //     "custody assets",
-          //     Number(custody.assets.owned) / 10 ** custody.decimals
-          //   );
-          // });
 
           let poolAddress = findProgramAddressSync(
             ["pool", pool.account.name],
@@ -105,8 +100,6 @@ export function usePools() {
 
           let poolObj = new PoolObj(poolData);
 
-          console.log("poolObj in effect", poolObj.getLiquidities());
-          console.log("poolObj in effff", poolObj.speak());
           poolInfos[pool.account.name] = poolObj;
         })
       );

@@ -13,7 +13,8 @@ export interface TokenCustody {
   decimals: number;
   minRatio: number;
   maxRatio: number;
-  // liquidity: number;
+  openPositionUsd: number;
+  closePositionUsd: number;
 }
 
 export class CustodyObject {
@@ -48,7 +49,7 @@ export interface Pool {
   // fees: number; // 7 days
   // oiLong: number;
   // oiShort: number;
-  // userLiquitiy: number;
+  userLiquidity: number;
   // userShare: number;
 }
 
@@ -68,34 +69,30 @@ export class PoolObj {
     if (stats === undefined) {
       return;
     }
-    // console.log("statsf", stats);
-
-    // Object.values(this.tokens).forEach((tokenCustody) => {
-    //   console.log("names?", tokenCustody.name);
-    //   console.log("currrr price", stats[tokenCustody.name].currentPrice);
-    //   let singleLiq =
-    //     stats[tokenCustody.name].currentPrice *
-    //     (Number(tokenCustody.amount) / 10 ** tokenCustody.decimals);
-    //   console.log("single liq ", singleLiq, "token", tokenCustody.name);
-    // });
 
     const totalAmount = Object.values(this.tokens).reduce(
       (acc: number, tokenCustody) => {
         let singleLiq =
           stats[tokenCustody.name].currentPrice *
           (Number(tokenCustody.amount) / 10 ** tokenCustody.decimals);
-        console.log("single liq ", singleLiq, "token", tokenCustody.name);
         return acc + singleLiq;
       },
       0
     );
 
-    console.log("total amount", totalAmount);
-
     return totalAmount.toFixed(2);
   }
 
-  speak() {
-    return this.poolName;
+  getTradeVolumes() {
+    const totalAmount = Object.values(this.tokens).reduce(
+      (acc: number, tokenCustody: TokenCustody) => {
+        return (
+          acc + tokenCustody.openPositionUsd + tokenCustody.closePositionUsd
+        );
+      },
+      0
+    );
+
+    return totalAmount.toFixed(2);
   }
 }

@@ -30,7 +30,7 @@ export default function PoolStats(props: Props) {
           },
           {
             label: "Volume",
-            value: `{}`,
+            value: `$${props.pool.getTradeVolumes()}`,
           },
           {
             label: "OI Long",

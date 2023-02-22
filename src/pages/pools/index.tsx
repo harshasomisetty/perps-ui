@@ -70,7 +70,7 @@ export default function Pools() {
                 />
               </td>
               <td>${pool.getLiquidities(stats)}</td>
-              <td>${}</td>
+              <td>${pool.getTradeVolumes()}</td>
               <td>${}</td>
               <td>${}</td>
               <td>${}</td>
