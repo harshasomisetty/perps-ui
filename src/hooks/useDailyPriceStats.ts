@@ -9,7 +9,7 @@ interface Stats {
   low24hr: number;
 }
 
-type AllStats = Record<Token, Stats>;
+export type AllStats = Record<Token, Stats>;
 
 const fetchAllStats = (() => {
   let inFlight: null | Promise<AllStats> = null;

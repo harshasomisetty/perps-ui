@@ -3,11 +3,11 @@ import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { getTokenAddress, tokenAddressToToken } from "@/lib/Token";
 import { PublicKey } from "@solana/web3.js";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
-import { Pool, TokenCustody } from "@/lib/Pool";
+import { Pool, PoolObj, TokenCustody } from "@/lib/Pool";
 import { getMint } from "@solana/spl-token";
 
 export function usePools() {
-  const [pools, setPools] = useState<Record<string, Pool>>();
+  const [pools, setPools] = useState<Record<string, PoolObj>>();
 
   let poolInfos = {};
 
@@ -93,7 +93,7 @@ export function usePools() {
           const lpDecimals = (await getMint(provider.connection, lpTokenMint))
             .decimals;
 
-          poolInfos[pool.account.name] = {
+          let poolData: Pool = {
             poolName: pool.account.name,
             poolAddress: poolAddress,
             lpTokenMint,
@@ -102,6 +102,12 @@ export function usePools() {
             custodyMetas,
             lpDecimals,
           };
+
+          let poolObj = new PoolObj(poolData);
+
+          console.log("poolObj in effect", poolObj.getLiquidities());
+          console.log("poolObj in effff", poolObj.speak());
+          poolInfos[pool.account.name] = poolObj;
         })
       );
 

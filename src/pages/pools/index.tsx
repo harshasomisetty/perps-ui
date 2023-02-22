@@ -4,10 +4,12 @@ import { twMerge } from "tailwind-merge";
 import { Pool } from "@/lib/Pool";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
+import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 
 export default function Pools() {
   const { pools } = usePools();
   const router = useRouter();
+  const stats = useDailyPriceStats();
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
 
@@ -15,8 +17,13 @@ export default function Pools() {
     return <p className="text-white">Loading...</p>;
   }
 
+  if (Object.keys(stats).length === 0) {
+    return <>Loading stats</>;
+  }
+
   console.log("pools in ppol page", pools);
   // TODO align title by baseline
+
   return (
     <div className="px-16 py-6">
       <div className="flex items-baseline space-x-3 pb-8 ">
@@ -62,7 +69,7 @@ export default function Pools() {
                   poolClassName="text-xs"
                 />
               </td>
-              <td>${}</td>
+              <td>${pool.getLiquidities(stats)}</td>
               <td>${}</td>
               <td>${}</td>
               <td>${}</td>

@@ -21,6 +21,7 @@ export default function SinglePool(props: Props) {
   }
 
   let pool = pools[router.query.poolName as string];
+  console.log("pool object", pool?.getLiquidities());
   return (
     <PoolLayout className="text-white">
       <div>
