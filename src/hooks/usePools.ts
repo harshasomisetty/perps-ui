@@ -30,12 +30,9 @@ export function usePools() {
               custodyAccounts
             );
 
-          console.log("fetchedCustodies", fetchedCustodies);
-
           let custodyInfos: Record<string, TokenCustody> = {};
 
           Object.values(fetchedCustodies).forEach((custody, ind) => {
-            console.log("each custody", custody);
             custodyInfos[custody.mint.toString()] = {
               custodyAccount: new PublicKey(custodyAccounts[ind]),
               tokenAccount: custody.tokenAccount,

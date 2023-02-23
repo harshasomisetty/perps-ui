@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
 import { Pool } from "@/lib/Pool";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function Pools() {
   const { pools } = usePools();
   const router = useRouter();
   const stats = useDailyPriceStats();
+  const { wallet, publicKey, signTransaction } = useWallet();
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
 
@@ -24,6 +26,25 @@ export default function Pools() {
   console.log("pools in ppol page", pools);
   // TODO align title by baseline
 
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     let lpTokenAccount = await getAssociatedTokenAddress(
+  //       props.pool.lpTokenMint,
+  //       publicKey
+  //     );
+
+  //     let balance = 0;
+  //     if (await checkIfAccountExists(lpTokenAccount, connection)) {
+  //       balance = (await connection.getTokenAccountBalance(lpTokenAccount))
+  //         .value.uiAmount;
+  //     }
+  //     console.log("user balance: ", balance);
+  //   }
+  //   if (publicKey) {
+  //     fetchData();
+  //   }
+  // }, [wallet, publicKey]);
+
   return (
     <div className="px-16 py-6">
       <div className="flex items-baseline space-x-3 pb-8 ">
@@ -32,9 +53,11 @@ export default function Pools() {
           <p className="text-zinc-500 ">TVL</p>
           <p className="text-white">
             $
-            {Object.values(pools).reduce((acc, pool) => {
-              return acc + Number(pool.getLiquidities(stats));
-            }, 0)}
+            {Object.values(pools)
+              .reduce((acc, pool) => {
+                return acc + Number(pool.getLiquidities(stats));
+              }, 0)
+              .toFixed(2)}
           </p>
         </div>
       </div>
