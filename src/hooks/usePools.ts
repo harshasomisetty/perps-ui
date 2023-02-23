@@ -121,7 +121,7 @@ export function usePools() {
 
           let poolObj = new PoolObj(poolData);
 
-          poolInfos[pool.account.name] = poolObj;
+          poolInfos[pool.publicKey.toString()] = poolObj;
         })
       );
 

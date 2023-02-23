@@ -24,7 +24,6 @@ export default function Pools() {
   }
 
   console.log("pools in ppol page", pools);
-  // TODO align title by baseline
 
   // useEffect(() => {
   //   async function fetchData() {

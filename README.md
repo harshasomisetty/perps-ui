@@ -1,10 +1,3 @@
 # Perps UI
 
-
-## TODO
-
-TODO data fetch a coin's 24h change, high, low, etc
-TODO calculate entry liq price etc
-
-
-
+ui demo for [perpetuals exchange](https://www.github.com/askibin/perpetuals)
