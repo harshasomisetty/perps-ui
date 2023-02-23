@@ -11,6 +11,21 @@ interface Props {
   pool: Pool;
 }
 
+function TableHeader() {
+  return (
+    <>
+      <p>Pool Tokens</p>
+      <p>Deposit Fee</p>
+      <p>Liquidity</p>
+      <p>Price</p>
+      <p>Amount</p>
+      <p>Current/Target Weight</p>
+      <p>Utilization</p>
+      <p>Utilization</p>
+    </>
+  );
+}
+
 export default function SinglePoolTokens(props: Props) {
   const stats = useDailyPriceStats();
 
@@ -18,19 +33,19 @@ export default function SinglePoolTokens(props: Props) {
     return <>Loading stats</>;
   } else {
     return (
-      <div className="w-full border">
+      <div className="w-full ">
         <div className="bg-zinc-900 p-8">
           <table className={twMerge("table-auto", "text-white", "w-full")}>
             <thead className={twMerge("text-xs", "text-zinc-500", "p-10")}>
-              <tr className="m-10 p-10">
-                <td>Pool Tokens</td>
-                <td>Deposit Fee</td>
-                <td>Liquidity</td>
-                <td>Price</td>
-                <td>Amount</td>
-                <td>Current/Target Weight</td>
-                <td>Utilization</td>
-                <thead></thead>
+              <tr className="">
+                <td className="pb-5 text-white">Pool Tokens</td>
+                <td className="pb-5">Deposit Fee</td>
+                <td className="pb-5">Liquidity</td>
+                <td className="pb-5">Price</td>
+                <td className="pb-5">Amount</td>
+                <td className="pb-5">Current/Target Weight</td>
+                <td className="pb-5">Utilization</td>
+                <td className="pb-5"></td>
               </tr>
             </thead>
             <tbody className={twMerge("text-xs")}>
@@ -38,8 +53,8 @@ export default function SinglePoolTokens(props: Props) {
                 const token = tokenAddressToToken(tokenMint);
                 const icon = getTokenIcon(token);
                 return (
-                  <tr key={tokenMint} className="my-2 border-t border-zinc-700">
-                    <td>
+                  <tr key={tokenMint} className="border-t border-zinc-700">
+                    <td className="py-4">
                       <div className="flex flex-row items-center space-x-1">
                         {cloneElement(icon, {
                           className: "h-10 w-10",

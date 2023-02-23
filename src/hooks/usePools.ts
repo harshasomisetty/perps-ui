@@ -3,11 +3,11 @@ import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { getTokenAddress, tokenAddressToToken } from "@/lib/Token";
 import { PublicKey } from "@solana/web3.js";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
-import { Pool, TokenCustody } from "@/lib/Pool";
+import { Pool, PoolObj, TokenCustody } from "@/lib/Pool";
 import { getMint } from "@solana/spl-token";
 
 export function usePools() {
-  const [pools, setPools] = useState<Record<string, Pool>>();
+  const [pools, setPools] = useState<Record<string, PoolObj>>();
 
   let poolInfos = {};
 
@@ -43,15 +43,31 @@ export function usePools() {
               decimals: custody.decimals,
               minRatio: Number(pool.account.tokens[ind].minRatio),
               maxRatio: Number(pool.account.tokens[ind].maxRatio),
+
+              volume: {
+                swap: Number(custody.volumeStats.swapUsd),
+                addLiquidity: Number(custody.volumeStats.addLiquidityUsd),
+                removeLiquidity: Number(custody.volumeStats.removeLiquidityUsd),
+                openPosition: Number(custody.volumeStats.openPositionUsd),
+                closePosition: Number(custody.volumeStats.closePositionUsd),
+                liquidation: Number(custody.volumeStats.liquidationUsd),
+              },
+
+              oiLong: Number(custody.tradeStats.oiLongUsd),
+              oiShort: Number(custody.tradeStats.oiShortUsd),
+
+              fees: {
+                swap: Number(custody.collectedFees.swapUsd),
+                addLiquidity: Number(custody.collectedFees.addLiquidityUsd),
+                removeLiquidity: Number(
+                  custody.collectedFees.removeLiquidityUsd
+                ),
+                openPosition: Number(custody.collectedFees.openPositionUsd),
+                closePosition: Number(custody.collectedFees.closePositionUsd),
+                liquidation: Number(custody.collectedFees.liquidationUsd),
+              },
             };
           });
-
-          // fetchedCustodies.forEach((custody) => {
-          //   console.log(
-          //     "custody assets",
-          //     Number(custody.assets.owned) / 10 ** custody.decimals
-          //   );
-          // });
 
           let poolAddress = findProgramAddressSync(
             ["pool", pool.account.name],
@@ -93,7 +109,7 @@ export function usePools() {
           const lpDecimals = (await getMint(provider.connection, lpTokenMint))
             .decimals;
 
-          poolInfos[pool.account.name] = {
+          let poolData: Pool = {
             poolName: pool.account.name,
             poolAddress: poolAddress,
             lpTokenMint,
@@ -102,6 +118,10 @@ export function usePools() {
             custodyMetas,
             lpDecimals,
           };
+
+          let poolObj = new PoolObj(poolData);
+
+          poolInfos[pool.publicKey.toString()] = poolObj;
         })
       );
 

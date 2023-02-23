@@ -1,4 +1,4 @@
-import { Pool } from "@/lib/Pool";
+import { Pool, PoolObj } from "@/lib/Pool";
 import { Side } from "@/lib/Position";
 import { getTokenAddress, Token } from "@/lib/Token";
 import {
@@ -25,7 +25,7 @@ import {
 } from "@solana/web3.js";
 
 export async function closePosition(
-  pool: Pool,
+  pool: PoolObj,
   wallet: Wallet,
   publicKey: PublicKey,
   signTransaction,

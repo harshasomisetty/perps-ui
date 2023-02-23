@@ -24,6 +24,8 @@ interface Props {
   token: Token;
   onChangeAmount?(amount: number): void;
   onSelectToken?(token: Token): void;
+  liqRatio: number;
+  setLiquidity?: (amount: number) => void;
   tokenList?: Token[];
 }
 
@@ -79,8 +81,23 @@ export function TokenSelector(props: Props) {
             value={decimalTrim(props.amount) || ""}
             onChange={(e) => {
               const text = e.currentTarget.value;
-              console.log("changing text", text, Number(text));
               props.onChangeAmount?.(Number(text));
+
+              // console.log(
+              //   "all nujbers ratio",
+              //   (Number(text) * stats[props.token].currentPrice) *
+              //     props.liqRatio
+              // );
+
+              props.setLiquidity?.(
+                Number(
+                  (
+                    Number(text) *
+                    stats[props.token].currentPrice *
+                    props.liqRatio
+                  ).toFixed(2)
+                )
+              );
             }}
           />
           {!!stats[props.token]?.currentPrice && (
