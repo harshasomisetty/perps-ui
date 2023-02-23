@@ -3,6 +3,24 @@ import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { Token } from "./Token";
 
+interface VolumeStats {
+  swap: number;
+  addLiquidity: number;
+  removeLiquidity: number;
+  openPosition: number;
+  closePosition: number;
+  liquidation: number;
+}
+
+interface FeeStats {
+  swap: number;
+  addLiquidity: number;
+  removeLiquidity: number;
+  openPosition: number;
+  closePosition: number;
+  liquidation: number;
+}
+
 export interface TokenCustody {
   custodyAccount: PublicKey;
   tokenAccount: PublicKey;
@@ -13,23 +31,28 @@ export interface TokenCustody {
   decimals: number;
   minRatio: number;
   maxRatio: number;
-  openPositionUsd: number;
-  closePositionUsd: number;
+
+  volume: VolumeStats;
+
+  oiLong: number;
+  oiShort: number;
+
+  fees: FeeStats;
 }
 
-export class CustodyObject {
-  constructor(custody: TokenCustody) {
-    this.custodyAccount = custody.custodyAccount;
-    this.tokenAccount = custody.tokenAccount;
-    this.mintAccount = custody.mintAccount;
-    this.oracleAccount = custody.oracleAccount;
-    this.name = custody.name;
-    this.amount = custody.amount;
-    this.decimals = custody.decimals;
-    this.minRatio = custody.minRatio;
-    this.maxRatio = custody.maxRatio;
-  }
-}
+// export class CustodyObject {
+//   constructor(custody: TokenCustody) {
+//     this.custodyAccount = custody.custodyAccount;
+//     this.tokenAccount = custody.tokenAccount;
+//     this.mintAccount = custody.mintAccount;
+//     this.oracleAccount = custody.oracleAccount;
+//     this.name = custody.name;
+//     this.amount = custody.amount;
+//     this.decimals = custody.decimals;
+//     this.minRatio = custody.minRatio;
+//     this.maxRatio = custody.maxRatio;
+//   }
+// }
 
 export interface CustodyMeta {
   pubkey: PublicKey;
@@ -87,12 +110,48 @@ export class PoolObj {
     const totalAmount = Object.values(this.tokens).reduce(
       (acc: number, tokenCustody: TokenCustody) => {
         return (
-          acc + tokenCustody.openPositionUsd + tokenCustody.closePositionUsd
+          acc +
+          Object.values(tokenCustody.volume).reduce((acc, val) => acc + val)
         );
       },
       0
     );
 
-    return totalAmount.toFixed(2);
+    return (totalAmount / 10 ** 6).toFixed(2);
+  }
+
+  getOiLong() {
+    const totalAmount = Object.values(this.tokens).reduce(
+      (acc: number, tokenCustody: TokenCustody) => {
+        return acc + tokenCustody.oiLong;
+      },
+      0
+    );
+
+    return (totalAmount / 10 ** 6).toFixed(2);
+  }
+
+  getOiShort() {
+    const totalAmount = Object.values(this.tokens).reduce(
+      (acc: number, tokenCustody: TokenCustody) => {
+        return acc + tokenCustody.oiShort;
+      },
+      0
+    );
+
+    return (totalAmount / 10 ** 6).toFixed(2);
+  }
+
+  getFees() {
+    const totalAmount = Object.values(this.tokens).reduce(
+      (acc: number, tokenCustody: TokenCustody) => {
+        return (
+          acc + Object.values(tokenCustody.fees).reduce((acc, val) => acc + val)
+        );
+      },
+      0
+    );
+
+    return (totalAmount / 10 ** 6).toFixed(2);
   }
 }

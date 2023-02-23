@@ -30,6 +30,8 @@ export function usePools() {
               custodyAccounts
             );
 
+          console.log("fetchedCustodies", fetchedCustodies);
+
           let custodyInfos: Record<string, TokenCustody> = {};
 
           Object.values(fetchedCustodies).forEach((custody, ind) => {
@@ -43,8 +45,27 @@ export function usePools() {
               decimals: custody.decimals,
               minRatio: Number(pool.account.tokens[ind].minRatio),
               maxRatio: Number(pool.account.tokens[ind].maxRatio),
-              openPositionUsd: Number(custody.volumeStats.openPositionUsd),
-              closePositionUsd: Number(custody.volumeStats.closePositionUsd),
+
+              volume: {
+                swap: Number(custody.volumeStats.swap),
+                addLiquidity: Number(custody.volumeStats.addLiquidity),
+                removeLiquidity: Number(custody.volumeStats.removeLiquidity),
+                openPosition: Number(custody.volumeStats.openPosition),
+                closePosition: Number(custody.volumeStats.closePosition),
+                liquidation: Number(custody.volumeStats.liquidation),
+              },
+
+              oiLong: Number(custody.tradeStats.oiLong),
+              oiShort: Number(custody.tradeStats.oiShort),
+
+              fees: {
+                swap: Number(custody.feesStats.swap),
+                addLiquidity: Number(custody.feesStats.addLiquidity),
+                removeLiquidity: Number(custody.feesStats.removeLiquidity),
+                openPosition: Number(custody.feesStats.openPosition),
+                closePosition: Number(custody.feesStats.closePosition),
+                liquidation: Number(custody.feesStats.liquidation),
+              },
             };
           });
 
