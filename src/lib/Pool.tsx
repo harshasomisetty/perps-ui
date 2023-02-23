@@ -109,6 +109,7 @@ export class PoolObj {
   getTradeVolumes() {
     const totalAmount = Object.values(this.tokens).reduce(
       (acc: number, tokenCustody: TokenCustody) => {
+        console.log("reducer", acc, tokenCustody.volume);
         return (
           acc +
           Object.values(tokenCustody.volume).reduce((acc, val) => acc + val)
@@ -116,6 +117,8 @@ export class PoolObj {
       },
       0
     );
+
+    console.log("volume totalAmount", totalAmount);
 
     return (totalAmount / 10 ** 6).toFixed(2);
   }

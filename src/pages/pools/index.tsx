@@ -30,7 +30,12 @@ export default function Pools() {
         <h1 className="m-0 text-4xl text-white">Liquidity Pools</h1>
         <div className="flex flex-row space-x-2 text-sm">
           <p className="text-zinc-500 ">TVL</p>
-          <p className="text-white">${0}</p>
+          <p className="text-white">
+            $
+            {Object.values(pools).reduce((acc, pool) => {
+              return acc + Number(pool.getLiquidities(stats));
+            }, 0)}
+          </p>
         </div>
       </div>
 
@@ -71,9 +76,9 @@ export default function Pools() {
               </td>
               <td>${pool.getLiquidities(stats)}</td>
               <td>${pool.getTradeVolumes()}</td>
-              <td>${}</td>
-              <td>${}</td>
-              <td>${}</td>
+              <td>${pool.getFees()}</td>
+              <td>${pool.getOiLong()}</td>
+              <td>${pool.getOiShort()}</td>
               <td>${}</td>
               <td>{}%</td>
             </tr>

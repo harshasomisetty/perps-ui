@@ -1,6 +1,10 @@
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { Pool } from "@/lib/Pool";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
+import { checkIfAccountExists } from "@/utils/retrieveData";
 
 interface Props {
   pool: Pool;
@@ -9,6 +13,28 @@ interface Props {
 
 export default function PoolStats(props: Props) {
   const stats = useDailyPriceStats();
+
+  const { wallet, publicKey, signTransaction } = useWallet();
+  const { connection } = useConnection();
+
+  useEffect(() => {
+    async function fetchData() {
+      let lpTokenAccount = await getAssociatedTokenAddress(
+        props.pool.lpTokenMint,
+        publicKey
+      );
+
+      let balance = 0;
+      if (await checkIfAccountExists(lpTokenAccount, connection)) {
+        balance = (await connection.getTokenAccountBalance(lpTokenAccount))
+          .value.uiAmount;
+      }
+      console.log("user balance: ", balance);
+    }
+    if (publicKey) {
+      fetchData();
+    }
+  }, [wallet, publicKey]);
 
   if (Object.keys(stats).length === 0) {
     return <>Loading stats</>;
@@ -36,18 +62,18 @@ export default function PoolStats(props: Props) {
             label: "OI Long",
             value: (
               <>
-                {`{}% `}
-                <span className="text-zinc-500"> / hr</span>
+                {`$${props.pool.getOiLong()} `}
+                <span className="text-zinc-500"> </span>
               </>
             ),
           },
           {
             label: "OI Short",
-            value: `{}`,
+            value: `$${props.pool.getOiShort()}`,
           },
           {
             label: "Fees",
-            value: `{}`,
+            value: `$${props.pool.getFees()}`,
           },
           {
             label: "Your Liquidity",

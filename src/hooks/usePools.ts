@@ -35,6 +35,7 @@ export function usePools() {
           let custodyInfos: Record<string, TokenCustody> = {};
 
           Object.values(fetchedCustodies).forEach((custody, ind) => {
+            console.log("each custody", custody);
             custodyInfos[custody.mint.toString()] = {
               custodyAccount: new PublicKey(custodyAccounts[ind]),
               tokenAccount: custody.tokenAccount,
@@ -47,24 +48,26 @@ export function usePools() {
               maxRatio: Number(pool.account.tokens[ind].maxRatio),
 
               volume: {
-                swap: Number(custody.volumeStats.swap),
-                addLiquidity: Number(custody.volumeStats.addLiquidity),
-                removeLiquidity: Number(custody.volumeStats.removeLiquidity),
-                openPosition: Number(custody.volumeStats.openPosition),
-                closePosition: Number(custody.volumeStats.closePosition),
-                liquidation: Number(custody.volumeStats.liquidation),
+                swap: Number(custody.volumeStats.swapUsd),
+                addLiquidity: Number(custody.volumeStats.addLiquidityUsd),
+                removeLiquidity: Number(custody.volumeStats.removeLiquidityUsd),
+                openPosition: Number(custody.volumeStats.openPositionUsd),
+                closePosition: Number(custody.volumeStats.closePositionUsd),
+                liquidation: Number(custody.volumeStats.liquidationUsd),
               },
 
-              oiLong: Number(custody.tradeStats.oiLong),
-              oiShort: Number(custody.tradeStats.oiShort),
+              oiLong: Number(custody.tradeStats.oiLongUsd),
+              oiShort: Number(custody.tradeStats.oiShortUsd),
 
               fees: {
-                swap: Number(custody.feesStats.swap),
-                addLiquidity: Number(custody.feesStats.addLiquidity),
-                removeLiquidity: Number(custody.feesStats.removeLiquidity),
-                openPosition: Number(custody.feesStats.openPosition),
-                closePosition: Number(custody.feesStats.closePosition),
-                liquidation: Number(custody.feesStats.liquidation),
+                swap: Number(custody.collectedFees.swapUsd),
+                addLiquidity: Number(custody.collectedFees.addLiquidityUsd),
+                removeLiquidity: Number(
+                  custody.collectedFees.removeLiquidityUsd
+                ),
+                openPosition: Number(custody.collectedFees.openPositionUsd),
+                closePosition: Number(custody.collectedFees.closePositionUsd),
+                liquidation: Number(custody.collectedFees.liquidationUsd),
               },
             };
           });

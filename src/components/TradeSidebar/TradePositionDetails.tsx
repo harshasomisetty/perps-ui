@@ -59,7 +59,7 @@ export function TradePositionDetails(props: Props) {
             value: (
               <>
                 {`${formatFees(props.borrowFee)}% `}
-                <span className="text-zinc-500"> / hr</span>
+                <span className="text-zinc-500"> </span>
               </>
             ),
           },
