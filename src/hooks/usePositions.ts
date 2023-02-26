@@ -42,6 +42,7 @@ export function usePositions() {
 
     let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
+    // not needed to fetch always pools 
     let fetchedPools = await perpetual_program.account.pool.all();
     let poolNames: Record<string, string> = {};
 
@@ -63,7 +64,8 @@ export function usePositions() {
     let custodyAccounts = fetchedPositions.map(
       (position) => position.account.custody
     );
-
+    
+    // not needed to fetch always custodies
     let fetchedCustodies =
       await perpetual_program.account.custody.fetchMultiple(custodyAccounts);
 
