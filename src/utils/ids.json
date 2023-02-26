@@ -1,0 +1,53 @@
+{
+    "cluster_urls": {
+        "devnet": "https://api.devnet.solana.com",
+        "localnet": "http://127.0.0.1:8899",
+        "mainnet": "https://api.mainnet-beta.solana.com",
+        "testnet": "http://api.testnet.rpcpool.com"
+      },
+     "pools" : [
+       {
+            "cluster": "devnet",
+            "poolName" : "TestPool1",
+            "poolAddress" : "GSa3BkjXpoUdd1Bw1EiuMLRY3jFZBwQJJivPNWgSiGJ3",
+            "lpTokenMint" : "Han23mxQeHeoBbj4vYtYZNaB5bhwV3n4nxKezM6H6nbr",
+            "lpDecimals" : 6,
+
+            "tokens" : [
+                {
+                    "symbol": "USDC",
+                    "mintKey": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr",
+                    "decimals": 6,
+                    "isStable" : true
+                },
+                {
+                    "symbol": "SOL",
+                    "mintKey": "So11111111111111111111111111111111111111112",
+                    "decimals": 9,
+                    "isStable" : false
+                }
+            ],
+            "custodies" : [
+                {
+                    "custodyAccount" : "GBrsFAWty2G2WfsP8XWmzDTrBj8Dafx8ZXpXHD1Th6Y9",
+                    "tokenAccount" : "EYYCHS8eGZYo7yWSwqL3dd2uY3Um5E8vLXjr6EE4zcQv",
+                    "symbol": "SOL",
+                    "mintKey": "So11111111111111111111111111111111111111112",
+                    "decimals": 9,
+                    "isStable" : false,
+                    "oracleAddress" : "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"
+                },
+                {
+                    "custodyAccount" : "BCuesBYYCUzfAHoLc1BeJo1Lq71Kacb2hMKJAi5FW9Be",
+                    "tokenAccount" : "EYYCHS8eGZYo7yWSwqL3dd2uY3Um5E8vLXjr6EE4zcQv",
+                    "symbol" : "USDC",
+                    "mintKey": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr",
+                    "decimals": 6,
+                    "isStable" : true,
+                    "oracleAddress" : "5SSkXsEKQepHHAewytPVwdej4epN1nxgLVM84L4KXgy7"
+                }
+            ]
+       }
+    ]
+}
+

@@ -1,7 +1,6 @@
-import { PoolObj } from "@/lib/Pool"
 
-export const getPoolData = () => {
-
+export const getPoolData = (poolName: string) => {
+    return POOLS[poolName];
 }
 
 
@@ -12,8 +11,25 @@ export const getPoolData = () => {
 // this.custodyMetas = pool.custodyMetas;
 // this.lpDecimals = pool.lpDecimals;
 
-const pools : PoolObj = [
-    {
+// {
+//     clusters : [],
+//     pools : [
+//         poolName : '',
+//         poolAddress : '',
+//         lpTokenMint : '',
+
+//         tokens : [
+
+//         ],
+//         custodies : [
+
+//         ]
+//     ]
+// }
+
+// mango Group 
+const POOLS = {
+    'tp2' : {
         poolName : 'tp2',
         poolAddress : '2bsToqS2DcziiyMHGf9qxLu2ks7HEF6FZiCpRZqeC3KM',
         tokens : [],
@@ -22,7 +38,7 @@ const pools : PoolObj = [
         lpDecimals : 6,
         lpTokenMint : 'BycanFS7yaWvJ488YZvJR3fufNfyXhJ8zEmQzHBkv52U'
     },
-    {
+    'internal_test' : {
         poolName : 'internal_test',
         poolAddress : 'DXdPxx7mS1EtCPcEm2uoLioYdXoE2HoVrHaR4o8Kg2uh',
         tokens : ['6QGdQbaZEgpXqqbGwXJZXwbZ9xJnthfyYNZ92ARzTdAX', 'So11111111111111111111111111111111111111112'],
@@ -31,7 +47,7 @@ const pools : PoolObj = [
         lpDecimals : 6,
         lpTokenMint : 'J1887XKSeZFRzD6ACyiWMurXZd8xtNyb1Edj2oAxKT9E'
     },
-    {
+    'TestPool1': {
         poolName : 'TestPool1',
         poolAddress : 'GSa3BkjXpoUdd1Bw1EiuMLRY3jFZBwQJJivPNWgSiGJ3',
         tokens : [ 'So11111111111111111111111111111111111111112','Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'],
@@ -40,4 +56,10 @@ const pools : PoolObj = [
         lpDecimals : 6,
         lpTokenMint : 'Han23mxQeHeoBbj4vYtYZNaB5bhwV3n4nxKezM6H6nbr'
     }
-]
+}
+
+//  Mango Markets - 
+
+
+//  Mango Tokens 
+
