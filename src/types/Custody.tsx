@@ -1,15 +1,18 @@
+import { BN } from "@project-serum/anchor";
+import { PublicKey } from "@solana/web3.js";
+
 export interface Custody {
-    pool:             string;
-    mint:             string;
-    tokenAccount:     string;
+    pool:             PublicKey;
+    mint:             PublicKey;
+    tokenAccount:     PublicKey;
     decimals:         number;
     isStable:         boolean;
     oracle:           Oracle;
     pricing:          Pricing;
     permissions:      Permissions;
     fees:             Fees;
-    borrowRate:       string;
-    borrowRateSum:    string;
+    borrowRate:       BN;
+    borrowRateSum:    BN;
     assets:           Assets;
     collectedFees:    CollectedFees;
     volumeStats:      CollectedFees;
@@ -19,32 +22,32 @@ export interface Custody {
 }
 
 export interface Assets {
-    collateral:   string;
-    protocolFees: string;
-    owned:        string;
-    locked:       string;
+    collateral:   BN;
+    protocolFees: BN;
+    owned:        BN;
+    locked:       BN;
 }
 
 export interface CollectedFees {
-    swapUsd:            string;
-    addLiquidityUsd:    string;
-    removeLiquidityUsd: string;
-    openPositionUsd:    string;
-    closePositionUsd:   string;
-    liquidationUsd:     string;
+    swapUsd:            BN;
+    addLiquidityUsd:    BN;
+    removeLiquidityUsd: BN;
+    openPositionUsd:    BN;
+    closePositionUsd:   BN;
+    liquidationUsd:     BN;
 }
 
 export interface Fees {
     mode:            Mode;
-    maxIncrease:     string;
-    maxDecrease:     string;
-    swap:            string;
-    addLiquidity:    string;
-    removeLiquidity: string;
-    openPosition:    string;
-    closePosition:   string;
-    liquidation:     string;
-    protocolShare:   string;
+    maxIncrease:     BN;
+    maxDecrease:     BN;
+    swap:            BN;
+    addLiquidity:    BN;
+    removeLiquidity: BN;
+    openPosition:    BN;
+    closePosition:   BN;
+    liquidation:     BN;
+    protocolShare:   BN;
 }
 
 export interface Mode {
@@ -55,9 +58,9 @@ export interface Linear {
 }
 
 export interface Oracle {
-    oracleAccount:  string;
+    oracleAccount:  PublicKey;
     oracleType:     OracleType;
-    maxPriceError:  string;
+    maxPriceError:  BN;
     maxPriceAgeSec: number;
 }
 
@@ -78,17 +81,17 @@ export interface Permissions {
 
 export interface Pricing {
     useEma:             boolean;
-    tradeSpreadLong:    string;
-    tradeSpreadShort:   string;
-    swapSpread:         string;
-    minInitialLeverage: string;
-    maxLeverage:        string;
-    maxPayoffMult:      string;
+    tradeSpreadLong:    BN;
+    tradeSpreadShort:   BN;
+    swapSpread:         BN;
+    minInitialLeverage: BN;
+    maxLeverage:        BN;
+    maxPayoffMult:      BN;
 }
 
 export interface TradeStats {
-    profitUsd:  string;
-    lossUsd:    string;
-    oiLongUsd:  string;
-    oiShortUsd: string;
+    profitUsd:  BN;
+    lossUsd:    BN;
+    oiLongUsd:  BN;
+    oiShortUsd: BN;
 }
