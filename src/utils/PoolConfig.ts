@@ -1,7 +1,7 @@
 import { Cluster, PublicKey } from '@solana/web3.js';
 import ids from './ids.json';
 
-export class Id {
+export class PoolConfig {
   constructor(
     public cluster: Cluster,
     public poolName: string,
@@ -57,10 +57,10 @@ export class Id {
     );
   }
 
-  static fromIdsByName(name: string): Id {
+  static fromIdsByName(name: string): PoolConfig {
     const poolConfig = ids.pools.find((id) => id['poolName'] === name);
     if (!poolConfig) throw new Error(`No pool config ${name} found in Ids!`);
-    return new Id(
+    return new PoolConfig(
       poolConfig.cluster as Cluster,
       poolConfig.poolName,
       poolConfig.poolAddress,
@@ -70,13 +70,13 @@ export class Id {
     );
   }
 
-  static fromIdsByPk(poolPk: PublicKey): Id {
+  static fromIdsByPk(poolPk: PublicKey): PoolConfig {
     const poolConfig = ids.pools.find(
       (id) => id['poolAddress'] === poolPk.toString(),
     );
     if (!poolConfig)
       throw new Error(`No pool config ${poolPk.toString()} found in Ids!`);
-      return new Id(
+      return new PoolConfig(
         poolConfig.cluster as Cluster,
         poolConfig.poolName,
         poolConfig.poolAddress,
