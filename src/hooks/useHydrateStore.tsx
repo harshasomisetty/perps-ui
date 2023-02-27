@@ -1,3 +1,4 @@
+import { usePositionStore } from '@/stores/store'
 import { Custody } from '@/types/Custody'
 import { getPerpetualProgramAndProvider } from '@/utils/constants'
 import { PoolConfig } from '@/utils/PoolConfig'
@@ -5,10 +6,10 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
 import React, { useEffect } from 'react'
 
-
 export const useHydrateStore = () => {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
+  const addCustody = usePositionStore(state => state.addCustody);
 
   useEffect(() => {
     const pool = PoolConfig.fromIdsByName('TestPool1', 'devnet');
@@ -21,7 +22,9 @@ export const useHydrateStore = () => {
       let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
       for (const custody of custodies) {
         const subId = connection.onAccountChange(new PublicKey(custody.custodyAccount), (accountInfo) => {
-          const custodyData = perpetual_program.account.custody.coder.state.decode<Custody>(accountInfo.data);
+          const custodyData = perpetual_program.coder.accounts.decode<Custody>('custody', accountInfo.data);
+          console.log('custodyData :: ', custodyData)
+          addCustody(custodyData)
         })
         subIds.push(subId)
       }
@@ -29,7 +32,7 @@ export const useHydrateStore = () => {
 
     return () => {
       subIds.forEach(subId => {
-        console.log(">>>> here >>> ");
+        console.log(">>>> unsubcribing >>> ");
         connection.removeAccountChangeListener(subId);
       });
     }
