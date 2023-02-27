@@ -67,7 +67,7 @@ export function usePositions() {
     let fetchedCustodies =
       await perpetual_program.account.custody.fetchMultiple(custodyAccounts);
 
-    // console.log("fetched custodies", fetchedCustodies);
+    console.log("fetched custodies", fetchedCustodies);
 
     let organizedPositions: Record<string, Position[]> = {};
 
