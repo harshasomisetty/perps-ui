@@ -6,7 +6,7 @@ import { RayIconCircle } from "@/components/Icons/RayIconCircle";
 import { UsdtIconCircle } from "@/components/Icons/UsdtIconCircle";
 import { OrcaIconCircle } from "@/components/Icons/OrcaIconCircle";
 import { BonkIconCircle } from "@/components/Icons/BonkIconCircle";
-import { Pool } from "@/hooks/usePools";
+
 
 export enum Token {
   SOL = "SOL",
