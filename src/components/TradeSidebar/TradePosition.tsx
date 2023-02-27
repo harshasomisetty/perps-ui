@@ -22,6 +22,8 @@ import { token } from "@metaplex-foundation/js";
 import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
 import { usePositions } from "@/hooks/usePositions";
+import { PoolConfig } from "@/utils/PoolConfig";
+import { usePositionStore } from "@/stores/store";
 
 interface Props {
   className?: string;
@@ -51,7 +53,7 @@ export function TradePosition(props: Props) {
   const { fetchPositions } = usePositions();
 
   const { pools } = usePools();
-  const [pool, setPool] = useState<Pool | null>(null);
+  const pool = usePositionStore(state => state.selectedPool);
 
   const allPriceStats = useDailyPriceStats();
   const router = useRouter();
@@ -107,7 +109,6 @@ export function TradePosition(props: Props) {
   if (pools === undefined) {
     return <LoadingDots />;
   } else if (pool === null) {
-    setPool(Object.values(pools)[0]);
     return <LoadingDots />;
   } else {
     return (
@@ -164,8 +165,7 @@ export function TradePosition(props: Props) {
         <PoolSelector
           className="mt-2"
           pool={pool}
-          onSelectPool={setPool}
-          pools={pools}
+          pools={PoolConfig.getAllPoolConfigs()}
         />
         <LeverageSlider
           className="mt-6"

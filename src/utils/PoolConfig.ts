@@ -1,5 +1,7 @@
 import { Cluster, PublicKey } from '@solana/web3.js';
+import { CLUSTER } from './constants';
 import poolConfigs from './PoolConfig.json';
+
 export class PoolConfig {
   constructor(
     public cluster: Cluster,
@@ -10,38 +12,38 @@ export class PoolConfig {
     // public multisigAccountKey: string,
     // public transferAuthorityAccountKey: string,
 
-    public tokenInfos: { 
+    public tokens: {
       symbol: string;
       mintKey: string;
       decimals: number;
       isStable: boolean;
-      }[],
+    }[],
 
     public custodies: {
-      custodyAccount : string;
-      tokenAccount : string;
+      custodyAccount: string;
+      tokenAccount: string;
       symbol: string;
       mintKey: string;
       decimals: number;
-      isStable : boolean,
-      oracleAddress : string;
+      isStable: boolean,
+      oracleAddress: string;
     }[],
-  ) {}
+  ) { }
 
   public getAllTokenMints(): PublicKey[] {
     return Array.from(
-      this.tokenInfos.map((token) => new PublicKey(token.mintKey)),
+      this.tokens.map((token) => new PublicKey(token.mintKey)),
     );
   }
 
   public getNonStableTokens(): PublicKey[] {
     return Array.from(
-      this.tokenInfos
+      this.tokens
         .filter((token) => !token.isStable)
         .map((token) => new PublicKey(token.mintKey)),
     );
   }
- 
+
   public getAllCustodies(): PublicKey[] {
     return Array.from(
       this.custodies.map((custody) => new PublicKey(custody.custodyAccount)),
@@ -54,6 +56,10 @@ export class PoolConfig {
         .filter((custody) => !custody.isStable)
         .map((custody) => new PublicKey(custody.custodyAccount)),
     );
+  }
+
+  static getAllPoolConfigs(): PoolConfig[] {
+    return poolConfigs.pools.map(p => this.fromIdsByName(p.poolName, CLUSTER))
   }
 
   static fromIdsByName(name: string, cluster: Cluster): PoolConfig {
@@ -75,14 +81,14 @@ export class PoolConfig {
     );
     if (!poolConfig)
       throw new Error(`No pool config ${poolPk.toString()} found in Ids!`);
-      return new PoolConfig(
-        poolConfig.cluster as Cluster,
-        poolConfig.poolName,
-        poolConfig.poolAddress,
-        poolConfig.lpTokenMint,
-        poolConfig['tokens'],
-        poolConfig['custodies'],
-      );
+    return new PoolConfig(
+      poolConfig.cluster as Cluster,
+      poolConfig.poolName,
+      poolConfig.poolAddress,
+      poolConfig.lpTokenMint,
+      poolConfig['tokens'],
+      poolConfig['custodies'],
+    );
   }
 
 }

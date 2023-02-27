@@ -103,7 +103,7 @@ export function getSymbol(token: Token) {
   }
 }
 
-export function getTokenIcon(token: Token) {
+export function getTokenIcon(token: string) {
   switch (token) {
     case Token.SOL:
       return <SolanaIconCircle />;

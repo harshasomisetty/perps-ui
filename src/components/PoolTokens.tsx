@@ -5,7 +5,7 @@ import { getTokenIcon, Token } from "@/lib/Token";
 
 interface Props {
   className?: string;
-  tokens: Token[];
+  tokens: string[];
 }
 
 export function PoolTokens(props: Props) {

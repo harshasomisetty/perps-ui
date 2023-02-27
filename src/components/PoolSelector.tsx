@@ -6,17 +6,20 @@ import { useState } from "react";
 
 import { PoolTokens } from "./PoolTokens";
 import { Pool } from "@/lib/Pool";
+import { PoolConfig } from "@/utils/PoolConfig";
+import { usePositionStore } from "@/stores/store";
 
 interface Props {
   className?: string;
-  pool: Pool;
-  onSelectPool?(pool: Pool): void;
-  pools: Record<string, Pool>;
+  pool: PoolConfig;
+  onSelectPool?(pool: PoolConfig): void;
+  pools: PoolConfig[];
 }
 
 export function PoolSelector(props: Props) {
   const [open, setOpen] = useState(false);
   // console.log("props.pool", props.pool);
+  const setSelectedPool = usePositionStore(state => state.setSelectedPool)
 
   if (!props.pool) {
     return <p>Loading props.pools</p>;
@@ -40,7 +43,7 @@ export function PoolSelector(props: Props) {
           props.className
         )}
       >
-        <PoolTokens tokens={props.pool.tokenNames} />
+        <PoolTokens tokens={props.pool.tokens.map(t => t.symbol)} />
         <div className="truncate text-sm font-medium text-white">
           {props.pool.poolName}
         </div>
@@ -83,17 +86,17 @@ export function PoolSelector(props: Props) {
                 "hover:bg-zinc-700"
               )}
               key={pool.poolAddress}
-              onClick={() => props.onSelectPool?.(pool)}
+              onClick={() => setSelectedPool(pool)}
             >
-              <PoolTokens tokens={pool.tokenNames} />
+              <PoolTokens tokens={pool.tokens.map(t => t.symbol)} /> 
               <div>
                 <div className="truncate text-sm font-medium text-white">
                   {pool.poolName}
                 </div>
                 <div className="text-xs text-zinc-500">
-                  {pool.tokenNames.slice(0, 3).join(", ")}
-                  {pool.tokenNames.length > 3
-                    ? ` +${pool.tokenNames.length - 3} more`
+                  {pool.tokens.map(t => t.symbol).slice(0, 3).join(", ")}
+                  {pool.tokens.map(t => t.symbol).length > 3
+                    ? ` +${pool.tokens.map(t => t.symbol).length - 3} more`
                     : ""}
                 </div>
               </div>

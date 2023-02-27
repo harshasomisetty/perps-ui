@@ -8,6 +8,7 @@ import {
   transferAuthorityAddress,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
+import { PoolConfig } from "@/utils/PoolConfig";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import { BN, Wallet } from "@project-serum/anchor";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
@@ -27,7 +28,7 @@ import {
 } from "@solana/web3.js";
 
 export async function openPosition(
-  pool: Pool,
+  pool: PoolConfig,
   wallet: Wallet,
   publicKey: PublicKey,
   signTransaction,
