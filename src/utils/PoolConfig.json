@@ -46,7 +46,48 @@
                     "oracleAddress" : "5SSkXsEKQepHHAewytPVwdej4epN1nxgLVM84L4KXgy7"
                 }
             ]
-       }
+       },
+       {
+        "cluster": "devnet",
+        "poolName" : "internal_test",
+        "poolAddress" : "DXdPxx7mS1EtCPcEm2uoLioYdXoE2HoVrHaR4o8Kg2uh",
+        "lpTokenMint" : "J1887XKSeZFRzD6ACyiWMurXZd8xtNyb1Edj2oAxKT9E",
+        "lpDecimals" : 6,
+        "tokens" : [
+            {
+                "symbol": "Test",
+                "mintKey": "6QGdQbaZEgpXqqbGwXJZXwbZ9xJnthfyYNZ92ARzTdAX",
+                "decimals": 9,
+                "isStable" : true
+            },
+            {
+                "symbol": "SOL",
+                "mintKey": "So11111111111111111111111111111111111111112",
+                "decimals": 9,
+                "isStable" : false
+            }
+        ],
+        "custodies" : [
+            {
+                "custodyAccount" : "5Yk9k7Gpyip9ySqYoXgRANVfPbmJdqhXBemancsV5QLJ",
+                "tokenAccount" : "DmEf6bvLt9eTkRWGUhpmwhJjf7dZL31ziGqNqALYctvH",
+                "symbol": "SOL",
+                "mintKey": "So11111111111111111111111111111111111111112",
+                "decimals": 9,
+                "isStable" : false,
+                "oracleAddress" : "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"
+            },
+            {
+                "custodyAccount" : "AZCvUZ1qmbvnqebiYrExLoZtqyCgS33LN4XobAwwizR8",
+                "tokenAccount" : "EuTHwLfV5pjtWE3sJTbjTgFb4BdLCwo6FZFAc8YdgxeM",
+                "symbol" : "Test",
+                "mintKey": "6QGdQbaZEgpXqqbGwXJZXwbZ9xJnthfyYNZ92ARzTdAX",
+                "decimals": 9,
+                "isStable" : true,
+                "oracleAddress" : "HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J"
+            }
+        ]
+   }
     ]
 }
 
