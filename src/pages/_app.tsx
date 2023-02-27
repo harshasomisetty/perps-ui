@@ -22,6 +22,12 @@ import { ToastContainer } from 'react-toastify';
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 import { Navbar } from "@/components/Navbar";
+import { useHydrateStore } from "@/hooks/useHydrateStore";
+
+const StoreUpdater = () => {
+  useHydrateStore()
+  return null
+}
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -38,6 +44,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         pauseOnHover
       />
       <Navbar />
+      <StoreUpdater />
       <Component {...pageProps} />
     </Context>
   );

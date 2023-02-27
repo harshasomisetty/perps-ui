@@ -1,11 +1,13 @@
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
-import { Program, Wallet } from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
 
 import { IDL as PERPETUALS_IDL } from "@/target/types/perpetuals";
 import * as PerpetualsJson from "@/target/idl/perpetuals.json";
 import { getProvider } from "@/utils/provider";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
+import { Wallet } from "@project-serum/anchor/dist/cjs/provider";
+import { AnchorWallet } from "@solana/wallet-adapter-react";
 
 export const PERPETUALS_PROGRAM_ID = new PublicKey(
   PerpetualsJson["metadata"]["address"]
@@ -31,7 +33,7 @@ class DefaultWallet implements Wallet {
   }
 }
 
-export async function getPerpetualProgramAndProvider(wallet?: Wallet) {
+export async function getPerpetualProgramAndProvider(wallet?: AnchorWallet) {
   let provider;
 
   if (wallet) {

@@ -17,7 +17,6 @@ export function usePools() {
         await getPerpetualProgramAndProvider();
 
       let fetchedPools = await perpetual_program.account.pool.all();
-      console.log("fetchedPools", fetchedPools);
 
       await Promise.all(
         Object.values(fetchedPools).map(async (pool) => {

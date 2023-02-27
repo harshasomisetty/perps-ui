@@ -39,6 +39,7 @@
       "@/target/*": ["./src/target/*"],
       "@/lib/*": ["src/lib/*"],
       "@/stores/*": ["src/stores/*"],
+      "@/types/*": ["src/types/*"],
     }
   },
   "exclude": ["./out/**/*", "./node_modules/**/*", "**/*.test.ts"],

@@ -1,5 +1,5 @@
-import { Cluster, PublicKey } from '@solana/web3.js';
-import ids from './ids.json';
+import { Cluster, clusterApiUrl, PublicKey } from '@solana/web3.js';
+import poolConfigs from './PoolConfig.json';
 
 export class PoolConfig {
   constructor(
@@ -57,8 +57,8 @@ export class PoolConfig {
     );
   }
 
-  static fromIdsByName(name: string): PoolConfig {
-    const poolConfig = ids.pools.find((id) => id['poolName'] === name);
+  static fromIdsByName(name: string, cluster: Cluster): PoolConfig {
+    const poolConfig = poolConfigs.pools.find((pool) => pool['poolName'] === name && cluster === pool['cluster']);
     if (!poolConfig) throw new Error(`No pool config ${name} found in Ids!`);
     return new PoolConfig(
       poolConfig.cluster as Cluster,
@@ -70,9 +70,9 @@ export class PoolConfig {
     );
   }
 
-  static fromIdsByPk(poolPk: PublicKey): PoolConfig {
-    const poolConfig = ids.pools.find(
-      (id) => id['poolAddress'] === poolPk.toString(),
+  static fromIdsByPk(poolPk: PublicKey, cluster: Cluster): PoolConfig {
+    const poolConfig = poolConfigs.pools.find(
+      (pool) => pool['poolAddress'] === poolPk.toString() && cluster === pool['cluster'],
     );
     if (!poolConfig)
       throw new Error(`No pool config ${poolPk.toString()} found in Ids!`);

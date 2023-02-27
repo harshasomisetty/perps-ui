@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { tokenAddressToToken } from "@/lib/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { Position, UserPoolPositions, Side } from "@/lib/Position";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
 import { usePositionStore } from "@/stores/store";
 import { shallow } from "zustand/shallow";
 
@@ -32,8 +32,8 @@ export function usePositions() {
     shallow
   );
 
-  const { publicKey, wallet } = useWallet();
-
+  const { publicKey } = useWallet();
+  const wallet = useAnchorWallet();
   const fetchPositions = async () => {
     if (!wallet) return;
     if (!publicKey) {
@@ -58,8 +58,6 @@ export function usePositions() {
         },
       },
     ]);
-
-    console.log("fetched positons", fetchedPositions);
 
     let custodyAccounts = fetchedPositions.map(
       (position) => position.account.custody
@@ -120,7 +118,6 @@ export function usePositions() {
       ),
     };
 
-    console.log("finalPositionObject:", organizedPositionsObject);
     setStorePositions(organizedPositionsObject);
   };
 

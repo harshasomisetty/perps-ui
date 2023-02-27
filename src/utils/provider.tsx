@@ -1,7 +1,8 @@
 import { Connection } from "@solana/web3.js";
-import { AnchorProvider, Wallet } from "@project-serum/anchor";
+import { AnchorProvider } from "@project-serum/anchor";
+import { AnchorWallet } from "@solana/wallet-adapter-react";
 
-export async function getProvider(wallet: Wallet, network: string = "devnet") {
+export async function getProvider(wallet: AnchorWallet, network: string = "devnet") {
   let network_url;
   if (network === "devnet") {
     network_url = "https://api.devnet.solana.com";
