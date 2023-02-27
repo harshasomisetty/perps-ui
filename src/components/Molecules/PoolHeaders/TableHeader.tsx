@@ -12,10 +12,14 @@ interface Props {
 export function TableHeader(props: Props) {
   return (
     <div className="flex flex-row space-x-1">
-      <PoolTokens
-        tokens={props.pool.tokenNames}
-        className={props.iconClassName}
-      />
+      {Object.keys(props.pool.tokens).length > 0 ? (
+        <PoolTokens
+          tokens={props.pool.tokenNames}
+          className={props.iconClassName}
+        />
+      ) : (
+        <div className={props.iconClassName}></div>
+      )}
       <div>
         <p className={twMerge("font-medium", props.poolClassName)}>
           {props.pool.poolName}

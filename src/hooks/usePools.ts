@@ -17,7 +17,7 @@ export function usePools() {
         await getPerpetualProgramAndProvider();
 
       let fetchedPools = await perpetual_program.account.pool.all();
-      console.log("fetchedPools", fetchedPools);
+      // console.log("fetchedPools", fetchedPools);
 
       await Promise.all(
         Object.values(fetchedPools).map(async (pool) => {
@@ -106,8 +106,7 @@ export function usePools() {
             perpetual_program.programId
           )[0];
 
-          const lpDecimals = (await getMint(provider.connection, lpTokenMint))
-            .decimals;
+          const lpData = await getMint(provider.connection, lpTokenMint);
 
           let poolData: Pool = {
             poolName: pool.account.name,
@@ -116,7 +115,8 @@ export function usePools() {
             tokens: custodyInfos,
             tokenNames,
             custodyMetas,
-            lpDecimals,
+            lpDecimals: lpData.decimals,
+            lpSupply: Number(lpData.supply),
           };
 
           let poolObj = new PoolObj(poolData);

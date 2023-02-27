@@ -4,7 +4,7 @@ import { tokenAddressToToken } from "@/lib/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { Position, UserPoolPositions, Side } from "@/lib/Position";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { usePositionStore } from "@/stores/store";
+import { useAppStore, usePositionStore } from "@/stores/store";
 import { shallow } from "zustand/shallow";
 
 interface Pending {
@@ -58,7 +58,7 @@ export function usePositions() {
       },
     ]);
 
-    console.log("fetched positons", fetchedPositions);
+    // console.log("fetched positons", fetchedPositions);
 
     let custodyAccounts = fetchedPositions.map(
       (position) => position.account.custody
@@ -117,8 +117,7 @@ export function usePositions() {
         }
       ),
     };
-
-    console.log("finalPositionObject:", organizedPositionsObject);
+    // console.log("finalPositionObject:", organizedPositionsObject);
     setStorePositions(organizedPositionsObject);
   };
 
