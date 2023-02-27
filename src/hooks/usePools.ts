@@ -118,6 +118,8 @@ export function usePools() {
             lpDecimals,
           };
 
+          console.log('poolData :>> ', poolData);
+
           let poolObj = new PoolObj(poolData);
 
           poolInfos[pool.publicKey.toString()] = poolObj;

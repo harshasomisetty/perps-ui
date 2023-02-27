@@ -1,6 +1,5 @@
-import { Cluster, clusterApiUrl, PublicKey } from '@solana/web3.js';
+import { Cluster, PublicKey } from '@solana/web3.js';
 import poolConfigs from './PoolConfig.json';
-
 export class PoolConfig {
   constructor(
     public cluster: Cluster,

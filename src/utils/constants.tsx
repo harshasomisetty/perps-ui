@@ -1,4 +1,4 @@
-import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { Cluster, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { Program } from "@project-serum/anchor";
 
 import { IDL as PERPETUALS_IDL } from "@/target/types/perpetuals";
@@ -12,6 +12,9 @@ import { AnchorWallet } from "@solana/wallet-adapter-react";
 export const PERPETUALS_PROGRAM_ID = new PublicKey(
   PerpetualsJson["metadata"]["address"]
 );
+
+export const CLUSTER: Cluster = process.env.NEXT_CLUSTER as Cluster || 'devnet';
+export const DEFAULT_POOL: string = process.env.NEXT_DEFAULT_POOL || 'TestPool1';
 
 class DefaultWallet implements Wallet {
   constructor(readonly payer: Keypair) {}

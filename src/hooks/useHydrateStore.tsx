@@ -10,6 +10,13 @@ export const useHydrateStore = () => {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
   const addCustody = usePositionStore(state => state.addCustody);
+  const setCustodies = usePositionStore(state => state.setCustodies);
+  const custodies = usePositionStore(state => state.custodies);
+
+  useEffect(() => {
+    console.log('updated custodies :>> ',custodies);
+  }, [custodies])
+  
 
   useEffect(() => {
     const pool = PoolConfig.fromIdsByName('TestPool1', 'devnet');
@@ -25,6 +32,7 @@ export const useHydrateStore = () => {
           const custodyData = perpetual_program.coder.accounts.decode<Custody>('custody', accountInfo.data);
           console.log('custodyData :: ', custodyData)
           addCustody(custodyData)
+          setCustodies((new Map()).set(custodyData.mint.toBase58(), custodyData))
         })
         subIds.push(subId)
       }
