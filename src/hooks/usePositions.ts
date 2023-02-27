@@ -4,7 +4,7 @@ import { tokenAddressToToken } from "@/lib/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { Position, UserPoolPositions, Side } from "@/lib/Position";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useAppStore, usePositionStore } from "@/stores/store";
+import { usePositionStore } from "@/stores/store";
 import { shallow } from "zustand/shallow";
 
 interface Pending {
@@ -58,7 +58,7 @@ export function usePositions() {
       },
     ]);
 
-    // console.log("fetched positons", fetchedPositions);
+    console.log("fetched positons", fetchedPositions);
 
     let custodyAccounts = fetchedPositions.map(
       (position) => position.account.custody
@@ -71,30 +71,34 @@ export function usePositions() {
 
     let organizedPositions: Record<string, Position[]> = {};
 
-    fetchedPositions.forEach((position, index) => {
+    fetchedPositions.forEach(async (position, index) => {
       let poolAddress = position.account.pool.toString();
       if (!organizedPositions[poolAddress]) {
         organizedPositions[poolAddress] = [];
       }
+
       let cleanedPosition: Position = {
         id: index.toString(),
-        positionAccountAddress: position.publicKey.toBase58(),
-        poolAddress: poolAddress,
-        collateral: position.account.collateralUsd.toNumber(),
-        entryPrice: position.account.openTime.toNumber(),
-        leverage: 0,
-        liquidationPrice: 0,
-        liquidationThreshold: 0,
-        markPrice: 0,
-        pnlDelta: 0,
-        pnlDeltaPercent: 0,
-        size: position.account.sizeUsd.toNumber(),
+        // borrowRateSum: position.account.borrowRateSum.toNumber(),
+        positionAccountAddress: position.publicKey,
+        poolAddress: position.account.pool,
+        collateralUsd: position.account.collateralUsd.toNumber() / 10 ** 6,
+
+        leverage:
+          position.account.sizeUsd.toNumber() /
+          position.account.collateralUsd.toNumber(),
+
+        // liquidationPrice: 0,
+        // liquidationThreshold: 0,
+        // markPrice: 0,
+        // pnlDelta: 0,
+        // pnlDeltaPercent: 0,
+        sizeUsd: position.account.sizeUsd.toNumber() / 10 ** 6,
         timestamp: Date.now(),
         token: tokenAddressToToken(fetchedCustodies[index].mint.toString()),
         side: position.account.side.hasOwnProperty("long")
           ? Side.Long
           : Side.Short,
-        value: 0,
         valueDelta: 0,
         valueDeltaPercentage: 0,
       };
@@ -117,7 +121,7 @@ export function usePositions() {
         }
       ),
     };
-    // console.log("finalPositionObject:", organizedPositionsObject);
+    console.log("finalPositionObject:", organizedPositionsObject);
     setStorePositions(organizedPositionsObject);
   };
 

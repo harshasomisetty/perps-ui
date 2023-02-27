@@ -53,7 +53,7 @@ export function TradePosition(props: Props) {
   const { pools } = usePools();
   const [pool, setPool] = useState<Pool | null>(null);
 
-  const allPriceStats = useDailyPriceStats();
+  const stats = useDailyPriceStats();
   const router = useRouter();
 
   const { pair } = router.query;
@@ -71,7 +71,7 @@ export function TradePosition(props: Props) {
       positionToken,
       new BN(payAmount * LAMPORTS_PER_SOL),
       new BN(positionAmount * LAMPORTS_PER_SOL),
-      new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6),
+      new BN(stats[payToken]?.currentPrice * 10 ** 6),
       props.side
     );
     fetchPositions();
@@ -97,7 +97,7 @@ export function TradePosition(props: Props) {
     }
   }, [connection, payToken, publicKey]);
 
-  const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
+  const entryPrice = stats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
 
   if (!pair) {
@@ -110,6 +110,7 @@ export function TradePosition(props: Props) {
     setPool(Object.values(pools)[0]);
     return <LoadingDots />;
   } else {
+    console.log("tade position", pool.getLiquidities(stats));
     return (
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">
@@ -187,11 +188,11 @@ export function TradePosition(props: Props) {
           collateralToken={payToken}
           entryPrice={entryPrice}
           liquidationPrice={liquidationPrice}
-          fees={0.05}
+          fees={0}
         />
         <TradePositionDetails
-          availableLiquidity={3871943.82}
-          borrowFee={0.0052}
+          availableLiquidity={pool.getLiquidities(stats)}
+          borrowFee={0}
           className={twMerge(
             "-mb-4",
             "-mx-4",
@@ -201,8 +202,8 @@ export function TradePosition(props: Props) {
             "pt-4",
             "px-4"
           )}
-          entryPrice={16.4}
-          exitPrice={16.4}
+          entryPrice={0}
+          exitPrice={0}
           token={positionToken}
           side={props.side}
         />

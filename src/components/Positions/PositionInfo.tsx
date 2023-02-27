@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { cloneElement } from "react";
+import { cloneElement, useEffect, useState } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
@@ -10,6 +10,9 @@ import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { Position, Side } from "@/lib/Position";
+import { getLiquidationPrice } from "src/actions/getPrices";
+import { usePools } from "@/hooks/usePools";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -27,7 +30,32 @@ interface Props {
 }
 
 export function PositionInfo(props: Props) {
+  console.log("position info props", props);
   const tokenIcon = getTokenIcon(props.position.token);
+
+  const { pools } = usePools();
+
+  const { publicKey, signTransaction, wallet } = useWallet();
+  const { connection } = useConnection();
+
+  // useState liqPrice
+  const [liqPrice, setLiqPrice] = useState(0);
+
+  // use effect get liq price
+
+  useEffect(() => {
+    async function fetchData() {
+      let fetchedPrice = await getLiquidationPrice(
+        pools[props.position.poolAddress.toString()],
+        wallet,
+        publicKey,
+        connection,
+        props.position
+      );
+      setLiqPrice(fetchedPrice);
+    }
+    fetchData();
+  }, []);
 
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
@@ -59,7 +87,9 @@ export function PositionInfo(props: Props) {
         </div>
       </PositionColumn>
       <PositionColumn num={2}>
-        <div className="text-sm text-white">{props.position.leverage}x</div>
+        <div className="text-sm text-white">
+          {props.position.leverage.toFixed(2)}x
+        </div>
         <div
           className={twMerge(
             "flex",
@@ -83,7 +113,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={3}>
         <div className="text-sm text-white">
-          ${formatPrice(props.position.value)}
+          ${formatPrice(props.position.sizeUsd)}
         </div>
         <PositionValueDelta
           className="mt-0.5"
@@ -94,7 +124,7 @@ export function PositionInfo(props: Props) {
       <PositionColumn num={4}>
         <div className="flex items-center">
           <div className="text-sm text-white">
-            ${formatPrice(props.position.collateral)}
+            ${formatPrice(props.position.collateralUsd)}
           </div>
           <button className="group ml-2">
             <EditIcon
@@ -121,10 +151,11 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={7}>
         <div className="flex items-center justify-between pr-2">
-          <div className="text-sm text-white">
-            ${formatPrice(props.position.liquidationPrice)}
-          </div>
+          <div className="text-sm text-white">${formatPrice(liqPrice)}</div>
           <div className="flex items-center space-x-2">
+            {/* <button className="text-white" onClick={liqPrice}>
+              liq
+            </button> */}
             <a
               target="_blank"
               rel="noreferrer"

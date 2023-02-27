@@ -36,18 +36,21 @@ export async function closePosition(
   side: Side,
   price: BN
 ) {
+  console.log("in close postion");
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
   console.log("pool", pool);
   console.log("side:", side);
 
   // TODO: need to take slippage as param , this is now for testing
+  console.log("side", side.toString());
   const adjustedPrice =
     side.toString() == "Long"
       ? price.mul(new BN(50)).div(new BN(100))
-      : price.mul(new BN(50)).div(new BN(100));
+      : price.mul(new BN(150)).div(new BN(100));
   console.log(
-    "adjustedPrice, coingeckoPrice:",
+    "price, adjustedPrice, apiPrice:",
+    price.toString(),
     adjustedPrice.toString(),
     price.toString()
   );
@@ -83,17 +86,6 @@ export async function closePosition(
   let transaction = new Transaction();
 
   try {
-    // if (!(await checkIfAccountExists(lpTokenAccount, connection))) {
-    //   transaction = transaction.add(
-    //     createAssociatedTokenAccountInstruction(
-    //       publicKey,
-    //       lpTokenAccount,
-    //       publicKey,
-    //       pool.lpTokenMint
-    //     )
-    //   );
-    // }
-
     const positionAccount = new PublicKey(positionAccountAddress);
 
     console.log("position account", positionAccount.toString());
@@ -121,13 +113,13 @@ export async function closePosition(
 
     console.log("close position tx", transaction);
     console.log("tx keys");
-    for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-      console.log(
-        "key",
-        i,
-        transaction.instructions[0]!.keys[i]?.pubkey.toString()
-      );
-    }
+    // for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
+    //   console.log(
+    //     "key",
+    //     i,
+    //     transaction.instructions[0]!.keys[i]?.pubkey.toString()
+    //   );
+    // }
 
     await manualSendTransaction(
       transaction,

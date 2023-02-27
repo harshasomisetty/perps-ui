@@ -1,9 +1,9 @@
 import { Token } from "./Token";
 
 export enum Side {
-  None,
-  Long,
-  Short,
+  None = "None",
+  Long = "Long",
+  Short = "Short",
 }
 
 export class TradeSide {

@@ -32,7 +32,6 @@ interface Props {
 export function TokenSelector(props: Props) {
   const stats = useDailyPriceStats();
   const [selectorOpen, setSelectorOpen] = useState(false);
-  console.log("props", props, props.token, props.token === undefined);
 
   // check if props.token is undefined
 

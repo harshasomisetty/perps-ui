@@ -43,7 +43,7 @@ export default function Page() {
       </div>
       <div>
         <CandlestickChart comparisonCurrency={currency} token={token} />
-        <Positions className="mt-8" />
+        <Positions className="mt-8 border border-red-500" />
       </div>
     </TradeLayout>
   );
