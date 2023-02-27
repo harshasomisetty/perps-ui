@@ -31,28 +31,11 @@ export interface TokenCustody {
   decimals: number;
   minRatio: number;
   maxRatio: number;
-
   volume: VolumeStats;
-
   oiLong: number;
   oiShort: number;
-
   fees: FeeStats;
 }
-
-// export class CustodyObject {
-//   constructor(custody: TokenCustody) {
-//     this.custodyAccount = custody.custodyAccount;
-//     this.tokenAccount = custody.tokenAccount;
-//     this.mintAccount = custody.mintAccount;
-//     this.oracleAccount = custody.oracleAccount;
-//     this.name = custody.name;
-//     this.amount = custody.amount;
-//     this.decimals = custody.decimals;
-//     this.minRatio = custody.minRatio;
-//     this.maxRatio = custody.maxRatio;
-//   }
-// }
 
 export interface CustodyMeta {
   pubkey: PublicKey;
@@ -68,12 +51,8 @@ export interface Pool {
   tokenNames: Token[];
   custodyMetas: CustodyMeta[];
   lpDecimals: number;
-  // volume: number;
-  // fees: number; // 7 days
-  // oiLong: number;
-  // oiShort: number;
+  lpSupply: number;
   userLiquidity: number;
-  // userShare: number;
 }
 
 export class PoolObj {
@@ -85,6 +64,7 @@ export class PoolObj {
     this.tokenNames = pool.tokenNames;
     this.custodyMetas = pool.custodyMetas;
     this.lpDecimals = pool.lpDecimals;
+    this.lpSupply = pool.lpSupply;
   }
 
   getLiquidities(stats: AllStats) {

@@ -106,8 +106,7 @@ export function usePools() {
             perpetual_program.programId
           )[0];
 
-          const lpDecimals = (await getMint(provider.connection, lpTokenMint))
-            .decimals;
+          const lpData = await getMint(provider.connection, lpTokenMint);
 
           let poolData: Pool = {
             poolName: pool.account.name,
@@ -116,7 +115,8 @@ export function usePools() {
             tokens: custodyInfos,
             tokenNames,
             custodyMetas,
-            lpDecimals,
+            lpDecimals: lpData.decimals,
+            lpSupply: Number(lpData.supply),
           };
 
           console.log('poolData :>> ', poolData);

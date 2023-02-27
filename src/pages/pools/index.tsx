@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
-import { Pool } from "@/lib/Pool";
+import { Pool, PoolObj } from "@/lib/Pool";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useUserData } from "@/hooks/useUserData";
 
 export default function Pools() {
   const { pools } = usePools();
@@ -14,6 +15,7 @@ export default function Pools() {
   const { wallet, publicKey, signTransaction } = useWallet();
 
   const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
+  const { userLpTokens } = useUserData();
 
   if (!pools) {
     return <p className="text-white">Loading...</p>;
@@ -23,26 +25,29 @@ export default function Pools() {
     return <>Loading stats</>;
   }
 
-  console.log("pools in ppol page", pools);
+  function getLiquidityBalance(pool: PoolObj): number {
+    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
+    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
+    let userLiquidity = (userLpBalance / lpSupply) * pool.getLiquidities(stats);
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     let lpTokenAccount = await getAssociatedTokenAddress(
-  //       props.pool.lpTokenMint,
-  //       publicKey
-  //     );
+    if (Number.isNaN(userLiquidity)) {
+      return 0;
+    }
 
-  //     let balance = 0;
-  //     if (await checkIfAccountExists(lpTokenAccount, connection)) {
-  //       balance = (await connection.getTokenAccountBalance(lpTokenAccount))
-  //         .value.uiAmount;
-  //     }
-  //     console.log("user balance: ", balance);
-  //   }
-  //   if (publicKey) {
-  //     fetchData();
-  //   }
-  // }, [wallet, publicKey]);
+    return userLiquidity;
+  }
+
+  function getLiquidityShare(pool: PoolObj): number {
+    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
+    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
+
+    let userShare = (userLpBalance / lpSupply) * 100;
+
+    if (Number.isNaN(userShare)) {
+      return 0;
+    }
+    return userShare;
+  }
 
   return (
     <div className="px-16 py-6">
@@ -101,8 +106,16 @@ export default function Pools() {
               <td>${pool.getFees()}</td>
               <td>${pool.getOiLong()}</td>
               <td>${pool.getOiShort()}</td>
-              <td>${}</td>
-              <td>{}%</td>
+              {getLiquidityBalance(pool) > 0 ? (
+                <td>${getLiquidityBalance(pool).toFixed(2)}</td>
+              ) : (
+                <td>-</td>
+              )}
+              {getLiquidityShare(pool).toFixed(2) > 0 ? (
+                <td>{getLiquidityShare(pool).toFixed(2)}%</td>
+              ) : (
+                <td>-</td>
+              )}
             </tr>
           ))}
         </tbody>

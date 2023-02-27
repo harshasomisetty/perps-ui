@@ -32,6 +32,29 @@ interface Props {
 export function TokenSelector(props: Props) {
   const stats = useDailyPriceStats();
   const [selectorOpen, setSelectorOpen] = useState(false);
+  console.log("props", props, props.token, props.token === undefined);
+
+  // check if props.token is undefined
+
+  if (props.token === undefined) {
+    return (
+      <div
+        className={twMerge(
+          "grid-cols-[max-content,1fr]",
+          "bg-zinc-900",
+          "grid",
+          "h-20",
+          "items-center",
+          "p-4",
+          "rounded",
+          "w-full",
+          props.className
+        )}
+      >
+        <p>no Tokens</p>
+      </div>
+    );
+  }
 
   return (
     <>

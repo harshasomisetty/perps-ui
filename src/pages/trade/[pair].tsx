@@ -24,7 +24,6 @@ export default function Page() {
   }
 
   let token: ReturnType<typeof getToken> = asToken(pair.split("-")[0]);
-  // let token = Token.SOL;
   let currency: ReturnType<typeof getComparisonCurrency> =
     getComparisonCurrency(pair);
 

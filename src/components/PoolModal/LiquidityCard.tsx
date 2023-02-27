@@ -76,7 +76,7 @@ export default function LiquidityCard(props: Props) {
           props.pool.getLiquidities(stats)
       );
     }
-    if (publicKey && Object.values(stats).length > 0) {
+    if (publicKey && Object.values(stats).length > 0 && payToken) {
       console.log("passed iff", stats);
       fetchData();
     }
@@ -143,13 +143,13 @@ export default function LiquidityCard(props: Props) {
               <>
                 {" "}
                 <div className="text-sm font-medium text-white">You Add</div>
-                {publicKey && <div>Balance: {payTokenBalance}</div>}
+                {publicKey && <div>Balance: {payTokenBalance.toFixed(2)}</div>}
               </>
             ) : (
               <>
                 {" "}
                 <div className="text-sm font-medium text-white">You Remove</div>
-                {publicKey && <div>Balance: {liqBalance}</div>}
+                {publicKey && <div>Balance: {liqBalance.toFixed(2)}</div>}
               </>
             )}
           </div>
@@ -175,7 +175,7 @@ export default function LiquidityCard(props: Props) {
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Receive</div>
-            {publicKey && <div>Balance: {liqBalance}</div>}
+            {publicKey && <div>Balance: {liqBalance.toFixed(2)}</div>}
           </div>
 
           {tab === Tab.Add ? (
