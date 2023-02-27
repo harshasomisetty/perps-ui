@@ -11,16 +11,15 @@ import { SolidButton } from "../SolidButton";
 import { TradePositionDetails } from "./TradePositionDetails";
 import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
-import { Pool } from "@/lib/Pool";
 import { Tab } from ".";
 import { openPosition } from "src/actions/openPosition";
-import { usePools } from "@/hooks/usePools";
+
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { token } from "@metaplex-foundation/js";
+
 import { fetchTokenBalance } from "@/utils/retrieveData";
-import { LoadingDots } from "../LoadingDots";
+
 import { usePositions } from "@/hooks/usePositions";
 import { PoolConfig } from "@/utils/PoolConfig";
 import { usePositionStore } from "@/stores/store";
@@ -52,7 +51,6 @@ export function TradePosition(props: Props) {
 
   const { fetchPositions } = usePositions();
 
-  const { pools } = usePools();
   const pool = usePositionStore(state => state.selectedPool);
 
   const allPriceStats = useDailyPriceStats();
@@ -106,11 +104,7 @@ export function TradePosition(props: Props) {
     return <p>Pair not loaded</p>;
   }
 
-  if (pools === undefined) {
-    return <LoadingDots />;
-  } else if (pool === null) {
-    return <LoadingDots />;
-  } else {
+  
     return (
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">
@@ -208,5 +202,5 @@ export function TradePosition(props: Props) {
         />
       </div>
     );
-  }
+  
 }

@@ -6,27 +6,27 @@ export class PoolConfig {
   constructor(
     public cluster: Cluster,
     public poolName: string,
-    public poolAddress: string,
-    public lpTokenMint: string,
+    public poolAddress: PublicKey,
+    public lpTokenMint: PublicKey,
     // public perpMarketAccountKey: string,
     // public multisigAccountKey: string,
     // public transferAuthorityAccountKey: string,
 
     public tokens: {
       symbol: string;
-      mintKey: string;
+      mintKey: PublicKey;
       decimals: number;
       isStable: boolean;
     }[],
 
     public custodies: {
-      custodyAccount: string;
-      tokenAccount: string;
+      custodyAccount: PublicKey;
+      tokenAccount: PublicKey;
       symbol: string;
-      mintKey: string;
+      mintKey: PublicKey;
       decimals: number;
       isStable: boolean,
-      oracleAddress: string;
+      oracleAddress: PublicKey;
     }[],
   ) { }
 
@@ -65,13 +65,28 @@ export class PoolConfig {
   static fromIdsByName(name: string, cluster: Cluster): PoolConfig {
     const poolConfig = poolConfigs.pools.find((pool) => pool['poolName'] === name && cluster === pool['cluster']);
     if (!poolConfig) throw new Error(`No pool config ${name} found in Ids!`);
+    const tokens = poolConfig['tokens'].map(i => {
+      return {
+        ...i,
+        mintKey : new PublicKey(i.mintKey)
+      }
+    })
+    const custodies = poolConfig['custodies'].map(i => {
+      return {
+        ...i,
+        custodyAccount : new PublicKey(i.custodyAccount),
+        tokenAccount : new PublicKey(i.tokenAccount),
+        mintKey : new PublicKey(i.mintKey),
+        oracleAddress : new PublicKey(i.oracleAddress),
+      }
+    })
     return new PoolConfig(
       poolConfig.cluster as Cluster,
       poolConfig.poolName,
-      poolConfig.poolAddress,
-      poolConfig.lpTokenMint,
-      poolConfig['tokens'],
-      poolConfig['custodies'],
+      new PublicKey(poolConfig.poolAddress),
+      new PublicKey(poolConfig.lpTokenMint),
+      tokens,
+      custodies,
     );
   }
 
@@ -81,13 +96,30 @@ export class PoolConfig {
     );
     if (!poolConfig)
       throw new Error(`No pool config ${poolPk.toString()} found in Ids!`);
+
+      const tokens = poolConfig['tokens'].map(i => {
+        return {
+          ...i,
+          mintKey : new PublicKey(i.mintKey)
+        }
+      })
+      const custodies = poolConfig['custodies'].map(i => {
+        return {
+          ...i,
+          custodyAccount : new PublicKey(i.custodyAccount),
+          tokenAccount : new PublicKey(i.tokenAccount),
+          mintKey : new PublicKey(i.mintKey),
+          oracleAddress : new PublicKey(i.oracleAddress),
+        }
+      })
+
     return new PoolConfig(
       poolConfig.cluster as Cluster,
       poolConfig.poolName,
-      poolConfig.poolAddress,
-      poolConfig.lpTokenMint,
-      poolConfig['tokens'],
-      poolConfig['custodies'],
+      new PublicKey(poolConfig.poolAddress),
+      new PublicKey(poolConfig.lpTokenMint),
+      tokens,
+      custodies,
     );
   }
 

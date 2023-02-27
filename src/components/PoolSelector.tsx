@@ -85,7 +85,7 @@ export function PoolSelector(props: Props) {
                 "w-full",
                 "hover:bg-zinc-700"
               )}
-              key={pool.poolAddress}
+              key={pool.poolAddress.toBase58()}
               onClick={() => setSelectedPool(pool)}
             >
               <PoolTokens tokens={pool.tokens.map(t => t.symbol)} /> 
@@ -100,7 +100,7 @@ export function PoolSelector(props: Props) {
                     : ""}
                 </div>
               </div>
-              {pool.poolAddress === props.pool.poolAddress ? (
+              {pool.poolAddress.toBase58() === props.pool.poolAddress.toBase58() ? (
                 <CheckmarkIcon className="h-4 w-4 fill-white" />
               ) : (
                 <div />

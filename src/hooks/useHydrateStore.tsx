@@ -1,6 +1,6 @@
 import { usePositionStore } from '@/stores/store'
 import { Custody } from '@/types/Custody'
-import { getPerpetualProgramAndProvider } from '@/utils/constants'
+import { CLUSTER, DEFAULT_POOL, getPerpetualProgramAndProvider } from '@/utils/constants'
 import { PoolConfig } from '@/utils/PoolConfig'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
@@ -19,7 +19,7 @@ export const useHydrateStore = () => {
   
 
   useEffect(() => {
-    const pool = PoolConfig.fromIdsByName('TestPool1', 'devnet');
+    const pool = PoolConfig.fromIdsByName(DEFAULT_POOL, CLUSTER);
 
     const custodies = pool.custodies;
     const subIds: number[] = [];

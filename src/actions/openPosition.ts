@@ -65,8 +65,18 @@ export async function openPosition(
   //   publicKey
   // );
 
+  const poolToken = pool.tokens.find(i => i.mintKey.toBase58()=== getTokenAddress(payToken));
+  if(!poolToken){
+    throw "Pool token not found";
+  }
+
+  const poolTokenCustody = pool.custodies.find(i => i.mintKey.toBase58()=== getTokenAddress(payToken));
+  if(!poolTokenCustody){
+    throw "poolTokenCustody  not found";
+  }
+
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]?.mintAccount,
+    new PublicKey(getTokenAddress(payToken)),
     publicKey
   );
 
@@ -78,11 +88,11 @@ export async function openPosition(
   console.log("tokens", payToken, positionToken);
   let positionAccount = findProgramAddressSync(
     [
-      "position",
+      Buffer.from("position") ,
       publicKey.toBuffer(),
       pool.poolAddress.toBuffer(),
-      pool.tokens[getTokenAddress(payToken)]?.custodyAccount.toBuffer(),
-      side.toString() == "Long" ? [1] : [2],
+      poolTokenCustody.custodyAccount.toBuffer(),
+      side.toString() == "Long" ?  Buffer.from([1]) :  Buffer.from([2]),
     ],
     perpetual_program.programId
   )[0];
@@ -151,11 +161,11 @@ export async function openPosition(
         perpetuals: perpetualsAddress,
         pool: pool.poolAddress,
         position: positionAccount,
-        custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
+        custody: poolTokenCustody.custodyAccount,
         custodyOracleAccount:
-          pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
+        poolTokenCustody.oracleAddress,
         custodyTokenAccount:
-          pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
+        poolTokenCustody.tokenAccount,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
@@ -163,14 +173,14 @@ export async function openPosition(
     transaction = transaction.add(tx);
 
     console.log("open position tx", transaction);
-    console.log("tx keys");
-    for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
-      console.log(
-        "key",
-        i,
-        transaction.instructions[0].keys[i]?.pubkey.toString()
-      );
-    }
+    // console.log("tx keys");
+    // for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
+    //   console.log(
+    //     "key",
+    //     i,
+    //     transaction.instructions[0].keys[i]?.pubkey.toString()
+    //   );
+    // }
 
     await manualSendTransaction(
       transaction,
