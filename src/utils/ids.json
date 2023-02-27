@@ -12,7 +12,6 @@
             "poolAddress" : "GSa3BkjXpoUdd1Bw1EiuMLRY3jFZBwQJJivPNWgSiGJ3",
             "lpTokenMint" : "Han23mxQeHeoBbj4vYtYZNaB5bhwV3n4nxKezM6H6nbr",
             "lpDecimals" : 6,
-
             "tokens" : [
                 {
                     "symbol": "USDC",
