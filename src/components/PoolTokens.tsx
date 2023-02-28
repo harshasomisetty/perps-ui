@@ -24,7 +24,7 @@ export function PoolTokens(props: Props) {
             "relative"
           ),
           style: { zIndex: 3 - i },
-          key: token,
+          key: i,
         });
       })}
     </div>

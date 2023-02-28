@@ -75,7 +75,6 @@ export function TradePosition(props: Props) {
       props.side
     );
     fetchPositions();
-    // router.reload(window.location.pathname);
   }
 
   useEffect(() => {

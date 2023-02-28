@@ -44,7 +44,6 @@ export function PositionInfo(props: Props) {
 
   useEffect(() => {
     async function fetchData() {
-      console.log("pools ", pools, Object.keys(pools));
       let token = props.position.token;
 
       let custody =

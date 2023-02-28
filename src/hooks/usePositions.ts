@@ -6,6 +6,8 @@ import { Position, UserPoolPositions, Side } from "@/lib/Position";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { usePositionStore } from "@/stores/store";
 import { shallow } from "zustand/shallow";
+import { PublicKey } from "@solana/web3.js";
+import { useRouter } from "next/router";
 
 interface Pending {
   status: "pending";
@@ -31,16 +33,25 @@ export function usePositions() {
     }),
     shallow
   );
-
   const { publicKey, wallet } = useWallet();
 
+  // if page is admin
+
+  let allPositions = false;
+
+  const router = useRouter();
+  console.log("router path", router.pathname);
+  if (router.pathname.includes("admin")) {
+    allPositions = true;
+  }
+
   const fetchPositions = async () => {
-    if (!wallet) return;
-    if (!publicKey) {
+    if (!wallet || !publicKey) {
+      console.log("no wallet or pubkey", publicKey);
       return;
     }
 
-    let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
+    let { perpetual_program } = await getPerpetualProgramAndProvider();
 
     let fetchedPools = await perpetual_program.account.pool.all();
     let poolNames: Record<string, string> = {};
@@ -49,15 +60,23 @@ export function usePositions() {
       poolNames[pool.publicKey.toBase58()] = pool.account.name;
     });
 
-    let fetchedPositions = await perpetual_program.account.position.all([
-      {
-        memcmp: {
-          offset: 8,
-          bytes: publicKey.toBase58(),
-        },
-      },
-    ]);
+    let fetchedPositions;
 
+    console.log("all positions", allPositions);
+    if (allPositions) {
+      console.log("all positions");
+      fetchedPositions = await perpetual_program.account.position.all();
+    } else {
+      console.log("user positions");
+      fetchedPositions = await perpetual_program.account.position.all([
+        {
+          memcmp: {
+            offset: 8,
+            bytes: publicKey.toBase58(),
+          },
+        },
+      ]);
+    }
     console.log("fetched positons", fetchedPositions);
 
     let custodyAccounts = fetchedPositions.map(
@@ -110,9 +129,6 @@ export function usePositions() {
       status: "success",
       data: Object.entries(organizedPositions).map(
         ([poolAddress, positions]) => {
-          positions.forEach((position) =>
-            console.log("position", position.side)
-          );
           return {
             name: poolNames[poolAddress],
             tokens: positions.map((position) => position.token),
