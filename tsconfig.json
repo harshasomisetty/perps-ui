@@ -40,6 +40,7 @@
       "@/lib/*": ["src/lib/*"],
       "@/stores/*": ["src/stores/*"],
       "@/types/*": ["src/types/*"],
+      "@/viewHelpers/*": ["src/viewHelpers/*"],
     }
   },
   "exclude": ["./out/**/*", "./node_modules/**/*", "**/*.test.ts"],

@@ -16,7 +16,7 @@ export const PERPETUALS_PROGRAM_ID = new PublicKey(
 export const CLUSTER: Cluster = process.env.NEXT_CLUSTER as Cluster || 'devnet';
 export const DEFAULT_POOL: string = process.env.NEXT_DEFAULT_POOL || 'TestPool1';
 
-class DefaultWallet implements Wallet {
+export class DefaultWallet implements Wallet {
   constructor(readonly payer: Keypair) {}
 
   static local(): NodeWallet | never {

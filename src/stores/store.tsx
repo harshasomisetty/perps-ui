@@ -1,5 +1,5 @@
 import { PositionRequest } from "@/hooks/usePositions";
-import { Custody } from "@/types/Custody";
+import { Custody, Pool } from "@/types/index";
 import { CLUSTER, DEFAULT_POOL } from "@/utils/constants";
 import { PoolConfig } from "@/utils/PoolConfig";
 import { create } from "zustand";
@@ -8,6 +8,9 @@ import { devtools } from "zustand/middleware";
 interface StoreState {
   storePositions: PositionRequest;
   setStorePositions: (position: PositionRequest) => void;
+  pools: Map<string, Pool>;
+  setPool: (custodies: Map<string, Pool>) => void;
+  addPool: (custody: Pool) => void;
   custodies: Map<string, Custody>;
   setCustodies: (custodies: Map<string, Custody>) => void;
   addCustody: (custody: Custody) => void;
@@ -22,6 +25,13 @@ export const usePositionStore = create<StoreState>()(
       status: "pending",
     },
     setStorePositions: (position: PositionRequest) => set({ storePositions: position }),
+    pools: new Map<string, Pool>(),
+    setPool: (pools: Map<string, Pool>) => set({ pools }),
+    addPool: (pool: Pool) => set((state) => {
+      const pools = new Map<string, Pool>(state.pools);
+      pools.set(pool.name, pool)
+      return { pools: pools }
+    }),
     custodies: new Map<string, Custody>(),
     setCustodies: (custodies: Map<string, Custody>) => set({ custodies }),
     addCustody: (custody: Custody) => set((state) => {

@@ -119,8 +119,6 @@ export function usePools() {
             lpSupply: Number(lpData.supply),
           };
 
-          console.log('poolData :>> ', poolData);
-
           let poolObj = new PoolObj(poolData);
 
           poolInfos[pool.publicKey.toString()] = poolObj;
