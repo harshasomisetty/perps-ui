@@ -186,7 +186,7 @@ export function TradePosition(props: Props) {
           collateralToken={payToken}
           entryPrice={entryPrice}
           liquidationPrice={liquidationPrice}
-          fees={0}
+          fees={pool.getFees()}
         />
         <TradePositionDetails
           availableLiquidity={pool.getLiquidities(stats)}
