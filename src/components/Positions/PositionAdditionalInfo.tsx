@@ -6,7 +6,7 @@ import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
@@ -14,6 +14,8 @@ import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useRouter } from "next/router";
 import { usePositions } from "@/hooks/usePositions";
+import { getPnl } from "src/actions/getPrices";
+import { getTokenAddress } from "@/lib/Token";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -38,6 +40,35 @@ export function PositionAdditionalInfo(props: Props) {
   let payToken = props.position.token;
   let positionToken = props.position.token;
   const { fetchPositions } = usePositions();
+
+  const [pnl, setPnl] = useState(0);
+
+  useEffect(() => {
+    async function fetchData() {
+      let token = props.position.token;
+
+      let custody =
+        pools[props.position.poolAddress.toString()].tokens[
+          getTokenAddress(token)
+        ];
+
+      let fetchedPrice = await getPnl(
+        wallet,
+        publicKey,
+        connection,
+        props.position.poolAddress,
+        props.position.positionAccountAddress,
+        custody.custodyAccount,
+        custody.oracleAccount
+      );
+      setPnl(fetchedPrice);
+
+      console.log("pnl percentage", pnl, props.position.collateralUsd);
+    }
+    if (pools) {
+      fetchData();
+    }
+  }, [pools]);
 
   async function handleCloseTrade() {
     console.log("in close trade");
@@ -94,8 +125,8 @@ export function PositionAdditionalInfo(props: Props) {
           <div className="text-xs text-zinc-500">PnL</div>
           <PositionValueDelta
             className="mt-0.5"
-            valueDelta={props.position.pnlDelta}
-            valueDeltaPercentage={props.position.pnlDeltaPercent}
+            valueDelta={pnl}
+            valueDeltaPercentage={pnl / props.position.collateralUsd}
             formatValueDelta={formatPrice}
           />
         </div>

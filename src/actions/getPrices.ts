@@ -14,6 +14,10 @@ import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 
 function baseToDecimal(base64String: string) {
+  if (!base64String) {
+    return 0;
+  }
+  console.log("running baseToDecimal", base64String);
   const binaryString = atob(base64String)
     .split("")
     .map(function (char) {
@@ -39,44 +43,34 @@ export async function getEntryPrice(
 
   let transaction = new Transaction();
 
-  //   try {
-  //     let getEntryPriceTx = await perpetual_program.methods
-  //       .getEntryPriceAndFee({
-  //         new BN(collateral),
-  //         new BN(size),
-  //         side: side === "long" ? { long: {} } : { short: {} },
-  //       })
-  //       .accounts({
-  //         signer: publicKey,
-  //         perpetuals: perpetualsAddress,
-  //         pool: pool.poolAddress,
-  //         custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-  //         custodyOracleAccount:
-  //           pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-  //       })
-  //       .transaction();
+  // try {
+  //   let getEntryPriceTx = await perpetual_program.methods
+  //     .getEntryPriceAndFee({
+  //       new BN(collateral),
+  //       new BN(size),
+  //       side: side === "long" ? { long: {} } : { short: {} },
+  //     })
+  //     .accounts({
+  //       signer: publicKey,
+  //       perpetuals: perpetualsAddress,
+  //       pool: pool.poolAddress,
+  //       custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
+  //       custodyOracleAccount:
+  //         pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
+  //     })
+  //     .transaction();
 
-  //     transaction = transaction.add(getEntryPriceTx);
+  //   transaction = transaction.add(getEntryPriceTx);
+  //       let results = await connection.simulateTransaction(transaction, [
+  //   perpsUser,
+  // ]);
 
-  //     if (transaction.instructions.length > 0) {
-  //       for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-  //         console.log(
-  //           "key",
-  //           i,
-  //           transaction.instructions[0]!.keys[i]?.pubkey.toString()
-  //         );
-  //       }
-  //     }
-  //     await manualSendTransaction(
-  //       transaction,
-  //       publicKey,
-  //       connection,
-  //       signTransaction
-  //     );
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw err;
-  //   }
+  // console.log("entry price", results.value.returnData?.data[0]);
+
+  // } catch (err) {
+  //   console.log(err);
+  //   throw err;
+  // }
 }
 
 export async function getLiquidationPrice(
@@ -111,10 +105,55 @@ export async function getLiquidationPrice(
       perpsUser,
     ]);
 
+    console.log("get liq price resultsf", results.value.returnData?.data[0]);
+
     let liqPrice = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;
 
     console.log("liq price", liqPrice);
     return liqPrice;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+}
+
+export async function getPnl(
+  wallet: Wallet,
+  publicKey: PublicKey,
+  connection: Connection,
+  poolAddress: PublicKey,
+  positionAddress: PublicKey,
+  custodyAddress: PublicKey,
+  custodyOracleAddress: PublicKey
+) {
+  let { perpetual_program } = await getPerpetualProgramAndProvider();
+
+  let transaction = new Transaction();
+
+  try {
+    let getPnlTx = await perpetual_program.methods
+      .getPnl({})
+      .accounts({
+        signer: perpsUser.publicKey,
+        perpetuals: perpetualsAddress,
+        pool: poolAddress,
+        position: positionAddress,
+        custody: custodyAddress,
+        custodyOracleAccount: custodyOracleAddress,
+      })
+      .transaction();
+
+    transaction = transaction.add(getPnlTx);
+
+    let results = await connection.simulateTransaction(transaction, [
+      perpsUser,
+    ]);
+    console.log("pnl results", results.value.returnData?.data[0]);
+
+    let pnl = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;
+
+    console.log("pnl price", pnl);
+    return pnl;
   } catch (err) {
     console.log(err);
     throw err;
