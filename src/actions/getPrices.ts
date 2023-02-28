@@ -13,6 +13,17 @@ import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 
+function baseToDecimal(base64String: string) {
+  const binaryString = atob(base64String)
+    .split("")
+    .map(function (char) {
+      return char.charCodeAt(0).toString(2).padStart(8, "0");
+    })
+    .join("");
+
+  return parseInt(binaryString, 2);
+}
+
 export async function getEntryPrice(
   pool: Pool,
   wallet: Wallet,
@@ -69,15 +80,16 @@ export async function getEntryPrice(
 }
 
 export async function getLiquidationPrice(
-  pool: PoolObj,
   wallet: Wallet,
   publicKey: PublicKey,
   connection: Connection,
-  position: Position
+  poolAddress: PublicKey,
+  positionAddress: PublicKey,
+  custodyAddress: PublicKey,
+  custodyOracleAddress: PublicKey
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider();
 
-  console.log("position", position);
   let transaction = new Transaction();
 
   try {
@@ -86,11 +98,10 @@ export async function getLiquidationPrice(
       .accounts({
         signer: perpsUser.publicKey,
         perpetuals: perpetualsAddress,
-        pool: position.poolAddress,
-        position: position.positionAccountAddress,
-        custody: pool.tokens[getTokenAddress(position.token)]?.custodyAccount,
-        custodyOracleAccount:
-          pool.tokens[getTokenAddress(position.token)]?.oracleAccount,
+        pool: poolAddress,
+        position: positionAddress,
+        custody: custodyAddress,
+        custodyOracleAccount: custodyOracleAddress,
       })
       .transaction();
 
@@ -99,22 +110,8 @@ export async function getLiquidationPrice(
     let results = await connection.simulateTransaction(transaction, [
       perpsUser,
     ]);
-    console.log("results", results.value.returnData?.data[0]);
 
-    let base64String = results.value.returnData?.data[0];
-
-    const binaryString = atob(base64String)
-      .split("")
-      .map(function (char) {
-        return char.charCodeAt(0).toString(2).padStart(8, "0");
-      })
-      .join("");
-
-    const decimalNumber = parseInt(binaryString, 2);
-
-    console.log(decimalNumber);
-    // TODO Check if this liq price conversion is correct
-    let liqPrice = decimalNumber / 10 ** 8;
+    let liqPrice = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;
 
     console.log("liq price", liqPrice);
     return liqPrice;

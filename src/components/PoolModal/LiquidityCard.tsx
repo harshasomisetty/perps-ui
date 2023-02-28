@@ -77,7 +77,6 @@ export default function LiquidityCard(props: Props) {
       );
     }
     if (publicKey && Object.values(stats).length > 0 && payToken) {
-      console.log("passed iff", stats);
       fetchData();
     }
   }, [payToken, stats]);
@@ -98,9 +97,9 @@ export default function LiquidityCard(props: Props) {
     // router.reload(window.location.pathname);
   }
 
-  async function onChangeAmtLiq(tokenAmtUsd: number) {
-    setLiqAmount(tokenAmtUsd * liqRatio);
-  }
+  // async function onChangeAmtLiq(tokenAmtUsd: number) {
+  //   setLiqAmount(tokenAmtUsd * liqRatio);
+  // }
 
   return (
     <div className={props.className}>

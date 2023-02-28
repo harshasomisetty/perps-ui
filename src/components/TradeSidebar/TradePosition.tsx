@@ -110,7 +110,6 @@ export function TradePosition(props: Props) {
     setPool(Object.values(pools)[0]);
     return <LoadingDots />;
   } else {
-    console.log("tade position", pool.getLiquidities(stats));
     return (
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">

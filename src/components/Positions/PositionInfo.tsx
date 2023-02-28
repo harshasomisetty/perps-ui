@@ -6,7 +6,7 @@ import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 
-import { getTokenIcon, getTokenLabel } from "@/lib/Token";
+import { getTokenAddress, getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { Position, Side } from "@/lib/Position";
@@ -30,7 +30,6 @@ interface Props {
 }
 
 export function PositionInfo(props: Props) {
-  console.log("position info props", props);
   const tokenIcon = getTokenIcon(props.position.token);
 
   const { pools } = usePools();
@@ -45,17 +44,29 @@ export function PositionInfo(props: Props) {
 
   useEffect(() => {
     async function fetchData() {
+      console.log("pools ", pools, Object.keys(pools));
+      let token = props.position.token;
+
+      let custody =
+        pools[props.position.poolAddress.toString()].tokens[
+          getTokenAddress(token)
+        ];
+
       let fetchedPrice = await getLiquidationPrice(
-        pools[props.position.poolAddress.toString()],
         wallet,
         publicKey,
         connection,
-        props.position
+        props.position.poolAddress,
+        props.position.positionAccountAddress,
+        custody.custodyAccount,
+        custody.oracleAccount
       );
       setLiqPrice(fetchedPrice);
     }
-    fetchData();
-  }, []);
+    if (pools) {
+      fetchData();
+    }
+  }, [pools]);
 
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
