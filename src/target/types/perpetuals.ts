@@ -345,40 +345,6 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "setBorrowRate",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "SetBorrowRateParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
       "name": "setPermissions",
       "accounts": [
         {
@@ -1480,6 +1446,35 @@ export type Perpetuals = {
       "returns": {
         "defined": "SwapAmountAndFees"
       }
+    },
+    {
+      "name": "getAssetsUnderManagement",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetAssetsUnderManagementParams"
+          }
+        }
+      ],
+      "returns": "u128"
     }
   ],
   "accounts": [
@@ -1534,11 +1529,9 @@ export type Perpetuals = {
           },
           {
             "name": "borrowRate",
-            "type": "u64"
-          },
-          {
-            "name": "borrowRateSum",
-            "type": "u64"
+            "type": {
+              "defined": "BorrowRateParams"
+            }
           },
           {
             "name": "assets",
@@ -1565,6 +1558,24 @@ export type Perpetuals = {
             }
           },
           {
+            "name": "longPositions",
+            "type": {
+              "defined": "PositionStats"
+            }
+          },
+          {
+            "name": "shortPositions",
+            "type": {
+              "defined": "PositionStats"
+            }
+          },
+          {
+            "name": "borrowRateState",
+            "type": {
+              "defined": "BorrowRateState"
+            }
+          },
+          {
             "name": "bump",
             "type": "u8"
           },
@@ -1581,7 +1592,7 @@ export type Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "tokenAccount",
+            "name": "pool",
             "type": "publicKey"
           },
           {
@@ -1589,8 +1600,16 @@ export type Perpetuals = {
             "type": "publicKey"
           },
           {
+            "name": "tokenAccount",
+            "type": "publicKey"
+          },
+          {
             "name": "decimals",
             "type": "u8"
+          },
+          {
+            "name": "isStable",
+            "type": "bool"
           },
           {
             "name": "oracle",
@@ -1601,7 +1620,7 @@ export type Perpetuals = {
           {
             "name": "pricing",
             "type": {
-              "defined": "PricingParams"
+              "defined": "DeprecatedPricingParams"
             }
           },
           {
@@ -1857,8 +1876,8 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "borrowRateSum",
-            "type": "u64"
+            "name": "cumulativeInterestSnapshot",
+            "type": "u128"
           },
           {
             "name": "lockedAmount",
@@ -1923,6 +1942,12 @@ export type Perpetuals = {
             }
           },
           {
+            "name": "borrowRate",
+            "type": {
+              "defined": "BorrowRateParams"
+            }
+          },
+          {
             "name": "targetRatio",
             "type": "u64"
           },
@@ -1971,6 +1996,13 @@ export type Perpetuals = {
             "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "GetAssetsUnderManagementParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -2175,22 +2207,6 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "SetBorrowRateParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "borrowRate",
-            "type": "u64"
-          },
-          {
-            "name": "borrowRateSum",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "SetCustodyConfigParams",
       "type": {
         "kind": "struct",
@@ -2221,6 +2237,12 @@ export type Perpetuals = {
             "name": "fees",
             "type": {
               "defined": "Fees"
+            }
+          },
+          {
+            "name": "borrowRate",
+            "type": {
+              "defined": "BorrowRateParams"
             }
           },
           {
@@ -2380,8 +2402,10 @@ export type Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "isStable",
-            "type": "bool"
+            "name": "borrowRate",
+            "type": {
+              "defined": "BorrowRateParams"
+            }
           }
         ]
       }
@@ -2592,6 +2616,130 @@ export type Perpetuals = {
     },
     {
       "name": "PricingParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "useEma",
+            "type": "bool"
+          },
+          {
+            "name": "useUnrealizedPnlInAum",
+            "type": "bool"
+          },
+          {
+            "name": "tradeSpreadLong",
+            "type": "u64"
+          },
+          {
+            "name": "tradeSpreadShort",
+            "type": "u64"
+          },
+          {
+            "name": "swapSpread",
+            "type": "u64"
+          },
+          {
+            "name": "minInitialLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "maxLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "maxPayoffMult",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BorrowRateParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "baseRate",
+            "type": "u64"
+          },
+          {
+            "name": "slope1",
+            "type": "u64"
+          },
+          {
+            "name": "slope2",
+            "type": "u64"
+          },
+          {
+            "name": "optimalUtilization",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BorrowRateState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "currentRate",
+            "type": "u64"
+          },
+          {
+            "name": "cumulativeInterest",
+            "type": "u128"
+          },
+          {
+            "name": "lastUpdate",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PositionStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "openPositions",
+            "type": "u64"
+          },
+          {
+            "name": "collateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "weightedLeverage",
+            "type": "u128"
+          },
+          {
+            "name": "totalLeverage",
+            "type": "u128"
+          },
+          {
+            "name": "cumulativeInterest",
+            "type": "u64"
+          },
+          {
+            "name": "cumulativeInterestSnapshot",
+            "type": "u128"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeprecatedPricingParams",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3329,40 +3477,6 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "setBorrowRate",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "SetBorrowRateParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
       "name": "setPermissions",
       "accounts": [
         {
@@ -4464,6 +4578,35 @@ export const IDL: Perpetuals = {
       "returns": {
         "defined": "SwapAmountAndFees"
       }
+    },
+    {
+      "name": "getAssetsUnderManagement",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetAssetsUnderManagementParams"
+          }
+        }
+      ],
+      "returns": "u128"
     }
   ],
   "accounts": [
@@ -4518,11 +4661,9 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "borrowRate",
-            "type": "u64"
-          },
-          {
-            "name": "borrowRateSum",
-            "type": "u64"
+            "type": {
+              "defined": "BorrowRateParams"
+            }
           },
           {
             "name": "assets",
@@ -4549,6 +4690,24 @@ export const IDL: Perpetuals = {
             }
           },
           {
+            "name": "longPositions",
+            "type": {
+              "defined": "PositionStats"
+            }
+          },
+          {
+            "name": "shortPositions",
+            "type": {
+              "defined": "PositionStats"
+            }
+          },
+          {
+            "name": "borrowRateState",
+            "type": {
+              "defined": "BorrowRateState"
+            }
+          },
+          {
             "name": "bump",
             "type": "u8"
           },
@@ -4565,7 +4724,7 @@ export const IDL: Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "tokenAccount",
+            "name": "pool",
             "type": "publicKey"
           },
           {
@@ -4573,8 +4732,16 @@ export const IDL: Perpetuals = {
             "type": "publicKey"
           },
           {
+            "name": "tokenAccount",
+            "type": "publicKey"
+          },
+          {
             "name": "decimals",
             "type": "u8"
+          },
+          {
+            "name": "isStable",
+            "type": "bool"
           },
           {
             "name": "oracle",
@@ -4585,7 +4752,7 @@ export const IDL: Perpetuals = {
           {
             "name": "pricing",
             "type": {
-              "defined": "PricingParams"
+              "defined": "DeprecatedPricingParams"
             }
           },
           {
@@ -4841,8 +5008,8 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "borrowRateSum",
-            "type": "u64"
+            "name": "cumulativeInterestSnapshot",
+            "type": "u128"
           },
           {
             "name": "lockedAmount",
@@ -4907,6 +5074,12 @@ export const IDL: Perpetuals = {
             }
           },
           {
+            "name": "borrowRate",
+            "type": {
+              "defined": "BorrowRateParams"
+            }
+          },
+          {
             "name": "targetRatio",
             "type": "u64"
           },
@@ -4955,6 +5128,13 @@ export const IDL: Perpetuals = {
             "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "GetAssetsUnderManagementParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -5159,22 +5339,6 @@ export const IDL: Perpetuals = {
       }
     },
     {
-      "name": "SetBorrowRateParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "borrowRate",
-            "type": "u64"
-          },
-          {
-            "name": "borrowRateSum",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "SetCustodyConfigParams",
       "type": {
         "kind": "struct",
@@ -5205,6 +5369,12 @@ export const IDL: Perpetuals = {
             "name": "fees",
             "type": {
               "defined": "Fees"
+            }
+          },
+          {
+            "name": "borrowRate",
+            "type": {
+              "defined": "BorrowRateParams"
             }
           },
           {
@@ -5364,8 +5534,10 @@ export const IDL: Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "isStable",
-            "type": "bool"
+            "name": "borrowRate",
+            "type": {
+              "defined": "BorrowRateParams"
+            }
           }
         ]
       }
@@ -5576,6 +5748,130 @@ export const IDL: Perpetuals = {
     },
     {
       "name": "PricingParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "useEma",
+            "type": "bool"
+          },
+          {
+            "name": "useUnrealizedPnlInAum",
+            "type": "bool"
+          },
+          {
+            "name": "tradeSpreadLong",
+            "type": "u64"
+          },
+          {
+            "name": "tradeSpreadShort",
+            "type": "u64"
+          },
+          {
+            "name": "swapSpread",
+            "type": "u64"
+          },
+          {
+            "name": "minInitialLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "maxLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "maxPayoffMult",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BorrowRateParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "baseRate",
+            "type": "u64"
+          },
+          {
+            "name": "slope1",
+            "type": "u64"
+          },
+          {
+            "name": "slope2",
+            "type": "u64"
+          },
+          {
+            "name": "optimalUtilization",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BorrowRateState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "currentRate",
+            "type": "u64"
+          },
+          {
+            "name": "cumulativeInterest",
+            "type": "u128"
+          },
+          {
+            "name": "lastUpdate",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PositionStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "openPositions",
+            "type": "u64"
+          },
+          {
+            "name": "collateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "weightedLeverage",
+            "type": "u128"
+          },
+          {
+            "name": "totalLeverage",
+            "type": "u128"
+          },
+          {
+            "name": "cumulativeInterest",
+            "type": "u64"
+          },
+          {
+            "name": "cumulativeInterestSnapshot",
+            "type": "u128"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeprecatedPricingParams",
       "type": {
         "kind": "struct",
         "fields": [
