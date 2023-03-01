@@ -13,6 +13,7 @@ import { Position, Side } from "@/lib/Position";
 import { getLiquidationPrice } from "src/actions/getPrices";
 import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -33,6 +34,7 @@ export function PositionInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
 
   const { pools } = usePools();
+  const stats = useDailyPriceStats();
 
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
@@ -67,6 +69,7 @@ export function PositionInfo(props: Props) {
     }
   }, [pools]);
 
+  // TODO get mark price
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
       <PositionColumn num={1}>
@@ -156,7 +159,11 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={6}>
         <div className="text-sm text-white">
-          ${formatPrice(props.position.markPrice)}
+          $
+          {/* {stats != undefined
+            ? formatPrice(stats[props.position.token].currentPrice)
+            : 0} */}
+          0
         </div>
       </PositionColumn>
       <PositionColumn num={7}>

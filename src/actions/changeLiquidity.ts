@@ -105,8 +105,14 @@ export async function changeLiquidity(
       if (payToken === Token.SOL) {
         amount = new BN(tokenAmount * LAMPORTS_PER_SOL);
       } else {
-        amount = new BN(tokenAmount * 10e5);
+        amount = new BN(
+          tokenAmount * 10 ** pool.tokens[getTokenAddress(payToken)]?.decimals
+        );
       }
+      console.log(
+        "sending add",
+        pool.tokens[getTokenAddress(payToken)]?.oracleAccount.toString()
+      );
       let addLiquidityTx = await perpetual_program.methods
         .addLiquidity({ amount })
         .accounts({
@@ -127,8 +133,7 @@ export async function changeLiquidity(
         .remainingAccounts(pool.custodyMetas)
         .transaction();
       transaction = transaction.add(addLiquidityTx);
-    }
-    if (liquidityAmount) {
+    } else if (liquidityAmount) {
       let lpAmount = new BN(liquidityAmount * 10 ** pool.lpDecimals);
       let removeLiquidityTx = await perpetual_program.methods
         .removeLiquidity({ lpAmount })

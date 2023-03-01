@@ -82,15 +82,14 @@ export default function SinglePoolTokens(props: Props) {
                     <td>
                       {(
                         stats[token].currentPrice *
-                        (Number(custody.amount) / 10 ** custody.decimals)
+                        (Number(custody.owned) / 10 ** custody.decimals)
                       ).toFixed(2)}
                     </td>
                     <td>{stats[token].currentPrice.toFixed(2)}</td>
                     <td>
-                      {(
-                        Number(custody.amount) /
-                        10 ** custody.decimals
-                      ).toFixed(2)}
+                      {(Number(custody.owned) / 10 ** custody.decimals).toFixed(
+                        2
+                      )}
                     </td>
                     <td>% / %</td>
                     <td>%</td>

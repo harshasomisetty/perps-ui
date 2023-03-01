@@ -17,6 +17,7 @@ function clamp(num: number, min: number, max: number) {
 interface Props {
   className?: string;
   value: number;
+  maxLeverage: number;
   onChange?(value: number): void;
 }
 
@@ -35,7 +36,7 @@ export function LeverageSlider(props: Props) {
       <div>
         <Slider.Root
           min={1}
-          max={50}
+          max={props.maxLeverage}
           step={0.01}
           value={[props.value]}
           onValueChange={(values) => props.onChange?.(values[0] || 1)}

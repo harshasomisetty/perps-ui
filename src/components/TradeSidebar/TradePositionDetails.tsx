@@ -47,15 +47,7 @@ export function TradePositionDetails(props: Props) {
       <div className="grid grid-cols-2 gap-4">
         {[
           {
-            label: "Entry Price",
-            value: `$${formatPrice(props.entryPrice)}`,
-          },
-          {
-            label: "Exit Price",
-            value: `$${formatPrice(props.exitPrice)}`,
-          },
-          {
-            label: "Borrow Price",
+            label: "Borrow Rate",
             value: (
               <>
                 {`${formatFees(props.borrowFee)}% `}

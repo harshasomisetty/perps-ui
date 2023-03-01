@@ -25,7 +25,7 @@ export function TradeDetails(props: Props) {
       {[
         {
           label: "Collateral in",
-          value: props.collateralToken,
+          value: "USD",
         },
         {
           label: "Entry Price",
@@ -33,11 +33,11 @@ export function TradeDetails(props: Props) {
         },
         {
           label: "Liq. Price",
-          value: `$${formatNumber(props.liquidationPrice)}`,
+          value: `-`,
         },
         {
           label: "Fees",
-          value: `$${formatNumber(props.fees)}`,
+          value: `-`,
         },
       ].map(({ label, value }, i) => (
         <div

@@ -29,13 +29,13 @@ enum Tab {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [tokenAmount, setTokenAmount] = useState(10);
+  const [tokenAmount, setTokenAmount] = useState();
 
   const [tab, setTab] = useState(Tab.Add);
 
   const [payTokenBalance, setPayTokenBalance] = useState(0);
   const [liqBalance, setLiqBalance] = useState(0);
-  const [liqAmount, setLiqAmount] = useState(1);
+  const [liqAmount, setLiqAmount] = useState();
 
   const [liqRatio, setLiqRatio] = useState();
 
@@ -101,6 +101,7 @@ export default function LiquidityCard(props: Props) {
   //   setLiqAmount(tokenAmtUsd * liqRatio);
   // }
 
+  console.log("pool name", poolName);
   return (
     <div className={props.className}>
       <div
@@ -131,7 +132,7 @@ export default function LiquidityCard(props: Props) {
           </SidebarTab>
         </div>
 
-        {poolName == "internal_test" &&
+        {poolName == "TestPool1" &&
           Object.keys(props.pool.tokens).map((token) => {
             return <AirdropButton key={token} mint={token} />;
           })}

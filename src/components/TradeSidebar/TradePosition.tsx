@@ -169,6 +169,7 @@ export function TradePosition(props: Props) {
         <LeverageSlider
           className="mt-6"
           value={leverage}
+          maxLeverage={50}
           onChange={(e) => {
             if (lastChanged === Input.Pay) {
               setPositionAmount(payAmount * e);
@@ -190,7 +191,10 @@ export function TradePosition(props: Props) {
         />
         <TradePositionDetails
           availableLiquidity={pool.getLiquidities(stats)}
-          borrowFee={0}
+          borrowFee={
+            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
+            0
+          }
           className={twMerge(
             "-mb-4",
             "-mx-4",
