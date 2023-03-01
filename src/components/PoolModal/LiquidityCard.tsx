@@ -29,15 +29,15 @@ enum Tab {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [tokenAmount, setTokenAmount] = useState();
+  const [tokenAmount, setTokenAmount] = useState(0);
 
   const [tab, setTab] = useState(Tab.Add);
 
   const [payTokenBalance, setPayTokenBalance] = useState(0);
   const [liqBalance, setLiqBalance] = useState(0);
-  const [liqAmount, setLiqAmount] = useState();
+  const [liqAmount, setLiqAmount] = useState(0);
 
-  const [liqRatio, setLiqRatio] = useState();
+  const [liqRatio, setLiqRatio] = useState(0);
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
