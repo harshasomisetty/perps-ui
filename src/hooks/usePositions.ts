@@ -97,8 +97,7 @@ export function usePositions() {
       }
 
       let cleanedPosition: Position = {
-        id: index.toString(),
-        // borrowRateSum: position.account.borrowRateSum.toNumber(),
+        poolName: poolNames[poolAddress],
         positionAccountAddress: position.publicKey,
         poolAddress: position.account.pool,
         collateralUsd: position.account.collateralUsd.toNumber() / 10 ** 6,

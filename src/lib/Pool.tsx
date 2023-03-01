@@ -34,8 +34,7 @@ export interface TokenCustody {
   owned: BN;
   locked: BN;
   decimals: number;
-  minRatio: number;
-  maxRatio: number;
+  targetRatio: number;
   volume: VolumeStats;
   oiLong: number;
   oiShort: number;

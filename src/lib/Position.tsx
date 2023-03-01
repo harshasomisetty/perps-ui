@@ -12,7 +12,7 @@ export class TradeSide {
 }
 
 export interface Position {
-  id: string;
+  poolName: string;
   positionAccountAddress: string;
   poolAddress: string;
   collateralUsd: number;

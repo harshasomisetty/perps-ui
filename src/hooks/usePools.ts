@@ -17,6 +17,7 @@ export function usePools() {
         await getPerpetualProgramAndProvider();
 
       let fetchedPools = await perpetual_program.account.pool.all();
+      console.log("fetchedPools", fetchedPools);
 
       await Promise.all(
         Object.values(fetchedPools).map(async (pool) => {
@@ -28,6 +29,8 @@ export function usePools() {
             await perpetual_program.account.custody.fetchMultiple(
               custodyAccounts
             );
+
+          console.log("fetchedCustodies", fetchedCustodies[0]);
 
           let custodyInfos: Record<string, TokenCustody> = {};
 
@@ -41,8 +44,7 @@ export function usePools() {
               owned: custody.assets.owned,
               locked: custody.assets.locked,
               decimals: custody.decimals,
-              minRatio: Number(pool.account.tokens[ind].minRatio),
-              maxRatio: Number(pool.account.tokens[ind].maxRatio),
+              targetRatio: Number(pool.account.tokens[ind].targetRatio) / 100,
 
               volume: {
                 swap: Number(custody.volumeStats.swapUsd),

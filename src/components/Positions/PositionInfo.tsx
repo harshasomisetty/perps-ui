@@ -47,11 +47,10 @@ export function PositionInfo(props: Props) {
   useEffect(() => {
     async function fetchData() {
       let token = props.position.token;
+      console.log("pos info", pools, props.position.poolName);
 
       let custody =
-        pools[props.position.poolAddress.toString()].tokens[
-          getTokenAddress(token)
-        ];
+        pools[props.position.poolName].tokens[getTokenAddress(token)];
 
       let fetchedPrice = await getLiquidationPrice(
         wallet,

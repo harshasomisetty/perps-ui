@@ -91,7 +91,15 @@ export default function SinglePoolTokens(props: Props) {
                         2
                       )}
                     </td>
-                    <td>% / %</td>
+                    <td>
+                      {(
+                        (100 *
+                          stats[token].currentPrice *
+                          (Number(custody.owned) / 10 ** custody.decimals)) /
+                        props.pool.getLiquidities(stats)
+                      ).toFixed(2)}
+                      % / {custody.targetRatio}%
+                    </td>
                     <td>%</td>
                     <td>
                       <a
