@@ -103,6 +103,8 @@ export function usePositions() {
         poolAddress: position.account.pool,
         collateralUsd: position.account.collateralUsd.toNumber() / 10 ** 6,
 
+        entryPrice: position.account.price.toNumber() / 10 ** 6,
+
         leverage:
           position.account.sizeUsd.toNumber() /
           position.account.collateralUsd.toNumber(),

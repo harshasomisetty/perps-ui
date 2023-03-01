@@ -16,7 +16,7 @@ export interface Position {
   positionAccountAddress: string;
   poolAddress: string;
   collateralUsd: number;
-  // entryPrice: number;
+  entryPrice: number;
   leverage: number;
   // liquidationPrice: number;
   // liquidationThreshold: number;

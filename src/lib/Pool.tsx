@@ -21,13 +21,18 @@ interface FeeStats {
   liquidation: number;
 }
 
+interface Rates {
+  currentRate: number;
+}
+
 export interface TokenCustody {
   custodyAccount: PublicKey;
   tokenAccount: PublicKey;
   mintAccount: PublicKey;
   oracleAccount: PublicKey;
   name: Token;
-  amount: BN;
+  owned: BN;
+  locked: BN;
   decimals: number;
   minRatio: number;
   maxRatio: number;
@@ -35,6 +40,7 @@ export interface TokenCustody {
   oiLong: number;
   oiShort: number;
   fees: FeeStats;
+  rate: Rates;
 }
 
 export interface CustodyMeta {
@@ -77,7 +83,8 @@ export class PoolObj {
       (acc: number, tokenCustody) => {
         let singleLiq =
           stats[tokenCustody.name].currentPrice *
-          (Number(tokenCustody.amount) / 10 ** tokenCustody.decimals);
+          ((Number(tokenCustody.owned) - Number(tokenCustody.locked)) /
+            10 ** tokenCustody.decimals);
         return acc + singleLiq;
       },
       0
