@@ -44,7 +44,7 @@ export function usePools() {
               owned: custody.assets.owned,
               locked: custody.assets.locked,
               decimals: custody.decimals,
-              targetRatio: Number(pool.account.tokens[ind].targetRatio) / 100,
+              targetRatio: Number(pool.account.tokens[ind].targetRatio),
 
               volume: {
                 swap: Number(custody.volumeStats.swapUsd),
@@ -58,7 +58,7 @@ export function usePools() {
               oiLong: Number(custody.tradeStats.oiLongUsd),
               oiShort: Number(custody.tradeStats.oiShortUsd),
 
-              fees: {
+              feeStats: {
                 swap: Number(custody.collectedFees.swapUsd),
                 addLiquidity: Number(custody.collectedFees.addLiquidityUsd),
                 removeLiquidity: Number(
@@ -67,6 +67,10 @@ export function usePools() {
                 openPosition: Number(custody.collectedFees.openPositionUsd),
                 closePosition: Number(custody.collectedFees.closePositionUsd),
                 liquidation: Number(custody.collectedFees.liquidationUsd),
+              },
+
+              fees: {
+                addLiquidity: Number(custody.fees.addLiquidity),
               },
             };
           });

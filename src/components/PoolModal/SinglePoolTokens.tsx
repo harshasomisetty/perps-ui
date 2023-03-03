@@ -78,7 +78,7 @@ export default function SinglePoolTokens(props: Props) {
                         </a>
                       </div>
                     </td>
-                    <td>%</td>
+                    <td>{custody.fees.addLiquidity / 100}%</td>
                     <td>
                       {(
                         stats[token].currentPrice *

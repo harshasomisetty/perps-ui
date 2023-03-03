@@ -21,6 +21,10 @@ interface FeeStats {
   liquidation: number;
 }
 
+interface Fees {
+  addLiquidity: number;
+}
+
 interface Rates {
   currentRate: number;
 }
@@ -38,7 +42,8 @@ export interface TokenCustody {
   volume: VolumeStats;
   oiLong: number;
   oiShort: number;
-  fees: FeeStats;
+  feeStats: FeeStats;
+  fees: Fees;
   rate: Rates;
 }
 
@@ -132,7 +137,8 @@ export class PoolObj {
     const totalAmount = Object.values(this.tokens).reduce(
       (acc: number, tokenCustody: TokenCustody) => {
         return (
-          acc + Object.values(tokenCustody.fees).reduce((acc, val) => acc + val)
+          acc +
+          Object.values(tokenCustody.feeStats).reduce((acc, val) => acc + val)
         );
       },
       0
