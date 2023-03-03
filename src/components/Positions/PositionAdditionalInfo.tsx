@@ -14,7 +14,7 @@ import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useRouter } from "next/router";
 import { usePositions } from "@/hooks/usePositions";
-import { getPnl } from "src/actions/getPrices";
+import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
 import { getTokenAddress } from "@/lib/Token";
 
 function formatPrice(num: number) {
@@ -33,7 +33,7 @@ interface Props {
 export function PositionAdditionalInfo(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
-  const allPriceStats = useDailyPriceStats();
+  const stats = useDailyPriceStats(props.position.token);
 
   const { pools } = usePools();
 
@@ -42,6 +42,7 @@ export function PositionAdditionalInfo(props: Props) {
   const { fetchPositions } = usePositions();
 
   const [pnl, setPnl] = useState(0);
+  const [liqPrice, setLiqPrice] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -68,6 +69,30 @@ export function PositionAdditionalInfo(props: Props) {
     }
   }, [pools]);
 
+  useEffect(() => {
+    async function fetchData() {
+      let token = props.position.token;
+      console.log("pos info", pools, props.position.poolName);
+
+      let custody =
+        pools[props.position.poolName].tokens[getTokenAddress(token)];
+
+      let fetchedPrice = await getLiquidationPrice(
+        wallet,
+        publicKey,
+        connection,
+        props.position.poolAddress,
+        props.position.positionAccountAddress,
+        custody.custodyAccount,
+        custody.oracleAccount
+      );
+      setLiqPrice(fetchedPrice);
+    }
+    if (pools) {
+      fetchData();
+    }
+  }, [pools]);
+
   async function handleCloseTrade() {
     console.log("in close trade");
     let pool = pools[props.position.poolAddress.toString()];
@@ -81,7 +106,7 @@ export function PositionAdditionalInfo(props: Props) {
       positionToken,
       props.position.positionAccountAddress,
       props.position.side,
-      new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6)
+      new BN(stats.currentPrice * 10 ** 6)
     );
 
     fetchPositions();
@@ -150,7 +175,7 @@ export function PositionAdditionalInfo(props: Props) {
         <div>
           <div className="text-xs text-zinc-500">Liq. Threshold</div>
           <div className="mt-1 text-sm text-white">
-            ${formatPrice(props.position.liquidationThreshold)}
+            ${formatPrice(liqPrice - stats.currentPrice)}
           </div>
         </div>
       </div>

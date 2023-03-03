@@ -14,14 +14,7 @@ import { getLiquidationPrice } from "src/actions/getPrices";
 import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-
-function formatPrice(num: number) {
-  const formatter = new Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
+import { formatNumberCommas } from "@/utils/formatters";
 
 interface Props {
   className?: string;
@@ -34,12 +27,11 @@ export function PositionInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
 
   const { pools } = usePools();
-  const stats = useDailyPriceStats();
+  const stats = useDailyPriceStats(props.position.token);
 
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
 
-  // useState liqPrice
   const [liqPrice, setLiqPrice] = useState(0);
 
   // use effect get liq price
@@ -69,6 +61,7 @@ export function PositionInfo(props: Props) {
   }, [pools]);
 
   // TODO get mark price
+  console.log("stats full", stats);
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
       <PositionColumn num={1}>
@@ -125,7 +118,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={3}>
         <div className="text-sm text-white">
-          ${formatPrice(props.position.sizeUsd)}
+          ${formatNumberCommas(props.position.sizeUsd)}
         </div>
         <PositionValueDelta
           className="mt-0.5"
@@ -136,7 +129,7 @@ export function PositionInfo(props: Props) {
       <PositionColumn num={4}>
         <div className="flex items-center">
           <div className="text-sm text-white">
-            ${formatPrice(props.position.collateralUsd)}
+            ${formatNumberCommas(props.position.collateralUsd)}
           </div>
           <button className="group ml-2">
             <EditIcon
@@ -153,21 +146,19 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={5}>
         <div className="text-sm text-white">
-          ${formatPrice(props.position.entryPrice)}
+          ${formatNumberCommas(props.position.entryPrice)}
         </div>
       </PositionColumn>
       <PositionColumn num={6}>
         <div className="text-sm text-white">
-          $
-          {/* {stats != undefined
-            ? formatPrice(stats[props.position.token].currentPrice)
-            : 0} */}
-          0
+          ${stats != undefined ? formatNumberCommas(stats.currentPrice) : 0}
         </div>
       </PositionColumn>
       <PositionColumn num={7}>
         <div className="flex items-center justify-between pr-2">
-          <div className="text-sm text-white">${formatPrice(liqPrice)}</div>
+          <div className="text-sm text-white">
+            ${formatNumberCommas(liqPrice)}
+          </div>
           <div className="flex items-center space-x-2">
             {/* <button className="text-white" onClick={liqPrice}>
               liq
