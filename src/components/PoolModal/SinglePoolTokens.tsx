@@ -5,6 +5,7 @@ import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
+import { formatNumberCommas } from "@/utils/formatters";
 
 interface Props {
   className?: string;
@@ -80,31 +81,31 @@ export default function SinglePoolTokens(props: Props) {
                     </td>
                     <td>{custody.fees.addLiquidity / 100}%</td>
                     <td>
-                      {(
+                      $
+                      {formatNumberCommas(
                         stats[token].currentPrice *
-                        (Number(custody.owned) / 10 ** custody.decimals)
-                      ).toFixed(2)}
+                          (Number(custody.owned) / 10 ** custody.decimals)
+                      )}
                     </td>
-                    <td>{stats[token].currentPrice.toFixed(2)}</td>
+                    <td>${formatNumberCommas(stats[token].currentPrice)}</td>
                     <td>
-                      {(Number(custody.owned) / 10 ** custody.decimals).toFixed(
-                        2
+                      {formatNumberCommas(
+                        Number(custody.owned) / 10 ** custody.decimals
                       )}
                     </td>
                     <td>
-                      {(
+                      {formatNumberCommas(
                         (100 *
                           stats[token].currentPrice *
                           (Number(custody.owned) / 10 ** custody.decimals)) /
-                        props.pool.getLiquidities(stats)
-                      ).toFixed(2)}
+                          props.pool.getLiquidities(stats)
+                      )}
                       % / {custody.targetRatio}%
                     </td>
                     <td>
-                      {100 *
-                        (
-                          Number(custody.locked) / Number(custody.owned)
-                        ).toFixed(2)}
+                      {formatNumberCommas(
+                        100 * (Number(custody.locked) / Number(custody.owned))
+                      )}
                       %
                     </td>
                     <td>

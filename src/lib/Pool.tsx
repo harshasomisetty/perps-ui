@@ -94,7 +94,7 @@ export class PoolObj {
       0
     );
 
-    return totalAmount.toFixed(2);
+    return totalAmount;
   }
 
   getTradeVolumes() {
@@ -108,7 +108,7 @@ export class PoolObj {
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 
   getOiLong() {
@@ -119,7 +119,7 @@ export class PoolObj {
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 
   getOiShort() {
@@ -130,7 +130,7 @@ export class PoolObj {
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 
   getFees() {
@@ -144,6 +144,6 @@ export class PoolObj {
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 }
