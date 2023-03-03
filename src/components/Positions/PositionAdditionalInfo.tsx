@@ -48,9 +48,7 @@ export function PositionAdditionalInfo(props: Props) {
       let token = props.position.token;
 
       let custody =
-        pools[props.position.poolAddress.toString()].tokens[
-          getTokenAddress(token)
-        ];
+        pools[props.position.poolName].tokens[getTokenAddress(token)];
 
       let fetchedPrice = await getPnl(
         wallet,
@@ -134,7 +132,7 @@ export function PositionAdditionalInfo(props: Props) {
           <div className="text-xs text-zinc-500">Size</div>
           <div className="mt-1 flex items-center">
             <div className="text-sm text-white">
-              ${formatPrice(props.position.size)}
+              ${formatPrice(props.position.sizeUsd)}
             </div>
             <button className="group ml-2">
               <EditIcon

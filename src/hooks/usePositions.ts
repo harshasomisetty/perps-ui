@@ -90,6 +90,7 @@ export function usePositions() {
 
     let organizedPositions: Record<string, Position[]> = {};
 
+    // netvalue: collateral + profit - loss
     fetchedPositions.forEach(async (position, index) => {
       let poolAddress = position.account.pool.toString();
       if (!organizedPositions[poolAddress]) {

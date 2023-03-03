@@ -100,7 +100,13 @@ export default function SinglePoolTokens(props: Props) {
                       ).toFixed(2)}
                       % / {custody.targetRatio}%
                     </td>
-                    <td>%</td>
+                    <td>
+                      {100 *
+                        (
+                          Number(custody.locked) / Number(custody.owned)
+                        ).toFixed(2)}
+                      %
+                    </td>
                     <td>
                       <a
                         target="_blank"

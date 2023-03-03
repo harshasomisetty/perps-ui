@@ -18,7 +18,6 @@ import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { token } from "@metaplex-foundation/js";
 import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
 import { usePositions } from "@/hooks/usePositions";
@@ -183,13 +182,28 @@ export function TradePosition(props: Props) {
           Place Order
         </SolidButton>
         <TradeDetails
-          className="mt-4"
+          className={twMerge(
+            "-mb-4",
+            "-mx-4",
+            "bg-zinc-900",
+            "mt-4",
+            "pb-5",
+            "pt-4",
+            "px-4"
+          )}
           collateralToken={payToken}
+          positionToken={positionToken}
           entryPrice={entryPrice}
           liquidationPrice={liquidationPrice}
           fees={pool.getFees()}
+          availableLiquidity={pool.getLiquidities(stats)}
+          borrowRate={
+            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
+            0
+          }
+          side={props.side}
         />
-        <TradePositionDetails
+        {/* <TradePositionDetails
           availableLiquidity={pool.getLiquidities(stats)}
           borrowFee={
             // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
@@ -204,11 +218,8 @@ export function TradePosition(props: Props) {
             "pt-4",
             "px-4"
           )}
-          entryPrice={0}
-          exitPrice={0}
-          token={positionToken}
           side={props.side}
-        />
+        /> */}
       </div>
     );
   }
