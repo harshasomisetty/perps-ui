@@ -10,7 +10,7 @@ import { getTokenAddress, getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { Position, Side } from "@/lib/Position";
-import { getLiquidationPrice } from "src/actions/getPrices";
+import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
 import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
@@ -32,9 +32,48 @@ export function PositionInfo(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
 
+  const [pnl, setPnl] = useState(0);
   const [liqPrice, setLiqPrice] = useState(0);
 
   // use effect get liq price
+
+  function getNetValue() {
+    // let netValue = 0
+    let collateral = props.position.collateralUsd;
+
+    // if (props.position.side === Side.Buy) {
+    //   netValue = props.position.size * props.position.entryPrice;
+    // } else {
+    //   netValue = props.position.size * props.position.entryPrice * -1;
+    // }
+
+    console.log("net value", collateral, pnl, collateral + pnl);
+    return collateral + pnl;
+  }
+  useEffect(() => {
+    async function fetchData() {
+      let token = props.position.token;
+
+      let custody =
+        pools[props.position.poolName].tokens[getTokenAddress(token)];
+
+      let fetchedPrice = await getPnl(
+        wallet,
+        publicKey,
+        connection,
+        props.position.poolAddress,
+        props.position.positionAccountAddress,
+        custody.custodyAccount,
+        custody.oracleAccount
+      );
+      setPnl(fetchedPrice);
+
+      console.log("pnl percentage", pnl, props.position.collateralUsd);
+    }
+    if (pools) {
+      fetchData();
+    }
+  }, [pools]);
 
   useEffect(() => {
     async function fetchData() {
@@ -118,7 +157,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={3}>
         <div className="text-sm text-white">
-          ${formatNumberCommas(props.position.sizeUsd)}
+          ${formatNumberCommas(getNetValue())}
         </div>
         <PositionValueDelta
           className="mt-0.5"

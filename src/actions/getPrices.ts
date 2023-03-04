@@ -105,8 +105,6 @@ export async function getLiquidationPrice(
       perpsUser,
     ]);
 
-    console.log("get liq price resultsf", results.value.returnData?.data[0]);
-
     let liqPrice = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;
 
     console.log("liq price", liqPrice);
@@ -148,7 +146,6 @@ export async function getPnl(
     let results = await connection.simulateTransaction(transaction, [
       perpsUser,
     ]);
-    console.log("pnl results", results.value.returnData?.data[0]);
 
     let pnl = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;
 

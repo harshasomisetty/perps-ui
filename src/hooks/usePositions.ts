@@ -40,7 +40,6 @@ export function usePositions() {
   let allPositions = false;
 
   const router = useRouter();
-  console.log("router path", router.pathname);
   if (router.pathname.includes("admin")) {
     allPositions = true;
   }

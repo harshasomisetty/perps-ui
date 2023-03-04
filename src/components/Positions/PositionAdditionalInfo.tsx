@@ -1,6 +1,6 @@
 import { usePools } from "@/hooks/usePools";
 import { Pool } from "@/lib/Pool";
-import { Position } from "@/lib/Position";
+import { Position, Side } from "@/lib/Position";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
@@ -175,7 +175,12 @@ export function PositionAdditionalInfo(props: Props) {
         <div>
           <div className="text-xs text-zinc-500">Liq. Threshold</div>
           <div className="mt-1 text-sm text-white">
-            ${formatPrice(liqPrice - stats.currentPrice)}
+            $
+            {formatPrice(
+              props.position.side === Side.Long
+                ? stats.currentPrice - liqPrice
+                : liqPrice - stats.currentPrice
+            )}
           </div>
         </div>
       </div>
