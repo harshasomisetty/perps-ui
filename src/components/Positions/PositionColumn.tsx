@@ -1,11 +1,11 @@
 export const COL_WIDTHS = {
-  1: 16,
-  2: 10,
-  3: 18,
+  1: 14,
+  2: 13,
+  3: 13,
   4: 13,
-  5: 11,
-  6: 15,
-  7: 17,
+  5: 13,
+  6: 13,
+  7: 18,
 } as const;
 
 export function PositionColumn(props: {

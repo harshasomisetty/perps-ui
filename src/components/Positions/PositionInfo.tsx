@@ -50,55 +50,6 @@ export function PositionInfo(props: Props) {
     console.log("net value", collateral, pnl, collateral + pnl);
     return collateral + pnl;
   }
-  useEffect(() => {
-    async function fetchData() {
-      let token = props.position.token;
-
-      let custody =
-        pools[props.position.poolName].tokens[getTokenAddress(token)];
-
-      let fetchedPrice = await getPnl(
-        wallet,
-        publicKey,
-        connection,
-        props.position.poolAddress,
-        props.position.positionAccountAddress,
-        custody.custodyAccount,
-        custody.oracleAccount
-      );
-      setPnl(fetchedPrice);
-
-      console.log("pnl percentage", pnl, props.position.collateralUsd);
-    }
-    if (pools) {
-      fetchData();
-    }
-  }, [pools]);
-
-  useEffect(() => {
-    async function fetchData() {
-      let token = props.position.token;
-      console.log("pos info", pools, props.position.poolName);
-
-      let custody =
-        pools[props.position.poolName].tokens[getTokenAddress(token)];
-
-      let fetchedPrice = await getLiquidationPrice(
-        wallet,
-        publicKey,
-        connection,
-        props.position.poolAddress,
-        props.position.positionAccountAddress,
-        custody.custodyAccount,
-        custody.oracleAccount
-      );
-      setLiqPrice(fetchedPrice);
-    }
-    if (pools) {
-      fetchData();
-    }
-  }, [pools]);
-
   // TODO get mark price
   console.log("stats full", stats);
   return (
@@ -159,11 +110,11 @@ export function PositionInfo(props: Props) {
         <div className="text-sm text-white">
           ${formatNumberCommas(getNetValue())}
         </div>
-        <PositionValueDelta
+        {/* <PositionValueDelta
           className="mt-0.5"
           valueDelta={props.position.valueDelta}
           valueDeltaPercentage={props.position.valueDeltaPercentage}
-        />
+        /> */}
       </PositionColumn>
       <PositionColumn num={4}>
         <div className="flex items-center">

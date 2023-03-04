@@ -40,7 +40,7 @@ export function DailyStats(props: DailyStatsProps) {
             stats.change24hr > 0 && "text-emerald-400"
           )}
         >
-          {formatNumberCommas(stats.change24hr)}
+          ${formatNumberCommas(stats.change24hr)}
         </div>
       </div>
     </div>
