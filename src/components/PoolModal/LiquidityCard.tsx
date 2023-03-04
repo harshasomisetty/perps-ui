@@ -29,15 +29,15 @@ enum Tab {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [tokenAmount, setTokenAmount] = useState(10);
+  const [tokenAmount, setTokenAmount] = useState(0);
 
   const [tab, setTab] = useState(Tab.Add);
 
   const [payTokenBalance, setPayTokenBalance] = useState(0);
   const [liqBalance, setLiqBalance] = useState(0);
-  const [liqAmount, setLiqAmount] = useState(1);
+  const [liqAmount, setLiqAmount] = useState(0);
 
-  const [liqRatio, setLiqRatio] = useState();
+  const [liqRatio, setLiqRatio] = useState(0);
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -77,7 +77,6 @@ export default function LiquidityCard(props: Props) {
       );
     }
     if (publicKey && Object.values(stats).length > 0 && payToken) {
-      console.log("passed iff", stats);
       fetchData();
     }
   }, [payToken, stats]);
@@ -98,10 +97,11 @@ export default function LiquidityCard(props: Props) {
     // router.reload(window.location.pathname);
   }
 
-  async function onChangeAmtLiq(tokenAmtUsd: number) {
-    setLiqAmount(tokenAmtUsd * liqRatio);
-  }
+  // async function onChangeAmtLiq(tokenAmtUsd: number) {
+  //   setLiqAmount(tokenAmtUsd * liqRatio);
+  // }
 
+  console.log("pool name", poolName);
   return (
     <div className={props.className}>
       <div
@@ -132,7 +132,7 @@ export default function LiquidityCard(props: Props) {
           </SidebarTab>
         </div>
 
-        {poolName == "internal_test" &&
+        {poolName == "TestPool1" &&
           Object.keys(props.pool.tokens).map((token) => {
             return <AirdropButton key={token} mint={token} />;
           })}

@@ -1,23 +1,20 @@
 import { twMerge } from "tailwind-merge";
-import { cloneElement } from "react";
+import { cloneElement, useEffect, useState } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 
-import { getTokenIcon, getTokenLabel } from "@/lib/Token";
+import { getTokenAddress, getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { Position, Side } from "@/lib/Position";
-
-function formatPrice(num: number) {
-  const formatter = new Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
+import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
+import { usePools } from "@/hooks/usePools";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
+import { formatNumberCommas } from "@/utils/formatters";
 
 interface Props {
   className?: string;
@@ -29,6 +26,32 @@ interface Props {
 export function PositionInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
 
+  const { pools } = usePools();
+  const stats = useDailyPriceStats(props.position.token);
+
+  const { publicKey, signTransaction, wallet } = useWallet();
+  const { connection } = useConnection();
+
+  const [pnl, setPnl] = useState(0);
+  const [liqPrice, setLiqPrice] = useState(0);
+
+  // use effect get liq price
+
+  function getNetValue() {
+    // let netValue = 0
+    let collateral = props.position.collateralUsd;
+
+    // if (props.position.side === Side.Buy) {
+    //   netValue = props.position.size * props.position.entryPrice;
+    // } else {
+    //   netValue = props.position.size * props.position.entryPrice * -1;
+    // }
+
+    console.log("net value", collateral, pnl, collateral + pnl);
+    return collateral + pnl;
+  }
+  // TODO get mark price
+  console.log("stats full", stats);
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
       <PositionColumn num={1}>
@@ -59,7 +82,9 @@ export function PositionInfo(props: Props) {
         </div>
       </PositionColumn>
       <PositionColumn num={2}>
-        <div className="text-sm text-white">{props.position.leverage}x</div>
+        <div className="text-sm text-white">
+          {props.position.leverage.toFixed(2)}x
+        </div>
         <div
           className={twMerge(
             "flex",
@@ -83,18 +108,18 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={3}>
         <div className="text-sm text-white">
-          ${formatPrice(props.position.value)}
+          ${formatNumberCommas(getNetValue())}
         </div>
-        <PositionValueDelta
+        {/* <PositionValueDelta
           className="mt-0.5"
           valueDelta={props.position.valueDelta}
           valueDeltaPercentage={props.position.valueDeltaPercentage}
-        />
+        /> */}
       </PositionColumn>
       <PositionColumn num={4}>
         <div className="flex items-center">
           <div className="text-sm text-white">
-            ${formatPrice(props.position.collateral)}
+            ${formatNumberCommas(props.position.collateralUsd)}
           </div>
           <button className="group ml-2">
             <EditIcon
@@ -111,20 +136,23 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={5}>
         <div className="text-sm text-white">
-          ${formatPrice(props.position.entryPrice)}
+          ${formatNumberCommas(props.position.entryPrice)}
         </div>
       </PositionColumn>
       <PositionColumn num={6}>
         <div className="text-sm text-white">
-          ${formatPrice(props.position.markPrice)}
+          ${stats != undefined ? formatNumberCommas(stats.currentPrice) : 0}
         </div>
       </PositionColumn>
       <PositionColumn num={7}>
         <div className="flex items-center justify-between pr-2">
           <div className="text-sm text-white">
-            ${formatPrice(props.position.liquidationPrice)}
+            ${formatNumberCommas(liqPrice)}
           </div>
           <div className="flex items-center space-x-2">
+            {/* <button className="text-white" onClick={liqPrice}>
+              liq
+            </button> */}
             <a
               target="_blank"
               rel="noreferrer"

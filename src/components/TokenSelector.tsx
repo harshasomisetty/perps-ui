@@ -32,7 +32,6 @@ interface Props {
 export function TokenSelector(props: Props) {
   const stats = useDailyPriceStats();
   const [selectorOpen, setSelectorOpen] = useState(false);
-  console.log("props", props, props.token, props.token === undefined);
 
   // check if props.token is undefined
 
@@ -106,11 +105,13 @@ export function TokenSelector(props: Props) {
               const text = e.currentTarget.value;
               props.onChangeAmount?.(Number(text));
 
-              // console.log(
               //   "all nujbers ratio",
               //   (Number(text) * stats[props.token].currentPrice) *
               //     props.liqRatio
-              // );
+              // )
+
+              // TODO liquidity should be subtract fees
+              console.log("liq ration", props.liqRatio);
 
               props.setLiquidity?.(
                 Number(

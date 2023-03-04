@@ -1,12 +1,12 @@
 import { usePools } from "@/hooks/usePools";
 import { Pool } from "@/lib/Pool";
-import { Position } from "@/lib/Position";
+import { Position, Side } from "@/lib/Position";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
@@ -14,6 +14,8 @@ import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useRouter } from "next/router";
 import { usePositions } from "@/hooks/usePositions";
+import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
+import { getTokenAddress } from "@/lib/Token";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -31,13 +33,65 @@ interface Props {
 export function PositionAdditionalInfo(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
-  const allPriceStats = useDailyPriceStats();
+  const stats = useDailyPriceStats(props.position.token);
 
   const { pools } = usePools();
 
   let payToken = props.position.token;
   let positionToken = props.position.token;
   const { fetchPositions } = usePositions();
+
+  const [pnl, setPnl] = useState(0);
+  const [liqPrice, setLiqPrice] = useState(0);
+
+  useEffect(() => {
+    async function fetchData() {
+      let token = props.position.token;
+
+      let custody =
+        pools[props.position.poolName].tokens[getTokenAddress(token)];
+
+      let fetchedPrice = await getPnl(
+        wallet,
+        publicKey,
+        connection,
+        props.position.poolAddress,
+        props.position.positionAccountAddress,
+        custody.custodyAccount,
+        custody.oracleAccount
+      );
+      setPnl(fetchedPrice);
+
+      console.log("pnl percentage", pnl, props.position.collateralUsd);
+    }
+    if (pools) {
+      fetchData();
+    }
+  }, [pools]);
+
+  useEffect(() => {
+    async function fetchData() {
+      let token = props.position.token;
+      console.log("pos info", pools, props.position.poolName);
+
+      let custody =
+        pools[props.position.poolName].tokens[getTokenAddress(token)];
+
+      let fetchedPrice = await getLiquidationPrice(
+        wallet,
+        publicKey,
+        connection,
+        props.position.poolAddress,
+        props.position.positionAccountAddress,
+        custody.custodyAccount,
+        custody.oracleAccount
+      );
+      setLiqPrice(fetchedPrice);
+    }
+    if (pools) {
+      fetchData();
+    }
+  }, [pools]);
 
   async function handleCloseTrade() {
     console.log("in close trade");
@@ -52,7 +106,7 @@ export function PositionAdditionalInfo(props: Props) {
       positionToken,
       props.position.positionAccountAddress,
       props.position.side,
-      new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6)
+      new BN(stats.currentPrice * 10 ** 6)
     );
 
     fetchPositions();
@@ -94,8 +148,8 @@ export function PositionAdditionalInfo(props: Props) {
           <div className="text-xs text-zinc-500">PnL</div>
           <PositionValueDelta
             className="mt-0.5"
-            valueDelta={props.position.pnlDelta}
-            valueDeltaPercentage={props.position.pnlDeltaPercent}
+            valueDelta={pnl}
+            valueDeltaPercentage={pnl / props.position.collateralUsd}
             formatValueDelta={formatPrice}
           />
         </div>
@@ -103,7 +157,7 @@ export function PositionAdditionalInfo(props: Props) {
           <div className="text-xs text-zinc-500">Size</div>
           <div className="mt-1 flex items-center">
             <div className="text-sm text-white">
-              ${formatPrice(props.position.size)}
+              ${formatPrice(props.position.sizeUsd)}
             </div>
             <button className="group ml-2">
               <EditIcon
@@ -121,7 +175,12 @@ export function PositionAdditionalInfo(props: Props) {
         <div>
           <div className="text-xs text-zinc-500">Liq. Threshold</div>
           <div className="mt-1 text-sm text-white">
-            ${formatPrice(props.position.liquidationThreshold)}
+            $
+            {formatPrice(
+              props.position.side === Side.Long
+                ? stats.currentPrice - liqPrice
+                : liqPrice - stats.currentPrice
+            )}
           </div>
         </div>
       </div>

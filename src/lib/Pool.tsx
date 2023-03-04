@@ -21,20 +21,30 @@ interface FeeStats {
   liquidation: number;
 }
 
+interface Fees {
+  addLiquidity: number;
+}
+
+interface Rates {
+  currentRate: number;
+}
+
 export interface TokenCustody {
   custodyAccount: PublicKey;
   tokenAccount: PublicKey;
   mintAccount: PublicKey;
   oracleAccount: PublicKey;
   name: Token;
-  amount: BN;
+  owned: BN;
+  locked: BN;
   decimals: number;
-  minRatio: number;
-  maxRatio: number;
+  targetRatio: number;
   volume: VolumeStats;
   oiLong: number;
   oiShort: number;
-  fees: FeeStats;
+  feeStats: FeeStats;
+  fees: Fees;
+  rate: Rates;
 }
 
 export interface CustodyMeta {
@@ -77,13 +87,14 @@ export class PoolObj {
       (acc: number, tokenCustody) => {
         let singleLiq =
           stats[tokenCustody.name].currentPrice *
-          (Number(tokenCustody.amount) / 10 ** tokenCustody.decimals);
+          ((Number(tokenCustody.owned) - Number(tokenCustody.locked)) /
+            10 ** tokenCustody.decimals);
         return acc + singleLiq;
       },
       0
     );
 
-    return totalAmount.toFixed(2);
+    return totalAmount;
   }
 
   getTradeVolumes() {
@@ -97,7 +108,7 @@ export class PoolObj {
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 
   getOiLong() {
@@ -108,7 +119,7 @@ export class PoolObj {
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 
   getOiShort() {
@@ -119,19 +130,20 @@ export class PoolObj {
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 
   getFees() {
     const totalAmount = Object.values(this.tokens).reduce(
       (acc: number, tokenCustody: TokenCustody) => {
         return (
-          acc + Object.values(tokenCustody.fees).reduce((acc, val) => acc + val)
+          acc +
+          Object.values(tokenCustody.feeStats).reduce((acc, val) => acc + val)
         );
       },
       0
     );
 
-    return (totalAmount / 10 ** 6).toFixed(2);
+    return totalAmount / 10 ** 6;
   }
 }

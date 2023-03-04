@@ -7,6 +7,7 @@ import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUserData } from "@/hooks/useUserData";
+import { formatNumberCommas } from "@/utils/formatters";
 
 export default function Pools() {
   const { pools } = usePools();
@@ -57,11 +58,11 @@ export default function Pools() {
           <p className="text-zinc-500 ">TVL</p>
           <p className="text-white">
             $
-            {Object.values(pools)
-              .reduce((acc, pool) => {
+            {formatNumberCommas(
+              Object.values(pools).reduce((acc, pool) => {
                 return acc + Number(pool.getLiquidities(stats));
               }, 0)
-              .toFixed(2)}
+            )}
           </p>
         </div>
       </div>
@@ -101,18 +102,18 @@ export default function Pools() {
                   poolClassName="text-xs"
                 />
               </td>
-              <td>${pool.getLiquidities(stats)}</td>
-              <td>${pool.getTradeVolumes()}</td>
-              <td>${pool.getFees()}</td>
-              <td>${pool.getOiLong()}</td>
-              <td>${pool.getOiShort()}</td>
+              <td>${formatNumberCommas(pool.getLiquidities(stats))}</td>
+              <td>${formatNumberCommas(pool.getTradeVolumes())}</td>
+              <td>${formatNumberCommas(pool.getFees())}</td>
+              <td>${formatNumberCommas(pool.getOiLong())}</td>
+              <td>${formatNumberCommas(pool.getOiShort())}</td>
               {getLiquidityBalance(pool) > 0 ? (
-                <td>${getLiquidityBalance(pool).toFixed(2)}</td>
+                <td>${formatNumberCommas(getLiquidityBalance(pool))}</td>
               ) : (
                 <td>-</td>
               )}
-              {getLiquidityShare(pool).toFixed(2) > 0 ? (
-                <td>{getLiquidityShare(pool).toFixed(2)}%</td>
+              {getLiquidityShare(pool) > 0 ? (
+                <td>{formatNumberCommas(getLiquidityShare(pool))}%</td>
               ) : (
                 <td>-</td>
               )}

@@ -34,12 +34,14 @@ class DefaultWallet implements Wallet {
 export async function getPerpetualProgramAndProvider(wallet?: Wallet) {
   let provider;
 
+  let perpetual_program;
+
   if (wallet) {
     provider = await getProvider(wallet);
   } else {
     provider = await getProvider(new DefaultWallet(perpsUser));
   }
-  let perpetual_program = new Program(
+  perpetual_program = new Program(
     PERPETUALS_IDL,
     PERPETUALS_PROGRAM_ID,
     provider

@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import { useUserData } from "@/hooks/useUserData";
+import { formatNumberCommas } from "@/utils/formatters";
 
 interface Props {
   pool: Pool;
@@ -61,36 +62,36 @@ export default function PoolStats(props: Props) {
         {[
           {
             label: "Liquidity",
-            value: `$${props.pool.getLiquidities(stats)}`,
+            value: `$${formatNumberCommas(props.pool.getLiquidities(stats))}`,
           },
           {
             label: "Volume",
-            value: `$${props.pool.getTradeVolumes()}`,
+            value: `$${formatNumberCommas(props.pool.getTradeVolumes())}`,
           },
           {
             label: "OI Long",
             value: (
               <>
-                {`$${props.pool.getOiLong()} `}
+                {`$${formatNumberCommas(props.pool.getOiLong())} `}
                 <span className="text-zinc-500"> </span>
               </>
             ),
           },
           {
             label: "OI Short",
-            value: `$${props.pool.getOiShort()}`,
+            value: `$${formatNumberCommas(props.pool.getOiShort())}`,
           },
           {
             label: "Fees",
-            value: `$${props.pool.getFees()}`,
+            value: `$${formatNumberCommas(props.pool.getFees())}`,
           },
           {
             label: "Your Liquidity",
-            value: `$${getLiquidityBalance(props.pool).toFixed(2)}`,
+            value: `$${formatNumberCommas(getLiquidityBalance(props.pool))}`,
           },
           {
             label: "Your Share",
-            value: `${getLiquidityShare(props.pool).toFixed(2)}%`,
+            value: `${formatNumberCommas(getLiquidityShare(props.pool))}%`,
           },
         ].map(({ label, value }, i) => (
           <div

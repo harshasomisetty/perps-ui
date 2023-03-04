@@ -6,6 +6,7 @@ import Link from "next/link";
 import StoragePoolIcon from "@carbon/icons-react/lib/StoragePool";
 
 import { NavbarLink } from "./NavbarLink";
+import UserAdmin from "@carbon/icons-react/lib/UserAdmin";
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
@@ -40,6 +41,9 @@ export const Navbar = () => {
         </NavbarLink>
         <NavbarLink href="/pools" icon={<StoragePoolIcon />}>
           Pools
+        </NavbarLink>
+        <NavbarLink href="/admin" icon={<UserAdmin />}>
+          Admin
         </NavbarLink>
       </div>
       <div className="flex flex-row items-center">

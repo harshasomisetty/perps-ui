@@ -46,6 +46,7 @@ export async function openPosition(
     side.toString() == "Long"
       ? price.mul(new BN(115)).div(new BN(100))
       : price.mul(new BN(90)).div(new BN(100));
+
   console.log(
     "inputs",
     Number(payAmount),
@@ -58,11 +59,6 @@ export async function openPosition(
   );
 
   console.log("pool", pool);
-
-  // let lpTokenAccount = await getAssociatedTokenAddress(
-  //   pool.lpTokenMint,
-  //   publicKey
-  // );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
     pool.tokens[getTokenAddress(payToken)]?.mintAccount,
@@ -141,6 +137,7 @@ export async function openPosition(
       size: positionAmount,
       side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
     };
+
     let tx = await perpetual_program.methods
       .openPosition(params)
       .accounts({
@@ -160,16 +157,6 @@ export async function openPosition(
       })
       .transaction();
     transaction = transaction.add(tx);
-
-    console.log("open position tx", transaction);
-    console.log("tx keys");
-    for (let i = 0; i < transaction.instructions[0].keys.length; i++) {
-      console.log(
-        "key",
-        i,
-        transaction.instructions[0].keys[i]?.pubkey.toString()
-      );
-    }
 
     await manualSendTransaction(
       transaction,

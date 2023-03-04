@@ -18,7 +18,6 @@ import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { token } from "@metaplex-foundation/js";
 import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
 import { usePositions } from "@/hooks/usePositions";
@@ -53,7 +52,7 @@ export function TradePosition(props: Props) {
   const { pools } = usePools();
   const [pool, setPool] = useState<Pool | null>(null);
 
-  const allPriceStats = useDailyPriceStats();
+  const stats = useDailyPriceStats();
   const router = useRouter();
 
   const { pair } = router.query;
@@ -71,11 +70,10 @@ export function TradePosition(props: Props) {
       positionToken,
       new BN(payAmount * LAMPORTS_PER_SOL),
       new BN(positionAmount * LAMPORTS_PER_SOL),
-      new BN(allPriceStats[payToken]?.currentPrice * 10 ** 6),
+      new BN(stats[payToken]?.currentPrice * 10 ** 6),
       props.side
     );
     fetchPositions();
-    // router.reload(window.location.pathname);
   }
 
   useEffect(() => {
@@ -97,7 +95,7 @@ export function TradePosition(props: Props) {
     }
   }, [connection, payToken, publicKey]);
 
-  const entryPrice = allPriceStats[payToken]?.currentPrice * payAmount || 0;
+  const entryPrice = stats[payToken]?.currentPrice * payAmount || 0;
   const liquidationPrice = entryPrice * leverage;
 
   if (!pair) {
@@ -170,6 +168,7 @@ export function TradePosition(props: Props) {
         <LeverageSlider
           className="mt-6"
           value={leverage}
+          maxLeverage={50}
           onChange={(e) => {
             if (lastChanged === Input.Pay) {
               setPositionAmount(payAmount * e);
@@ -183,15 +182,6 @@ export function TradePosition(props: Props) {
           Place Order
         </SolidButton>
         <TradeDetails
-          className="mt-4"
-          collateralToken={payToken}
-          entryPrice={entryPrice}
-          liquidationPrice={liquidationPrice}
-          fees={0.05}
-        />
-        <TradePositionDetails
-          availableLiquidity={3871943.82}
-          borrowFee={0.0052}
           className={twMerge(
             "-mb-4",
             "-mx-4",
@@ -201,11 +191,35 @@ export function TradePosition(props: Props) {
             "pt-4",
             "px-4"
           )}
-          entryPrice={16.4}
-          exitPrice={16.4}
-          token={positionToken}
+          collateralToken={payToken}
+          positionToken={positionToken}
+          entryPrice={entryPrice}
+          liquidationPrice={liquidationPrice}
+          fees={pool.getFees()}
+          availableLiquidity={pool.getLiquidities(stats)}
+          borrowRate={
+            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
+            0
+          }
           side={props.side}
         />
+        {/* <TradePositionDetails
+          availableLiquidity={pool.getLiquidities(stats)}
+          borrowFee={
+            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
+            0
+          }
+          className={twMerge(
+            "-mb-4",
+            "-mx-4",
+            "bg-zinc-900",
+            "mt-4",
+            "pb-5",
+            "pt-4",
+            "px-4"
+          )}
+          side={props.side}
+        /> */}
       </div>
     );
   }

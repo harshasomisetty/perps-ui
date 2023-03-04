@@ -12,7 +12,19 @@ interface Props {
 export function Positions(props: Props) {
   const { positions } = usePositions();
 
-  console.log("positons", positions);
+  const { publicKey } = useWallet();
+
+  if (!publicKey) {
+    return (
+      <div className={props.className}>
+        <header className="mb-5 flex items-center space-x-4">
+          <div className="font-medium text-white">My Positions</div>
+        </header>
+
+        <NoPositions />
+      </div>
+    );
+  }
 
   return (
     <div className={props.className}>
@@ -27,7 +39,8 @@ export function Positions(props: Props) {
           <ExistingPosition poolPositions={pool} key={index} />
         ))}
 
-      {positions.status != "success" && <NoPositions />}
+      {positions.status != "success" ||
+        (positions.data.length === 0 && <NoPositions />)}
     </div>
   );
 }

@@ -17,7 +17,7 @@ export function usePools() {
         await getPerpetualProgramAndProvider();
 
       let fetchedPools = await perpetual_program.account.pool.all();
-      // console.log("fetchedPools", fetchedPools);
+      console.log("fetchedPools", fetchedPools);
 
       await Promise.all(
         Object.values(fetchedPools).map(async (pool) => {
@@ -30,6 +30,8 @@ export function usePools() {
               custodyAccounts
             );
 
+          console.log("fetchedCustodies", fetchedCustodies[0]);
+
           let custodyInfos: Record<string, TokenCustody> = {};
 
           Object.values(fetchedCustodies).forEach((custody, ind) => {
@@ -39,10 +41,10 @@ export function usePools() {
               mintAccount: custody.mint,
               oracleAccount: custody.oracle.oracleAccount,
               name: tokenAddressToToken(custody.mint.toString()),
-              amount: custody.assets.owned,
+              owned: custody.assets.owned,
+              locked: custody.assets.locked,
               decimals: custody.decimals,
-              minRatio: Number(pool.account.tokens[ind].minRatio),
-              maxRatio: Number(pool.account.tokens[ind].maxRatio),
+              targetRatio: Number(pool.account.tokens[ind].targetRatio),
 
               volume: {
                 swap: Number(custody.volumeStats.swapUsd),
@@ -56,7 +58,7 @@ export function usePools() {
               oiLong: Number(custody.tradeStats.oiLongUsd),
               oiShort: Number(custody.tradeStats.oiShortUsd),
 
-              fees: {
+              feeStats: {
                 swap: Number(custody.collectedFees.swapUsd),
                 addLiquidity: Number(custody.collectedFees.addLiquidityUsd),
                 removeLiquidity: Number(
@@ -65,6 +67,10 @@ export function usePools() {
                 openPosition: Number(custody.collectedFees.openPositionUsd),
                 closePosition: Number(custody.collectedFees.closePositionUsd),
                 liquidation: Number(custody.collectedFees.liquidationUsd),
+              },
+
+              fees: {
+                addLiquidity: Number(custody.fees.addLiquidity),
               },
             };
           });
@@ -121,7 +127,7 @@ export function usePools() {
 
           let poolObj = new PoolObj(poolData);
 
-          poolInfos[pool.publicKey.toString()] = poolObj;
+          poolInfos[pool.account.name] = poolObj;
         })
       );
 

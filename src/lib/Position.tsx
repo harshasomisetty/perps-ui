@@ -1,9 +1,9 @@
 import { Token } from "./Token";
 
 export enum Side {
-  None,
-  Long,
-  Short,
+  None = "None",
+  Long = "Long",
+  Short = "Short",
 }
 
 export class TradeSide {
@@ -12,18 +12,18 @@ export class TradeSide {
 }
 
 export interface Position {
-  id: string;
+  poolName: string;
   positionAccountAddress: string;
   poolAddress: string;
-  collateral: number;
+  collateralUsd: number;
   entryPrice: number;
   leverage: number;
-  liquidationPrice: number;
-  liquidationThreshold: number;
-  markPrice: number;
-  pnlDelta: number;
-  pnlDeltaPercent: number;
-  size: number;
+  // liquidationPrice: number;
+  // liquidationThreshold: number;
+  // markPrice: number;
+  // pnlDelta: number;
+  // pnlDeltaPercent: number;
+  sizeUsd: number;
   timestamp: number;
   token: Token;
   side: Side;
