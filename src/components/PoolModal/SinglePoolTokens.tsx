@@ -75,9 +75,7 @@ export default function SinglePoolTokens(props: Props) {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`${ACCOUNT_URL(
-                            custody.mintAccount.toString()
-                          )}`}
+                          href={`${ACCOUNT_URL(custody.mint.toString())}`}
                         >
                           <NewTab />
                         </a>

@@ -6,6 +6,7 @@ import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
 import { useGlobalStore } from "@/stores/store";
+import { getLiquidityBalance, getLiquidityShare } from "@/utils/getters";
 
 export default function Pools() {
   const poolData = useGlobalStore((state) => state.poolData);
@@ -23,30 +24,6 @@ export default function Pools() {
 
   if (Object.keys(stats).length === 0) {
     return <>Loading stats</>;
-  }
-
-  function getLiquidityBalance(pool: PoolAccount): number {
-    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = Number(pool.lpSupply) / 10 ** pool.lpDecimals;
-    let userLiquidity = (userLpBalance / lpSupply) * pool.getLiquidities(stats);
-
-    if (Number.isNaN(userLiquidity)) {
-      return 0;
-    }
-
-    return userLiquidity;
-  }
-
-  function getLiquidityShare(pool: PoolAccount): number {
-    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = Number(pool.lpSupply) / 10 ** pool.lpDecimals;
-
-    let userShare = (userLpBalance / lpSupply) * 100;
-
-    if (Number.isNaN(userShare)) {
-      return 0;
-    }
-    return userShare;
   }
 
   return (
@@ -92,7 +69,7 @@ export default function Pools() {
             <tr
               className="cursor-pointer border-b border-zinc-700 text-xs hover:bg-zinc-800"
               key={poolName}
-              onClick={() => router.push(`/poolData/${poolName}`)}
+              onClick={() => router.push(`/pools/${poolName}`)}
             >
               <td className="py-4 px-2">
                 <TableHeader
@@ -106,13 +83,20 @@ export default function Pools() {
               <td>${formatNumberCommas(pool.getFees())}</td>
               <td>${formatNumberCommas(pool.getOiLong())}</td>
               <td>${formatNumberCommas(pool.getOiShort())}</td>
-              {getLiquidityBalance(pool) > 0 ? (
-                <td>${formatNumberCommas(getLiquidityBalance(pool))}</td>
+              {getLiquidityBalance(pool, userLpTokens, stats) > 0 ? (
+                <td>
+                  $
+                  {formatNumberCommas(
+                    getLiquidityBalance(pool, userLpTokens, stats)
+                  )}
+                </td>
               ) : (
                 <td>-</td>
               )}
-              {getLiquidityShare(pool) > 0 ? (
-                <td>{formatNumberCommas(getLiquidityShare(pool))}%</td>
+              {getLiquidityShare(pool, userLpTokens) > 0 ? (
+                <td>
+                  {formatNumberCommas(getLiquidityShare(pool, userLpTokens))}%
+                </td>
               ) : (
                 <td>-</td>
               )}

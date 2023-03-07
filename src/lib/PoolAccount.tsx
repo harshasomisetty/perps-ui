@@ -1,6 +1,5 @@
 import { AllStats } from "@/hooks/useDailyPriceStats";
-import { BN } from "@project-serum/anchor";
-import { AccountMeta, Custody, Pool } from "src/types";
+import { Custody, Pool } from "src/types";
 
 export class PoolAccount {
   public name: string;
@@ -33,14 +32,14 @@ export class PoolAccount {
 
     // console.log("stats", stats);
     const totalAmount = Object.values(this.tokens).reduce(
-      (acc: BN, tokenCustody) => {
+      (acc: number, tokenCustody) => {
         let singleLiq =
           stats[tokenCustody.name].currentPrice *
           ((Number(tokenCustody.owned) - Number(tokenCustody.locked)) /
             10 ** tokenCustody.decimals);
         return acc + singleLiq;
       },
-      new BN(0)
+      0
     );
 
     return totalAmount;
@@ -48,56 +47,57 @@ export class PoolAccount {
 
   getTradeVolumes() {
     const totalAmount = Object.values(this.tokens).reduce(
-      (acc: BN, tokenCustody: Custody) => {
+      (acc: number, tokenCustody: Custody) => {
         return (
           acc +
           Object.values(tokenCustody.volumeStats).reduce(
-            (acc, val) => acc + val
+            (acc, val) => Number(acc) + Number(val)
           )
         );
       },
-      new BN(0)
+      0
     );
+    console.log("totalAmount", totalAmount);
 
-    return totalAmount;
+    return totalAmount / 10 ** 6;
   }
 
   getOiLong() {
     const totalAmount = Object.values(this.tokens).reduce(
-      (acc: BN, tokenCustody: Custody) => {
-        return acc + tokenCustody.oiLong;
+      (acc: number, tokenCustody: Custody) => {
+        return Number(acc) + Number(tokenCustody.oiLong);
       },
-      new BN(0)
+      0
     );
 
-    return totalAmount;
+    return totalAmount / 10 ** 6;
   }
 
   getOiShort() {
     const totalAmount = Object.values(this.tokens).reduce(
-      (acc: BN, tokenCustody: Custody) => {
-        return acc + tokenCustody.oiShort;
+      (acc: number, tokenCustody: Custody) => {
+        return Number(acc) + Number(tokenCustody.oiShort);
       },
-      new BN(0)
+      0
     );
 
-    return totalAmount;
+    return totalAmount / 10 ** 6;
   }
 
   getFees() {
     const totalAmount = Object.values(this.tokens).reduce(
-      (acc: BN, tokenCustody: Custody) => {
+      (acc: number, tokenCustody: Custody) => {
         return (
           acc +
           Object.values(tokenCustody.collectedFees).reduce(
-            (acc, val) => acc + val
+            (acc, val) => Number(acc) + Number(val)
           )
         );
       },
-      new BN(0)
+      0
     );
 
-    return totalAmount;
+    return totalAmount / 10 ** 6;
   }
 }
 

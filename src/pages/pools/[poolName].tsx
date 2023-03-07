@@ -4,24 +4,22 @@ import { TitleHeader } from "@/components/Molecules/PoolHeaders/TitleHeader";
 import LiquidityCard from "@/components/PoolModal/LiquidityCard";
 import PoolStats from "@/components/PoolModal/PoolStats";
 import SinglePoolTokens from "@/components/PoolModal/SinglePoolTokens";
-import { usePools } from "@/hooks/usePools";
-import { ChevronLeft } from "@carbon/icons-react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useGlobalStore } from "@/stores/store";
 import { useRouter } from "next/router";
 
 interface Props {}
 
 export default function SinglePool(props: Props) {
-  const { wallet } = useWallet();
-  const { pools } = usePools();
   const router = useRouter();
 
-  if (!pools) {
+  const poolData = useGlobalStore((state) => state.poolData);
+  let pool = poolData[router.query.poolName as string];
+
+  if (!pool) {
     return <p className="text-white">Loading...</p>;
   }
 
-  let pool = pools[router.query.poolName as string];
-  console.log("formatting num", pool.getTradeVolumes().toLocaleString());
+  // console.log("formatting num", Nupool.getTradeVolumes().toLocaleString());
   return (
     <PoolLayout className="text-white">
       <div>

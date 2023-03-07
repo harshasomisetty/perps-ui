@@ -8,6 +8,7 @@ import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { Pool } from "src/types";
+import { getLiquidityBalance, getLiquidityShare } from "@/utils/getters";
 
 interface Props {
   pool: Pool;
@@ -17,35 +18,7 @@ interface Props {
 export default function PoolStats(props: Props) {
   const stats = useDailyPriceStats();
 
-  const { wallet, publicKey, signTransaction } = useWallet();
-  const { connection } = useConnection();
-
   const { userLpTokens } = useUserData();
-
-  function getLiquidityBalance(pool: PoolAccount): number {
-    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
-
-    let userLiquidity = (userLpBalance / lpSupply) * pool.getLiquidities(stats);
-
-    if (Number.isNaN(userLiquidity)) {
-      return 0;
-    }
-
-    return userLiquidity;
-  }
-
-  function getLiquidityShare(pool: PoolAccount): number {
-    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
-
-    let userShare = (userLpBalance / lpSupply) * 100;
-
-    if (Number.isNaN(userShare)) {
-      return 0;
-    }
-    return userShare;
-  }
 
   if (Object.keys(stats).length === 0) {
     return <>Loading stats</>;
@@ -88,11 +61,15 @@ export default function PoolStats(props: Props) {
           },
           {
             label: "Your Liquidity",
-            value: `$${formatNumberCommas(getLiquidityBalance(props.pool))}`,
+            value: `$${formatNumberCommas(
+              getLiquidityBalance(props.pool, userLpTokens, stats)
+            )}`,
           },
           {
             label: "Your Share",
-            value: `${formatNumberCommas(getLiquidityShare(props.pool))}%`,
+            value: `${formatNumberCommas(
+              Number(getLiquidityShare(props.pool, userLpTokens))
+            )}%`,
           },
         ].map(({ label, value }, i) => (
           <div

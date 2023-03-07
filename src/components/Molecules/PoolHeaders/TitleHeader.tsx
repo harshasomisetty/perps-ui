@@ -3,12 +3,13 @@ import { tokenAddressToToken } from "src/types/Token";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
+import { PoolAccount } from "@/lib/PoolAccount";
 
 interface Props {
   className?: string;
   iconClassName?: string;
   poolClassName?: string;
-  pool: Pool;
+  pool: PoolAccount;
 }
 
 export function TitleHeader(props: Props) {
@@ -16,12 +17,10 @@ export function TitleHeader(props: Props) {
     <div className={twMerge("flex", "flex-col", "space-x-1", props.className)}>
       <div className="flex flex-row items-center">
         <PoolTokens
-          tokens={props.pool.tokenNames}
+          tokens={props.pool.getTokenNames()}
           className={props.iconClassName}
         />
-        <p className={twMerge("font-medium", "text-2xl")}>
-          {props.pool.poolName}
-        </p>
+        <p className={twMerge("font-medium", "text-2xl")}>{props.pool.name}</p>
         <a
           target="_blank"
           rel="noreferrer"
