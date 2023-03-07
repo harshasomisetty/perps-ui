@@ -1,5 +1,6 @@
 import { AllStats } from "@/hooks/useDailyPriceStats";
 import { Custody, Pool } from "src/types";
+import { tokenAddressToToken, TokenE } from "src/types/Token";
 
 export class PoolAccount {
   public name: string;
@@ -24,13 +25,19 @@ export class PoolAccount {
     return Object.values(this.tokens).map((tokenCustody) => tokenCustody.name);
   }
 
+  getTokenList(): TokenE[] {
+    return Object.keys(this.tokens).map((token) => {
+      return tokenAddressToToken(token);
+    });
+  }
+
   getLiquidities(stats: AllStats) {
     // get liquidities from token custodies
-    if (stats === undefined) {
+    if (Object.keys(stats).length == 0) {
       return;
     }
 
-    // console.log("stats", stats);
+    // console.log("stats account", stats);
     const totalAmount = Object.values(this.tokens).reduce(
       (acc: number, tokenCustody) => {
         let singleLiq =
@@ -57,7 +64,7 @@ export class PoolAccount {
       },
       0
     );
-    console.log("totalAmount", totalAmount);
+    // console.log("totalAmount", totalAmount);
 
     return totalAmount / 10 ** 6;
   }
@@ -100,37 +107,3 @@ export class PoolAccount {
     return totalAmount / 10 ** 6;
   }
 }
-
-// interface Rates {
-//   currentRate: number;
-// }
-
-// export interface TokenCustody {
-//   custodyAccount: PublicKey;
-//   tokenAccount: PublicKey;
-//   mintAccount: PublicKey;
-//   oracleAccount: PublicKey;
-//   name: TokenE;
-//   owned: BN;
-//   locked: BN;
-//   decimals: number;
-//   targetRatio: number;
-//   volume: VolumeStats;
-//   oiLong: number;
-//   oiShort: number;
-//   feeStats: FeeStats;
-//   fees: Fees;
-//   rate: Rates;
-// }
-
-// export interface CustodyMeta {
-//   pubkey: PublicKey;
-//   isSigner: boolean;
-//   isWritable: boolean;
-// }
-
-// export interface Pool {
-//   poolAddress: PublicKey;
-//   custodyMetas: CustodyMeta[];
-//   lpSupply: number;
-// }

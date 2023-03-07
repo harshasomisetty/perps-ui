@@ -33,7 +33,6 @@ export function PositionAdditionalInfo(props: Props) {
   const { connection } = useConnection();
   const stats = useDailyPriceStats(props.position.token);
 
-  // const { poolData } = usePools();
   const poolData = useGlobalStore((state) => state.poolData);
 
   let payToken = props.position.token;

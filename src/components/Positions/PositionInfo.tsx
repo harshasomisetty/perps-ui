@@ -10,7 +10,6 @@ import { getTokenAddress, getTokenIcon, getTokenLabel } from "src/types/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
-import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { formatNumberCommas } from "@/utils/formatters";
@@ -26,11 +25,11 @@ interface Props {
 export function PositionInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
 
-  const { pools } = usePools();
+  // const poolData = useGlobalStore((state) => state.poolData);
   const stats = useDailyPriceStats(props.position.token);
 
-  const { publicKey, signTransaction, wallet } = useWallet();
-  const { connection } = useConnection();
+  // const { publicKey, signTransaction, wallet } = useWallet();
+  // const { connection } = useConnection();
 
   const [pnl, setPnl] = useState(0);
   const [liqPrice, setLiqPrice] = useState(0);

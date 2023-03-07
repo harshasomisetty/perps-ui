@@ -7,11 +7,11 @@ import { TokenSelector } from "../TokenSelector";
 import { SolidButton } from "../SolidButton";
 import { TradeSwapDetails } from "./TradeSwapDetails";
 import { swap } from "src/actions/swap";
-import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { useRouter } from "next/router";
-import { Pool } from "src/types";
+import { useGlobalStore } from "@/stores/store";
+import { PoolAccount } from "@/lib/PoolAccount";
 
 interface Props {
   className?: string;
@@ -25,11 +25,13 @@ export function TradeSwap(props: Props) {
 
   const allPriceStats = useDailyPriceStats();
 
-  const { pools } = usePools();
   const { connection } = useConnection();
   const router = useRouter();
 
-  const [pool, setPool] = useState<Pool | null>(null);
+  const poolData = useGlobalStore((state) => state.poolData);
+  const [pool, setPool] = useState<PoolAccount | null>(
+    Object.values(poolData)[0]
+  );
 
   const { publicKey, signTransaction, wallet } = useWallet();
 
@@ -55,17 +57,17 @@ export function TradeSwap(props: Props) {
   // }, [receiveAmount, payToken, receiveToken, allPriceStats]);
 
   // TODO: add pool selection for swap if need , for now fixing it to POOL1
-  useEffect(() => {
-    if (pools === undefined || pools === null) {
-      return;
-    } else {
-      const pool1 = Object.values(pools).filter(
-        (i) => i.poolName == "TestPool1"
-      );
-      console.log("selected pool:", pool1);
-      setPool(pool1[0]);
-    }
-  }, [pools]);
+  // useEffect(() => {
+  //   if (pools === undefined || pools === null) {
+  //     return;
+  //   } else {
+  //     const pool1 = Object.values(pools).filter(
+  //       (i) => i.poolName == "TestPool1"
+  //     );
+  //     console.log("selected pool:", pool1);
+  //     setPool(pool1[0]);
+  //   }
+  // }, [pools]);
 
   async function handleSwap() {
     // TODO: need to take slippage as param , this is now for testing

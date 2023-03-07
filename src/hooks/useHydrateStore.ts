@@ -7,13 +7,11 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { AccountMeta, PublicKey } from "@solana/web3.js";
 import { useEffect } from "react";
 import { Custody, Pool } from "src/types";
-import { getTokenAddress, tokenAddressToToken } from "src/types/Token";
+import { getTokenAddress, tokenAddressToToken, TokenE } from "src/types/Token";
 export const useHydrateStore = () => {
   const { connection } = useConnection();
 
   const setPoolData = useGlobalStore((state) => state.setPoolData);
-
-  console.log("in hydrate store");
 
   function getCustodyInfos(fetchedCustodies, custodyAccounts, pool) {
     let custodyInfos: Record<string, Custody> = {};
@@ -72,6 +70,28 @@ export const useHydrateStore = () => {
     return custodyInfos;
   }
 
+  function getCustodyMetas(tokenNames: TokenE[], custodyInfos) {
+    let custodyMetas: AccountMeta[] = [];
+
+    tokenNames.forEach((tokenName) => {
+      custodyMetas.push({
+        pubkey: custodyInfos[getTokenAddress(tokenName!)]?.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    });
+
+    tokenNames.forEach((tokenName) => {
+      custodyMetas.push({
+        pubkey: custodyInfos[getTokenAddress(tokenName!)]?.oracle,
+        isSigner: false,
+        isWritable: false,
+      });
+    });
+
+    return custodyMetas;
+  }
+
   async function updatePoolData() {
     let { perpetual_program } = await getPerpetualProgramAndProvider();
 
@@ -104,33 +124,16 @@ export const useHydrateStore = () => {
           perpetual_program.programId
         )[0];
 
-        let tokenNames = Object.values(custodyInfos).map((custody) => {
-          return tokenAddressToToken(custody.mint.toString());
-        });
-
-        let custodyMetas: AccountMeta[] = [];
-
-        tokenNames.forEach((tokenName) => {
-          custodyMetas.push({
-            pubkey: custodyInfos[getTokenAddress(tokenName!)]?.custodyAccount,
-            isSigner: false,
-            isWritable: false,
-          });
-        });
-
-        tokenNames.forEach((tokenName) => {
-          custodyMetas.push({
-            pubkey: custodyInfos[getTokenAddress(tokenName!)]?.oracle,
-            isSigner: false,
-            isWritable: false,
-          });
-        });
-
         let lpTokenMint = findProgramAddressSync(
           [Buffer.from("lp_token_mint"), poolAddress.toBuffer()],
           perpetual_program.programId
         )[0];
 
+        let tokenNames = Object.values(custodyInfos).map((custody) => {
+          return tokenAddressToToken(custody.mint.toString());
+        });
+
+        let custodyMetas = getCustodyMetas(tokenNames, custodyInfos);
         const lpData = await getMint(connection, lpTokenMint);
 
         let poolData: Pool = {
@@ -148,9 +151,7 @@ export const useHydrateStore = () => {
           lpSupply: lpData.supply,
         };
 
-        let poolObj = new PoolAccount(poolData);
-
-        poolObjs[pool.account.name] = poolObj;
+        poolObjs[pool.account.name] = new PoolAccount(poolData);
       })
     );
 
@@ -161,7 +162,7 @@ export const useHydrateStore = () => {
     (async () => {
       const getPoolInfos = await updatePoolData();
 
-      console.log("fetche the global store in hydrate", getPoolInfos);
+      // console.log("fetched the global store in hydrate", getPoolInfos);
       setPoolData(getPoolInfos);
     })();
   }, []);

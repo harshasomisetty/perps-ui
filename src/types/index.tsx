@@ -63,6 +63,24 @@ export interface Custody {
   tokenAccountBump: number;
 }
 
+// export interface TokenCustody {
+//   custodyAccount: PublicKey;
+//   tokenAccount: PublicKey;
+//   mintAccount: PublicKey;
+//   oracleAccount: PublicKey;
+//   name: TokenE;
+//   owned: BN;
+//   locked: BN;
+//   decimals: number;
+//   targetRatio: number;
+//   volume: VolumeStats;
+//   oiLong: number;
+//   oiShort: number;
+//   feeStats: FeeStats;
+//   fees: Fees;
+//   rate: Rates;
+// }
+
 export interface Assets {
   collateral: BN;
   protocolFees: BN;

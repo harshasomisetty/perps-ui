@@ -48,7 +48,6 @@ export function TradePosition(props: Props) {
 
   const { fetchPositions } = usePositions();
 
-  // const { pools } = usePools();
   const poolData = useGlobalStore((state) => state.poolData);
   const [pool, setPool] = useState<PoolAccount | null>(null);
   console.log("trade position pool data", poolData);
@@ -57,8 +56,6 @@ export function TradePosition(props: Props) {
   const router = useRouter();
 
   const { pair } = router.query;
-
-  let tokenList: TokenE[] = [];
 
   async function handleTrade() {
     await openPosition(
@@ -136,9 +133,7 @@ export function TradePosition(props: Props) {
             setLastChanged(Input.Pay);
           }}
           onSelectToken={setPayToken}
-          tokenList={Object.keys(pool.tokens).map((token) => {
-            return tokenAddressToToken(token);
-          })}
+          tokenList={pool.getTokenList()}
         />
         <div className="mt-4 text-sm font-medium text-white">
           Your {props.side}
@@ -156,17 +151,12 @@ export function TradePosition(props: Props) {
             setPositionToken(token);
             router.push("/trade/" + token + "-USD");
           }}
-          tokenList={Object.keys(pool.tokens).map((token) => {
-            return tokenAddressToToken(token);
-          })}
+          liqRatio={0}
+          setLiquidity={null}
+          tokenList={pool.getTokenList()}
         />
         <div className="mt-4 text-xs text-zinc-400">Pool</div>
-        <PoolSelector
-          className="mt-2"
-          pool={pool}
-          onSelectPool={setPool}
-          pools={poolData}
-        />
+        <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
         <LeverageSlider
           className="mt-6"
           value={leverage}

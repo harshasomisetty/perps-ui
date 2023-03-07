@@ -6,22 +6,23 @@ import { useState } from "react";
 
 import { PoolTokens } from "./PoolTokens";
 import { Pool } from "src/types";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { useGlobalStore } from "@/stores/store";
 
 interface Props {
   className?: string;
-  pool: Pool;
-  onSelectPool?(pool: Pool): void;
-  pools: Record<string, Pool>;
+  pool: PoolAccount;
+  onSelectPool?(pool: PoolAccount): void;
 }
 
 export function PoolSelector(props: Props) {
   const [open, setOpen] = useState(false);
 
+  const poolData = useGlobalStore((state) => state.poolData);
+
   if (!props.pool) {
     return <p>Loading props.pools</p>;
   }
-
-  console.log("props.pool", props.pool);
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -41,7 +42,7 @@ export function PoolSelector(props: Props) {
           props.className
         )}
       >
-        <PoolTokens tokens={props.pool.tokenNames} />
+        <PoolTokens tokens={props.pool.getTokenNames()} />
         <div className="truncate text-sm font-medium text-white">
           {props.pool.name}
         </div>
@@ -67,7 +68,7 @@ export function PoolSelector(props: Props) {
           className="w-[392px] overflow-hidden rounded bg-zinc-900 shadow-2xl"
         >
           <Dropdown.Arrow className="fill-zinc-900" />
-          {Object.values(props.pools).map((pool) => (
+          {Object.values(poolData).map((pool) => (
             <Dropdown.Item
               className={twMerge(
                 "cursor-pointer",
@@ -86,15 +87,15 @@ export function PoolSelector(props: Props) {
               key={pool.poolAddress}
               onClick={() => props.onSelectPool?.(pool)}
             >
-              <PoolTokens tokens={pool.tokenNames} />
+              <PoolTokens tokens={pool.getTokenNames()} />
               <div>
                 <div className="truncate text-sm font-medium text-white">
-                  {pool.poolName}
+                  {pool.name}
                 </div>
                 <div className="text-xs text-zinc-500">
-                  {pool.tokenNames.slice(0, 3).join(", ")}
-                  {pool.tokenNames.length > 3
-                    ? ` +${pool.tokenNames.length - 3} more`
+                  {pool.getTokenNames().slice(0, 3).join(", ")}
+                  {pool.getTokenNames().length > 3
+                    ? ` +${pool.getTokenNames().length - 3} more`
                     : ""}
                 </div>
               </div>
