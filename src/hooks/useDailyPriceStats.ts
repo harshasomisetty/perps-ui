@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { getTokenId, Token, TOKEN_LIST } from "@/lib/Token";
+import { getTokenId, TokenE, TOKEN_LIST } from "src/types/Token";
 
 interface Stats {
   change24hr: number;
@@ -9,7 +9,7 @@ interface Stats {
   low24hr: number;
 }
 
-export type AllStats = Record<Token, Stats>;
+export type AllStats = Record<TokenE, Stats>;
 
 const fetchAllStats = (() => {
   let inFlight: null | Promise<AllStats> = null;
@@ -81,8 +81,8 @@ const fetchAllStats = (() => {
 })();
 
 export function useDailyPriceStats(): AllStats;
-export function useDailyPriceStats(token: Token): Stats;
-export function useDailyPriceStats(token?: Token) {
+export function useDailyPriceStats(token: TokenE): Stats;
+export function useDailyPriceStats(token?: TokenE) {
   const timer = useRef<number | null>(null);
 
   const [allStats, setAllStats] = useState<Partial<AllStats>>({});

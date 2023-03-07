@@ -3,14 +3,14 @@ import { cloneElement, useState } from "react";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { useRouter } from "next/router";
 
-import { Token, getTokenIcon, getTokenLabel } from "@/lib/Token";
+import { TokenE, getTokenIcon, getTokenLabel } from "src/types/Token";
 
 import { TokenSelectorList } from "../TokenSelectorList";
 
 interface Props {
   className?: string;
-  comparisonCurrency: "usd" | "eur" | Token.USDC | Token.USDT;
-  token: Token;
+  comparisonCurrency: "usd" | "eur" | TokenE.USDC | TokenE.USDT;
+  token: TokenE;
 }
 
 export function ChartCurrency(props: Props) {

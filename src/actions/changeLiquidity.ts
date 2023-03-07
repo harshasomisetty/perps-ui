@@ -1,9 +1,8 @@
-import { Pool } from "@/lib/Pool";
-import { getTokenAddress, Token } from "@/lib/Token";
+import { getTokenAddress, TokenE } from "src/types/Token";
 import {
   getPerpetualProgramAndProvider,
-  perpetualsAddress,
-  transferAuthorityAddress,
+  PERPETUALS_ADDRESS,
+  TRANSFER_AUTHORITY,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -31,7 +30,7 @@ export async function changeLiquidity(
   publicKey: PublicKey,
   signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
-  payToken: Token,
+  payToken: TokenE,
   tokenAmount?: number,
   liquidityAmount?: number
 ) {
@@ -61,7 +60,7 @@ export async function changeLiquidity(
       );
     }
 
-    if (payToken == Token.SOL) {
+    if (payToken == TokenE.SOL) {
       console.log("pay token name is sol", payToken);
 
       const associatedTokenAccount = await getAssociatedTokenAddress(
@@ -102,7 +101,7 @@ export async function changeLiquidity(
     if (tokenAmount) {
       console.log("in add liq", tokenAmount);
       let amount;
-      if (payToken === Token.SOL) {
+      if (payToken === TokenE.SOL) {
         amount = new BN(tokenAmount * LAMPORTS_PER_SOL);
       } else {
         amount = new BN(
@@ -119,8 +118,8 @@ export async function changeLiquidity(
           owner: publicKey,
           fundingAccount: userCustodyTokenAccount, // user token account for custody token account
           lpTokenAccount,
-          transferAuthority: transferAuthorityAddress,
-          perpetuals: perpetualsAddress,
+          transferAuthority: TRANSFER_AUTHORITY,
+          perpetuals: PERPETUALS_ADDRESS,
           pool: pool.poolAddress,
           custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
           custodyOracleAccount:
@@ -141,8 +140,8 @@ export async function changeLiquidity(
           owner: publicKey,
           receivingAccount: userCustodyTokenAccount, // user token account for custody token account
           lpTokenAccount,
-          transferAuthority: transferAuthorityAddress,
-          perpetuals: perpetualsAddress,
+          transferAuthority: TRANSFER_AUTHORITY,
+          perpetuals: PERPETUALS_ADDRESS,
           pool: pool.poolAddress,
           custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
           custodyOracleAccount:

@@ -1,15 +1,10 @@
-import useProgram from "@/hooks/useProgram";
-import { Pool, PoolObj } from "@/lib/Pool";
-import { Position } from "@/lib/Position";
-import { getTokenAddress, Token } from "@/lib/Token";
+import { TokenE } from "src/types/Token";
 import {
   getPerpetualProgramAndProvider,
-  perpetualsAddress,
+  PERPETUALS_ADDRESS,
   perpsUser,
 } from "@/utils/constants";
-import { manualSendTransaction } from "@/utils/manualTransaction";
-import { BN, Wallet } from "@project-serum/anchor";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { Wallet } from "@project-serum/anchor";
 import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 
@@ -37,7 +32,7 @@ export async function getEntryPrice(
   collateral: number,
   size: number,
   side: string,
-  payToken: Token
+  payToken: TokenE
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
@@ -91,7 +86,7 @@ export async function getLiquidationPrice(
       .getLiquidationPrice({})
       .accounts({
         signer: perpsUser.publicKey,
-        perpetuals: perpetualsAddress,
+        perpetuals: PERPETUALS_ADDRESS,
         pool: poolAddress,
         position: positionAddress,
         custody: custodyAddress,
@@ -133,7 +128,7 @@ export async function getPnl(
       .getPnl({})
       .accounts({
         signer: perpsUser.publicKey,
-        perpetuals: perpetualsAddress,
+        perpetuals: PERPETUALS_ADDRESS,
         pool: poolAddress,
         position: positionAddress,
         custody: custodyAddress,
@@ -149,7 +144,6 @@ export async function getPnl(
 
     let pnl = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;
 
-    console.log("pnl price", pnl);
     return pnl;
   } catch (err) {
     console.log(err);

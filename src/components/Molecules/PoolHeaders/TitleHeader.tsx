@@ -1,6 +1,5 @@
 import { PoolTokens } from "@/components/PoolTokens";
-import { Pool } from "@/lib/Pool";
-import { tokenAddressToToken } from "@/lib/Token";
+import { tokenAddressToToken } from "src/types/Token";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";

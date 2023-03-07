@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token } from "@/lib/Token";
+import { TokenE } from "src/types/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { SolidButton } from "../SolidButton";
 import { TradeSwapDetails } from "./TradeSwapDetails";
 import { swap } from "src/actions/swap";
 import { usePools } from "@/hooks/usePools";
-import { Pool } from "@/lib/Pool";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { useRouter } from "next/router";
+import { Pool } from "src/types";
 
 interface Props {
   className?: string;
 }
 
 export function TradeSwap(props: Props) {
-  const [payToken, setPayToken] = useState(Token.SOL);
+  const [payToken, setPayToken] = useState(TokenE.SOL);
   const [payAmount, setPayAmount] = useState(0);
-  const [receiveToken, setReceiveToken] = useState(Token.USDC);
+  const [receiveToken, setReceiveToken] = useState(TokenE.USDC);
   const [receiveAmount, setReceiveAmount] = useState(0);
 
   const allPriceStats = useDailyPriceStats();

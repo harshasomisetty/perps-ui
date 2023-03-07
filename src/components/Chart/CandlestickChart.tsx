@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-import { getSymbol, Token } from "@/lib/Token";
+import { getSymbol, TokenE } from "src/types/Token";
 import { ChartCurrency } from "./ChartCurrency";
 import { DailyStats } from "./DailyStats";
 
@@ -12,7 +12,7 @@ const TradingViewWidget = dynamic<any>(import("react-tradingview-widget"), {
 interface Props {
   className?: string;
   comparisonCurrency: "usd";
-  token: Token;
+  token: TokenE;
 }
 
 export function CandlestickChart(props: Props) {
@@ -37,6 +37,6 @@ export function CandlestickChart(props: Props) {
 }
 
 CandlestickChart.defaultProps = {
-  token: Token.SOL,
+  token: TokenE.SOL,
   comparisonCurrency: "usd",
 };

@@ -1,4 +1,4 @@
-import { getTokenLabel, tokenAddressToToken } from "@/lib/Token";
+import { getTokenLabel, tokenAddressToToken } from "src/types/Token";
 import { perpsUser } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";

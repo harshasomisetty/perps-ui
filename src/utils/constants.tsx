@@ -50,13 +50,13 @@ export async function getPerpetualProgramAndProvider(wallet?: Wallet) {
   return { perpetual_program, provider };
 }
 
-export const transferAuthorityAddress = findProgramAddressSync(
-  ["transfer_authority"],
+export const TRANSFER_AUTHORITY = findProgramAddressSync(
+  [Buffer.from("transfer_authority")],
   PERPETUALS_PROGRAM_ID
 )[0];
 
-export const perpetualsAddress = findProgramAddressSync(
-  ["perpetuals"],
+export const PERPETUALS_ADDRESS = findProgramAddressSync(
+  [Buffer.from("perpetuals")],
   PERPETUALS_PROGRAM_ID
 )[0];
 

@@ -1,11 +1,8 @@
-import { Pool } from "@/lib/Pool";
-import { Side, TradeSide } from "@/lib/Position";
-import { getTokenAddress, Token } from "@/lib/Token";
+import { getTokenAddress, TokenE } from "src/types/Token";
 import {
   getPerpetualProgramAndProvider,
-  perpetualsAddress,
-  PERPETUALS_PROGRAM_ID,
-  transferAuthorityAddress,
+  PERPETUALS_ADDRESS,
+  TRANSFER_AUTHORITY,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -25,15 +22,16 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import { Pool, Side } from "src/types";
 
 export async function openPosition(
   pool: Pool,
   wallet: Wallet,
   publicKey: PublicKey,
-  signTransaction,
+  signTransaction: any,
   connection: Connection,
-  payToken: Token,
-  positionToken: Token,
+  payToken: TokenE,
+  positionToken: TokenE,
   payAmount: BN,
   positionAmount: BN,
   price: BN,
@@ -92,7 +90,7 @@ export async function openPosition(
 
   try {
     // wrap sol if needed
-    if (payToken == Token.SOL) {
+    if (payToken == TokenE.SOL) {
       console.log("pay token name is sol", payToken);
 
       const associatedTokenAccount = await getAssociatedTokenAddress(
@@ -143,8 +141,8 @@ export async function openPosition(
       .accounts({
         owner: publicKey,
         fundingAccount: userCustodyTokenAccount,
-        transferAuthority: transferAuthorityAddress,
-        perpetuals: perpetualsAddress,
+        transferAuthority: TRANSFER_AUTHORITY,
+        perpetuals: PERPETUALS_ADDRESS,
         pool: pool.poolAddress,
         position: positionAccount,
         custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,

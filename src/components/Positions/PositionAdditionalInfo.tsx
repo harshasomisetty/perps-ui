@@ -1,6 +1,3 @@
-import { usePools } from "@/hooks/usePools";
-import { Pool } from "@/lib/Pool";
-import { Position, Side } from "@/lib/Position";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
@@ -12,10 +9,11 @@ import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { useRouter } from "next/router";
 import { usePositions } from "@/hooks/usePositions";
 import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
-import { getTokenAddress } from "@/lib/Token";
+import { getTokenAddress } from "src/types/Token";
+import { useGlobalStore } from "@/stores/store";
+import { Position, Side } from "src/types";
 
 function formatPrice(num: number) {
   const formatter = new Intl.NumberFormat("en", {
@@ -35,7 +33,8 @@ export function PositionAdditionalInfo(props: Props) {
   const { connection } = useConnection();
   const stats = useDailyPriceStats(props.position.token);
 
-  const { pools } = usePools();
+  // const { poolData } = usePools();
+  const poolData = useGlobalStore((state) => state.poolData);
 
   let payToken = props.position.token;
   let positionToken = props.position.token;
@@ -49,7 +48,7 @@ export function PositionAdditionalInfo(props: Props) {
       let token = props.position.token;
 
       let custody =
-        pools[props.position.poolName].tokens[getTokenAddress(token)];
+        poolData[props.position.poolName].tokens[getTokenAddress(token)];
 
       let fetchedPrice = await getPnl(
         wallet,
@@ -58,24 +57,24 @@ export function PositionAdditionalInfo(props: Props) {
         props.position.poolAddress,
         props.position.positionAccountAddress,
         custody.custodyAccount,
-        custody.oracleAccount
+        custody.oracle
       );
       setPnl(fetchedPrice);
 
-      console.log("pnl percentage", pnl, props.position.collateralUsd);
+      // console.log("pnl percentage", pnl, props.position.collateralUsd);
     }
-    if (pools) {
+    if (Object.keys(poolData).length > 0) {
       fetchData();
     }
-  }, [pools]);
+  }, [poolData]);
 
   useEffect(() => {
     async function fetchData() {
       let token = props.position.token;
-      console.log("pos info", pools, props.position.poolName);
+      console.log("pos info", poolData, props.position.poolName);
 
       let custody =
-        pools[props.position.poolName].tokens[getTokenAddress(token)];
+        poolData[props.position.poolName].tokens[getTokenAddress(token)];
 
       let fetchedPrice = await getLiquidationPrice(
         wallet,
@@ -84,18 +83,18 @@ export function PositionAdditionalInfo(props: Props) {
         props.position.poolAddress,
         props.position.positionAccountAddress,
         custody.custodyAccount,
-        custody.oracleAccount
+        custody.oracle
       );
       setLiqPrice(fetchedPrice);
     }
-    if (pools) {
+    if (Object.keys(poolData).length > 0) {
       fetchData();
     }
-  }, [pools]);
+  }, [poolData]);
 
   async function handleCloseTrade() {
     console.log("in close trade");
-    let pool = pools[props.position.poolAddress.toString()];
+    let pool = poolData[props.position.poolAddress.toString()];
     await closePosition(
       pool,
       wallet,

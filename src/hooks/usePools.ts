@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
-import { getTokenAddress, tokenAddressToToken } from "@/lib/Token";
+import { getTokenAddress, tokenAddressToToken } from "src/types/Token";
 import { PublicKey } from "@solana/web3.js";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
-import { Pool, PoolObj, TokenCustody } from "@/lib/Pool";
 import { getMint } from "@solana/spl-token";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { Pool } from "src/types";
 
 export function usePools() {
-  const [pools, setPools] = useState<Record<string, PoolObj>>();
+  const [pools, setPools] = useState<Record<string, PoolAccount>>();
 
   let poolInfos = {};
 
@@ -125,7 +126,7 @@ export function usePools() {
             lpSupply: Number(lpData.supply),
           };
 
-          let poolObj = new PoolObj(poolData);
+          let poolObj = new PoolAccount(poolData);
 
           poolInfos[pool.account.name] = poolObj;
         })

@@ -1,4 +1,3 @@
-import { PoolPositions } from "@/lib/Position";
 import { PoolTokens } from "../PoolTokens";
 import { PositionColumn } from "./PositionColumn";
 

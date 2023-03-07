@@ -1,4 +1,4 @@
-import { getTokenAddress, Token } from "@/lib/Token";
+import { getTokenAddress, TokenE } from "src/types/Token";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
@@ -16,7 +16,7 @@ export async function checkIfAccountExists(
 }
 
 export async function fetchTokenBalance(
-  payToken: Token,
+  payToken: TokenE,
   publicKey: PublicKey,
   connection: Connection
 ): Promise<number> {
@@ -33,7 +33,7 @@ export async function fetchTokenBalance(
 
   let solBalance = (await connection.getBalance(publicKey)) / LAMPORTS_PER_SOL;
 
-  if (payToken === Token.SOL) {
+  if (payToken === TokenE.SOL) {
     return balance + solBalance;
   }
   return balance;

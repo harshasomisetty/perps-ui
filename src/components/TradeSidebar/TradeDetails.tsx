@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 
-import { getTokenIcon, Token } from "@/lib/Token";
+import { getTokenIcon, TokenE } from "src/types/Token";
 import { Tab } from ".";
 import { cloneElement } from "react";
 
@@ -30,8 +30,8 @@ function formatFees(num: number) {
 
 interface Props {
   className?: string;
-  collateralToken: Token;
-  positionToken: Token;
+  collateralToken: TokenE;
+  positionToken: TokenE;
   entryPrice: number;
   liquidationPrice: number;
   fees: number;
@@ -43,8 +43,6 @@ interface Props {
 
 export function TradeDetails(props: Props) {
   const icon = getTokenIcon(props.positionToken);
-  console.log("icon: ", icon);
-  console.log("props", props);
   return (
     <div className={props.className}>
       <header className="mb-4 flex items-center">

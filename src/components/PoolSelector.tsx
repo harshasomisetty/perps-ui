@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 
 import { PoolTokens } from "./PoolTokens";
-import { Pool } from "@/lib/Pool";
+import { Pool } from "src/types";
 
 interface Props {
   className?: string;
@@ -16,11 +16,12 @@ interface Props {
 
 export function PoolSelector(props: Props) {
   const [open, setOpen] = useState(false);
-  // console.log("props.pool", props.pool);
 
   if (!props.pool) {
     return <p>Loading props.pools</p>;
   }
+
+  console.log("props.pool", props.pool);
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -42,7 +43,7 @@ export function PoolSelector(props: Props) {
       >
         <PoolTokens tokens={props.pool.tokenNames} />
         <div className="truncate text-sm font-medium text-white">
-          {props.pool.poolName}
+          {props.pool.name}
         </div>
         <div
           className={twMerge(

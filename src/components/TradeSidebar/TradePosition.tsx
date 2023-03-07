@@ -2,25 +2,24 @@ import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { asToken, Token, tokenAddressToToken } from "@/lib/Token";
+import { asToken, TokenE, tokenAddressToToken } from "src/types/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { LeverageSlider } from "../LeverageSlider";
 import { TradeDetails } from "./TradeDetails";
 import { SolidButton } from "../SolidButton";
-import { TradePositionDetails } from "./TradePositionDetails";
 import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
-import { Pool } from "@/lib/Pool";
 import { Tab } from ".";
 import { openPosition } from "src/actions/openPosition";
-import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
 import { usePositions } from "@/hooks/usePositions";
+import { useGlobalStore } from "@/stores/store";
+import { PoolAccount } from "@/lib/PoolAccount";
 
 interface Props {
   className?: string;
@@ -33,8 +32,8 @@ enum Input {
 }
 
 export function TradePosition(props: Props) {
-  const [payToken, setPayToken] = useState(Token.SOL);
-  const [positionToken, setPositionToken] = useState(Token.SOL);
+  const [payToken, setPayToken] = useState(TokenE.SOL);
+  const [positionToken, setPositionToken] = useState(TokenE.SOL);
   const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
 
   const [payAmount, setPayAmount] = useState(0.1);
@@ -49,15 +48,17 @@ export function TradePosition(props: Props) {
 
   const { fetchPositions } = usePositions();
 
-  const { pools } = usePools();
-  const [pool, setPool] = useState<Pool | null>(null);
+  // const { pools } = usePools();
+  const poolData = useGlobalStore((state) => state.poolData);
+  const [pool, setPool] = useState<PoolAccount | null>(null);
+  console.log("trade position pool data", poolData);
 
   const stats = useDailyPriceStats();
   const router = useRouter();
 
   const { pair } = router.query;
 
-  let tokenList: Token[] = [];
+  let tokenList: TokenE[] = [];
 
   async function handleTrade() {
     await openPosition(
@@ -102,10 +103,11 @@ export function TradePosition(props: Props) {
     return <p>Pair not loaded</p>;
   }
 
-  if (pools === undefined) {
+  if (Object.keys(poolData).length === 0) {
     return <LoadingDots />;
   } else if (pool === null) {
-    setPool(Object.values(pools)[0]);
+    console.log("setting pool", poolData);
+    setPool(Object.values(poolData)[0]);
     return <LoadingDots />;
   } else {
     return (
@@ -163,7 +165,7 @@ export function TradePosition(props: Props) {
           className="mt-2"
           pool={pool}
           onSelectPool={setPool}
-          pools={pools}
+          pools={poolData}
         />
         <LeverageSlider
           className="mt-6"

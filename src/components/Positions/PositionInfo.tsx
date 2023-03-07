@@ -6,15 +6,15 @@ import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 
-import { getTokenAddress, getTokenIcon, getTokenLabel } from "@/lib/Token";
+import { getTokenAddress, getTokenIcon, getTokenLabel } from "src/types/Token";
 import { PositionColumn } from "./PositionColumn";
 import { PositionValueDelta } from "./PositionValueDelta";
-import { Position, Side } from "@/lib/Position";
 import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
 import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { formatNumberCommas } from "@/utils/formatters";
+import { Position, Side } from "src/types";
 
 interface Props {
   className?: string;
@@ -47,11 +47,10 @@ export function PositionInfo(props: Props) {
     //   netValue = props.position.size * props.position.entryPrice * -1;
     // }
 
-    console.log("net value", collateral, pnl, collateral + pnl);
+    // console.log("net value", collateral, pnl, collateral + pnl);
     return collateral + pnl;
   }
   // TODO get mark price
-  console.log("stats full", stats);
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
       <PositionColumn num={1}>

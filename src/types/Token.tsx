@@ -6,9 +6,8 @@ import { RayIconCircle } from "@/components/Icons/RayIconCircle";
 import { UsdtIconCircle } from "@/components/Icons/UsdtIconCircle";
 import { OrcaIconCircle } from "@/components/Icons/OrcaIconCircle";
 import { BonkIconCircle } from "@/components/Icons/BonkIconCircle";
-import { Pool } from "@/hooks/usePools";
 
-export enum Token {
+export enum TokenE {
   SOL = "SOL",
   mSOL = "mSOL",
   stSOL = "stSOL",
@@ -20,181 +19,181 @@ export enum Token {
   TEST = "Test",
 }
 export const TOKEN_LIST = [
-  Token.SOL,
-  Token.mSOL,
-  Token.stSOL,
-  Token.USDC,
-  Token.USDT,
-  Token.RAY,
-  Token.ORCA,
-  Token.Bonk,
-  Token.TEST,
+  TokenE.SOL,
+  TokenE.mSOL,
+  TokenE.stSOL,
+  TokenE.USDC,
+  TokenE.USDT,
+  TokenE.RAY,
+  TokenE.ORCA,
+  TokenE.Bonk,
+  TokenE.TEST,
 ];
 
-export function asToken(tokenStr: string): Token {
+export function asToken(tokenStr: string): TokenE {
   switch (tokenStr) {
     case "SOL":
-      return Token.SOL;
+      return TokenE.SOL;
 
     case "mSOL":
-      return Token.mSOL;
+      return TokenE.mSOL;
     case "stSOL":
-      return Token.stSOL;
+      return TokenE.stSOL;
     case "USDC":
-      return Token.USDC;
+      return TokenE.USDC;
     case "USDT":
-      return Token.USDT;
+      return TokenE.USDT;
     case "RAY":
-      return Token.RAY;
+      return TokenE.RAY;
     case "ORCA":
-      return Token.ORCA;
+      return TokenE.ORCA;
     case "Bonk":
-      return Token.Bonk;
+      return TokenE.Bonk;
     case "Test":
-      return Token.TEST;
+      return TokenE.TEST;
     default:
       throw new Error("Not a valid token string");
   }
 }
 
-export function getTokenLabel(token: Token) {
+export function getTokenLabel(token: TokenE) {
   switch (token) {
-    case Token.SOL:
+    case TokenE.SOL:
       return "Solana";
-    case Token.USDC:
+    case TokenE.USDC:
       return "UDC Coin";
-    case Token.mSOL:
+    case TokenE.mSOL:
       return "Marinade Staked SOL";
-    case Token.stSOL:
+    case TokenE.stSOL:
       return "Lido Staked SOL";
-    case Token.RAY:
+    case TokenE.RAY:
       return "Raydium";
-    case Token.USDT:
+    case TokenE.USDT:
       return "USDT";
-    case Token.ORCA:
+    case TokenE.ORCA:
       return "Orca";
-    case Token.Bonk:
+    case TokenE.Bonk:
       return "BonkCoin";
-    case Token.TEST:
+    case TokenE.TEST:
       return "Test Token";
   }
 }
 
-export function getSymbol(token: Token) {
+export function getSymbol(token: TokenE) {
   switch (token) {
-    case Token.Bonk:
+    case TokenE.Bonk:
       return "BONKUSDT";
-    case Token.ORCA:
+    case TokenE.ORCA:
       return "ORCAUSD";
-    case Token.RAY:
+    case TokenE.RAY:
       return "RAYUSD";
-    case Token.SOL:
+    case TokenE.SOL:
       return "SOLUSD";
-    case Token.USDC:
+    case TokenE.USDC:
       return "USDCUSD";
-    case Token.USDT:
+    case TokenE.USDT:
       return "USDTUSD";
-    case Token.mSOL:
+    case TokenE.mSOL:
       return "MSOLUSD";
-    case Token.stSOL:
+    case TokenE.stSOL:
       return "STSOLUSDT";
-    case Token.TEST:
+    case TokenE.TEST:
       return "BTCUSD";
   }
 }
 
-export function getTokenIcon(token: Token) {
+export function getTokenIcon(token: TokenE) {
   switch (token) {
-    case Token.SOL:
+    case TokenE.SOL:
       return <SolanaIconCircle />;
-    case Token.USDC:
+    case TokenE.USDC:
       return <UsdcIconCircle />;
-    case Token.mSOL:
+    case TokenE.mSOL:
       return <MSolIconCircle />;
-    case Token.stSOL:
+    case TokenE.stSOL:
       return <STSolIconCircle />;
-    case Token.RAY:
+    case TokenE.RAY:
       return <RayIconCircle />;
-    case Token.USDT:
+    case TokenE.USDT:
       return <UsdtIconCircle />;
-    case Token.ORCA:
+    case TokenE.ORCA:
       return <OrcaIconCircle />;
-    case Token.Bonk:
+    case TokenE.Bonk:
       return <BonkIconCircle />;
-    case Token.TEST:
+    case TokenE.TEST:
       return <BonkIconCircle />;
   }
 }
 
-export function getTokenId(token: Token) {
+export function getTokenId(token: TokenE) {
   switch (token) {
-    case Token.SOL:
+    case TokenE.SOL:
       return "solana";
-    case Token.mSOL:
+    case TokenE.mSOL:
       return "msol";
-    case Token.stSOL:
+    case TokenE.stSOL:
       return "lido-staked-sol";
-    case Token.USDC:
+    case TokenE.USDC:
       return "usd-coin";
-    case Token.USDT:
+    case TokenE.USDT:
       return "tether";
-    case Token.RAY:
+    case TokenE.RAY:
       return "raydium";
-    case Token.ORCA:
+    case TokenE.ORCA:
       return "orca";
-    case Token.Bonk:
+    case TokenE.Bonk:
       return "bonk";
-    case Token.TEST:
+    case TokenE.TEST:
       return "bitcoin";
   }
 }
 
-export function tokenAddressToToken(address: string): Token {
+export function tokenAddressToToken(address: string) {
   switch (address) {
     case "So11111111111111111111111111111111111111112":
-      return Token.SOL;
+      return TokenE.SOL;
     case "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So":
-      return Token.mSOL;
+      return TokenE.mSOL;
     case "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj":
-      return Token.stSOL;
+      return TokenE.stSOL;
     // case "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU":
     case "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr":
-      return Token.USDC;
+      return TokenE.USDC;
     case "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":
-      return Token.USDT;
+      return TokenE.USDT;
     case "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R":
-      return Token.RAY;
+      return TokenE.RAY;
     case "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE":
-      return Token.ORCA;
+      return TokenE.ORCA;
     case "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263":
-      return Token.Bonk;
+      return TokenE.Bonk;
     case "6QGdQbaZEgpXqqbGwXJZXwbZ9xJnthfyYNZ92ARzTdAX":
-      return Token.TEST;
+      return TokenE.TEST;
     default:
       return null;
   }
 }
 
-export function getTokenAddress(token: Token) {
+export function getTokenAddress(token: TokenE) {
   switch (token) {
-    case Token.SOL:
+    case TokenE.SOL:
       return "So11111111111111111111111111111111111111112";
-    case Token.mSOL:
+    case TokenE.mSOL:
       return "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So";
-    case Token.stSOL:
+    case TokenE.stSOL:
       return "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj";
-    case Token.USDC:
+    case TokenE.USDC:
       // return "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
       return "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr";
-    case Token.USDT:
+    case TokenE.USDT:
       return "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
-    case Token.RAY:
+    case TokenE.RAY:
       return "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R";
-    case Token.ORCA:
+    case TokenE.ORCA:
       return "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE";
-    case Token.Bonk:
+    case TokenE.Bonk:
       return "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263";
-    case Token.TEST:
+    case TokenE.TEST:
       return "6QGdQbaZEgpXqqbGwXJZXwbZ9xJnthfyYNZ92ARzTdAX";
   }
 }

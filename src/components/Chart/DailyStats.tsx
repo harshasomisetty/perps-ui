@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token } from "@/lib/Token";
+import { TokenE } from "src/types/Token";
 import { formatNumberCommas } from "@/utils/formatters";
 
 function formatNumber(number: number) {
@@ -14,7 +14,7 @@ function formatNumber(number: number) {
 
 interface DailyStatsProps {
   className?: string;
-  token: Token;
+  token: TokenE;
 }
 
 export function DailyStats(props: DailyStatsProps) {

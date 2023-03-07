@@ -1,11 +1,9 @@
-import { Pool, PoolObj } from "@/lib/Pool";
-import { Side } from "@/lib/Position";
-import { getTokenAddress, Token } from "@/lib/Token";
+import { getTokenAddress, TokenE } from "src/types/Token";
 import {
   getPerpetualProgramAndProvider,
-  perpetualsAddress,
+  PERPETUALS_ADDRESS,
   PERPETUALS_PROGRAM_ID,
-  transferAuthorityAddress,
+  TRANSFER_AUTHORITY,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -25,13 +23,13 @@ import {
 } from "@solana/web3.js";
 
 export async function closePosition(
-  pool: PoolObj,
+  pool: PoolAccount,
   wallet: Wallet,
   publicKey: PublicKey,
   signTransaction,
   connection: Connection,
-  payToken: Token,
-  positionToken: Token,
+  payToken: TokenE,
+  positionToken: TokenE,
   positionAccountAddress: String,
   side: Side,
   price: BN
@@ -97,8 +95,8 @@ export async function closePosition(
       .accounts({
         owner: publicKey,
         receivingAccount: userCustodyTokenAccount,
-        transferAuthority: transferAuthorityAddress,
-        perpetuals: perpetualsAddress,
+        transferAuthority: TRANSFER_AUTHORITY,
+        perpetuals: PERPETUALS_ADDRESS,
         pool: pool.poolAddress,
         position: positionAccount,
         custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,

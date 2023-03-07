@@ -1,24 +1,23 @@
-import { useState } from "react";
-import { usePools } from "@/hooks/usePools";
 import { twMerge } from "tailwind-merge";
-import { Pool, PoolObj } from "@/lib/Pool";
+import { PoolAccount } from "@/lib/PoolAccount";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
+import { useGlobalStore } from "@/stores/store";
 
 export default function Pools() {
-  const { pools } = usePools();
+  const poolData = useGlobalStore((state) => state.poolData);
+  console.log("global pool data", poolData);
   const router = useRouter();
   const stats = useDailyPriceStats();
-  const { wallet, publicKey, signTransaction } = useWallet();
+  // const { wallet, publicKey, signTransaction } = useWallet();
 
-  const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
+  // const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
   const { userLpTokens } = useUserData();
 
-  if (!pools) {
+  if (!poolData) {
     return <p className="text-white">Loading...</p>;
   }
 
@@ -26,9 +25,9 @@ export default function Pools() {
     return <>Loading stats</>;
   }
 
-  function getLiquidityBalance(pool: PoolObj): number {
+  function getLiquidityBalance(pool: PoolAccount): number {
     let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
+    let lpSupply = Number(pool.lpSupply) / 10 ** pool.lpDecimals;
     let userLiquidity = (userLpBalance / lpSupply) * pool.getLiquidities(stats);
 
     if (Number.isNaN(userLiquidity)) {
@@ -38,9 +37,9 @@ export default function Pools() {
     return userLiquidity;
   }
 
-  function getLiquidityShare(pool: PoolObj): number {
+  function getLiquidityShare(pool: PoolAccount): number {
     let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
+    let lpSupply = Number(pool.lpSupply) / 10 ** pool.lpDecimals;
 
     let userShare = (userLpBalance / lpSupply) * 100;
 
@@ -59,7 +58,7 @@ export default function Pools() {
           <p className="text-white">
             $
             {formatNumberCommas(
-              Object.values(pools).reduce((acc, pool) => {
+              Object.values(poolData).reduce((acc, pool) => {
                 return acc + Number(pool.getLiquidities(stats));
               }, 0)
             )}
@@ -89,11 +88,11 @@ export default function Pools() {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(pools).map(([poolName, pool]) => (
+          {Object.entries(poolData).map(([poolName, pool]) => (
             <tr
               className="cursor-pointer border-b border-zinc-700 text-xs hover:bg-zinc-800"
               key={poolName}
-              onClick={() => router.push(`/pools/${poolName}`)}
+              onClick={() => router.push(`/poolData/${poolName}`)}
             >
               <td className="py-4 px-2">
                 <TableHeader

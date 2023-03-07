@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 
-import { tokenAddressToToken } from "@/lib/Token";
+import { tokenAddressToToken } from "src/types/Token";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
-import { Position, UserPoolPositions, Side } from "@/lib/Position";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { usePositionStore } from "@/stores/store";
 import { shallow } from "zustand/shallow";
-import { PublicKey } from "@solana/web3.js";
 import { useRouter } from "next/router";
+import { useGlobalStore } from "@/stores/store";
+import { Side } from "src/types";
 
 interface Pending {
   status: "pending";
@@ -26,7 +25,7 @@ interface Success {
 export type PositionRequest = Pending | Failure | Success;
 
 export function usePositions() {
-  const { positions, setStorePositions } = usePositionStore(
+  const { positions, setStorePositions } = useGlobalStore(
     (state) => ({
       positions: state.storePositions,
       setStorePositions: state.setStorePositions,
@@ -46,7 +45,7 @@ export function usePositions() {
 
   const fetchPositions = async () => {
     if (!wallet || !publicKey) {
-      console.log("no wallet or pubkey", publicKey);
+      // console.log("no wallet or pubkey", publicKey);
       return;
     }
 
@@ -61,12 +60,11 @@ export function usePositions() {
 
     let fetchedPositions;
 
-    console.log("all positions", allPositions);
+    // console.log("all positions", allPositions);
     if (allPositions) {
-      console.log("all positions");
       fetchedPositions = await perpetual_program.account.position.all();
     } else {
-      console.log("user positions");
+      // console.log("user positions");
       fetchedPositions = await perpetual_program.account.position.all([
         {
           memcmp: {
@@ -76,7 +74,7 @@ export function usePositions() {
         },
       ]);
     }
-    console.log("fetched positons", fetchedPositions);
+    // console.log("fetched positons", fetchedPositions);
 
     let custodyAccounts = fetchedPositions.map(
       (position) => position.account.custody

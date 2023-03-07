@@ -1,4 +1,4 @@
-import { getTokenAddress, Token, tokenAddressToToken } from "@/lib/Token";
+import { getTokenAddress, TokenE, tokenAddressToToken } from "src/types/Token";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
@@ -11,7 +11,6 @@ import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
 import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
-import { Pool } from "@/lib/Pool";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
 import router from "next/router";
 import AirdropButton from "../AirdropButton";

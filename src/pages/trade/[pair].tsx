@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { TradeLayout } from "@/components/Layouts/TradeLayout";
 import { CandlestickChart } from "@/components/Chart/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
-import { asToken } from "@/lib/Token";
+import { asToken } from "src/types/Token";
 import { Positions } from "@/components/Positions";
 
 function getToken(pair: string) {

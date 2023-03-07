@@ -3,7 +3,7 @@ import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
 import { cloneElement, useState } from "react";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token, getTokenIcon } from "@/lib/Token";
+import { TokenE, getTokenIcon } from "src/types/Token";
 import { TokenSelectorList } from "./TokenSelectorList";
 
 function formatNumber(num: number) {
@@ -21,12 +21,12 @@ function decimalTrim(num: number) {
 interface Props {
   className?: string;
   amount: number;
-  token: Token;
+  token: TokenE;
   onChangeAmount?(amount: number): void;
-  onSelectToken?(token: Token): void;
+  onSelectToken?(token: TokenE): void;
   liqRatio: number;
   setLiquidity?: (amount: number) => void;
-  tokenList?: Token[];
+  tokenList?: TokenE[];
 }
 
 export function TokenSelector(props: Props) {

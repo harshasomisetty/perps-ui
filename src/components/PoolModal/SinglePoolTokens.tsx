@@ -1,11 +1,15 @@
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Pool } from "@/lib/Pool";
-import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
+import {
+  getTokenIcon,
+  getTokenLabel,
+  tokenAddressToToken,
+} from "src/types/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 import { formatNumberCommas } from "@/utils/formatters";
+import { Pool } from "src/types";
 
 interface Props {
   className?: string;

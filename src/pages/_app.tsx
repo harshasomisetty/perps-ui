@@ -16,12 +16,18 @@ import { clusterApiUrl } from "@solana/web3.js";
 import { AppProps } from "next/app";
 import { FC, useMemo } from "react";
 
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 import { Navbar } from "@/components/Navbar";
+import { useHydrateStore } from "@/hooks/useHydrateStore";
+
+const StoreUpdater = () => {
+  useHydrateStore();
+  return null;
+};
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -38,6 +44,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         pauseOnHover
       />
       <Navbar />
+      <StoreUpdater />
       <Component {...pageProps} />
     </Context>
   );
