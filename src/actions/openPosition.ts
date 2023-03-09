@@ -25,11 +25,12 @@ import {
 import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
+import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 
 export async function openPosition(
   wallet: Wallet,
   publicKey: PublicKey,
-  signTransaction: any,
+  signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
   pool: PoolAccount,
   payCustody: CustodyAccount,
@@ -49,10 +50,13 @@ export async function openPosition(
 
   console.log("pool", pool);
 
+  console.log("position custo", positionCustody.getTokenE());
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
     positionCustody.mint,
     publicKey
   );
+
+  console.log("user custody token account", userCustodyTokenAccount.toString());
 
   // check if usercustodytoken account exists
   if (!(await checkIfAccountExists(userCustodyTokenAccount, connection))) {
@@ -140,6 +144,16 @@ export async function openPosition(
       })
       .transaction();
     transaction = transaction.add(tx);
+
+    console.log("open pos tx", transaction);
+    console.log("tx keys");
+    // for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
+    //   console.log(
+    //     "key",
+    //     i,
+    //     transaction.instructions[0]!.keys[i]?.pubkey.toString()
+    //   );
+    // }
 
     await manualSendTransaction(
       transaction,

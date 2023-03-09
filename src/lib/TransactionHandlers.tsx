@@ -176,7 +176,9 @@ export const sendSignedTransactionAndNotify = async ({
     wallet: { signTransaction },
     enableSigning,
   });
-  console.log(`XEN:: - TRX :: https://explorer.solana.com/tx/${txid}`);
+  console.log(
+    `XEN:: - TRX :: https://explorer.solana.com/tx/${txid}?cluster=devnet`
+  );
 
   await new Promise(function (resolve, reject) {
     toast.promise(

@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function TradeSidebar(props: Props) {
-  const [tab, setTab] = useState(Tab.Long);
+  const [tab, setTab] = useState(Tab.Swap);
 
   return (
     <div className={props.className}>

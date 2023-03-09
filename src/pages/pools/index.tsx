@@ -61,43 +61,45 @@ export default function Pools() {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(poolData).map(([poolName, pool]) => (
-            <tr
-              className="cursor-pointer border-b border-zinc-700 text-xs hover:bg-zinc-800"
-              key={poolName}
-              onClick={() => router.push(`/pools/${poolName}`)}
-            >
-              <td className="py-4 px-2">
-                <TableHeader
-                  pool={pool}
-                  iconClassName="w-6 h-6"
-                  poolClassName="text-xs"
-                />
-              </td>
-              <td>${formatNumberCommas(pool.getLiquidities(stats!))}</td>
-              <td>${formatNumberCommas(pool.getTradeVolumes())}</td>
-              <td>${formatNumberCommas(pool.getFees())}</td>
-              <td>${formatNumberCommas(pool.getOiLong())}</td>
-              <td>${formatNumberCommas(pool.getOiShort())}</td>
-              {getLiquidityBalance(pool, userLpTokens, stats) > 0 ? (
-                <td>
-                  $
-                  {formatNumberCommas(
-                    getLiquidityBalance(pool, userLpTokens, stats)
-                  )}
+          {Object.entries(poolData)
+            .sort((a, b) => a[1].name.localeCompare(b[1].name))
+            .map(([poolName, pool]) => (
+              <tr
+                className="cursor-pointer border-b border-zinc-700 text-xs hover:bg-zinc-800"
+                key={poolName}
+                onClick={() => router.push(`/pools/${poolName}`)}
+              >
+                <td className="py-4 px-2">
+                  <TableHeader
+                    pool={pool}
+                    iconClassName="w-6 h-6"
+                    poolClassName="text-xs"
+                  />
                 </td>
-              ) : (
-                <td>-</td>
-              )}
-              {getLiquidityShare(pool, userLpTokens) > 0 ? (
-                <td>
-                  {formatNumberCommas(getLiquidityShare(pool, userLpTokens))}%
-                </td>
-              ) : (
-                <td>-</td>
-              )}
-            </tr>
-          ))}
+                <td>${formatNumberCommas(pool.getLiquidities(stats!))}</td>
+                <td>${formatNumberCommas(pool.getTradeVolumes())}</td>
+                <td>${formatNumberCommas(pool.getFees())}</td>
+                <td>${formatNumberCommas(pool.getOiLong())}</td>
+                <td>${formatNumberCommas(pool.getOiShort())}</td>
+                {getLiquidityBalance(pool, userLpTokens, stats) > 0 ? (
+                  <td>
+                    $
+                    {formatNumberCommas(
+                      getLiquidityBalance(pool, userLpTokens, stats)
+                    )}
+                  </td>
+                ) : (
+                  <td>-</td>
+                )}
+                {getLiquidityShare(pool, userLpTokens) > 0 ? (
+                  <td>
+                    {formatNumberCommas(getLiquidityShare(pool, userLpTokens))}%
+                  </td>
+                ) : (
+                  <td>-</td>
+                )}
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

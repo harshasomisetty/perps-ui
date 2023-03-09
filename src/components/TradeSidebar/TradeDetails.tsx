@@ -1,9 +1,9 @@
 import { twMerge } from "tailwind-merge";
-
 import { getTokenIcon, TokenE } from "@/lib/Token";
 import { Tab } from ".";
 import { cloneElement } from "react";
 import { formatFees, formatNumber, formatPrice } from "@/utils/formatters";
+
 interface Props {
   className?: string;
   collateralToken: TokenE;
