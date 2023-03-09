@@ -18,6 +18,8 @@ interface Props {
 }
 
 export function TradeDetails(props: Props) {
+  console.log("props in trade details", props);
+
   const icon = getTokenIcon(props.positionToken);
   return (
     <div className={props.className}>

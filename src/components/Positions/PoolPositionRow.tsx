@@ -39,7 +39,6 @@ export function SinglePosition(props: Props) {
       let finalPnl = Number(fetchedPrice.profit)
         ? Number(fetchedPrice.profit)
         : -1 * Number(fetchedPrice.loss);
-      console.log("final pnl", finalPnl);
       setPnl(finalPnl / 10 ** 6);
     }
     if (Object.keys(poolData).length > 0) {
@@ -54,7 +53,6 @@ export function SinglePosition(props: Props) {
       const View = new ViewHelper(connection, provider);
 
       let fetchedPrice = await View.getLiquidationPrice(props.position);
-      console.log("fetch liquidation price", Number(fetchedPrice) / 10 ** 6);
 
       setLiqPrice(Number(fetchedPrice) / 10 ** 6);
     }

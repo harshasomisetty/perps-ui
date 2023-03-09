@@ -17,6 +17,7 @@ import { decode } from "@project-serum/anchor/dist/cjs/utils/bytes/base64";
 import { IdlCoder } from "@/utils/IdlCoder";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PositionAccount } from "@/lib/PositionAccount";
+import { PoolAccount } from "@/lib/PoolAccount";
 
 export type PositionSide = "long" | "short";
 
@@ -112,11 +113,11 @@ export class ViewHelper {
     collateral: BN,
     size: BN,
     side: PositionSide,
-    poolKey: PublicKey,
-    custodyKey: PublicKey
+    pool: PoolAccount,
+    custodyKey: CustodyAccount
   ): Promise<PriceAndFee> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
-    console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+    // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
 
     let transaction: Transaction = await program.methods
       // @ts-ignore
@@ -148,7 +149,7 @@ export class ViewHelper {
 
   getExitPriceAndFee = async (position: PublicKey): Promise<PriceAndFee> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
-    console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+    // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
 
     const transaction = await program.methods
       // @ts-ignore
@@ -177,7 +178,7 @@ export class ViewHelper {
   getLiquidationPrice = async (position: PositionAccount): Promise<BN> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
-    console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+    // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
     const transaction = await program.methods
       // @ts-ignore
       .getLiquidationPrice({})

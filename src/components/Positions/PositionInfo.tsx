@@ -29,7 +29,6 @@ export function PositionInfo(props: Props) {
   function getNetValue(): number {
     // let netValue = 0
     let collateral = props.position.getCollateralUsd();
-    console.log("getting net value", Number(collateral), props.pnl);
 
     // if (props.position.side === Side.Buy) {
     //   netValue = props.position.size * props.position.entryPrice;
