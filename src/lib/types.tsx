@@ -157,9 +157,9 @@ export interface TradeStats {
 }
 
 export enum Side {
-  None,
-  Long,
-  Short,
+  None = "None",
+  Long = "Long",
+  Short = "Short",
 }
 
 export interface AccountMeta {

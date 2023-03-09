@@ -39,8 +39,7 @@ export async function closePosition(
   console.log(
     "price, adjustedPrice, apiPrice:",
     price.toString(),
-    adjustedPrice.toString(),
-    price.toString()
+    adjustedPrice.toString()
   );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(

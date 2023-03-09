@@ -69,12 +69,14 @@ export async function openPosition(
       Buffer.from("position"),
       publicKey.toBuffer(),
       pool.address.toBuffer(),
-      Buffer.from(positionCustody.getTokenE().toString()),
+      positionCustody.address.toBuffer(),
       // @ts-ignore
       side.toString() == "Long" ? [1] : [2],
     ],
     perpetual_program.programId
   )[0];
+
+  console.log("pos accoutn", positionAccount.toString());
 
   let transaction = new Transaction();
   // TODO SWAP IF PAY != POSITION TOKEN
