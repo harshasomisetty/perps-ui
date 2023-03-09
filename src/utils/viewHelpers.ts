@@ -89,101 +89,92 @@ export class ViewHelper {
     }
   }
 
-  //   getAssetsUnderManagement = async (poolKey: PublicKey): Promise<BN> => {
-  //     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+  getAssetsUnderManagement = async (poolKey: PublicKey): Promise<BN> => {
+    let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
-  //     const transaction = await program.methods
-  //       // @ts-ignore
-  //       .getAssetsUnderManagement({})
-  //       .accounts({
-  //         perpetuals: PERPETUALS_ADDRESS,
-  //         pool: poolKey,
-  //       })
-  //       .transaction();
+    const transaction = await program.methods
+      // @ts-ignore
+      .getAssetsUnderManagement({})
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: poolKey,
+      })
+      .transaction();
 
-  //     const result = await this.simulateTransaction(transaction);
-  //     const index = IDL.instructions.findIndex(
-  //       (f) => f.name === "getAssetsUnderManagement"
-  //     );
-  //     return this.decodeLogs(result, index);
-  //   };
+    const result = await this.simulateTransaction(transaction);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getAssetsUnderManagement"
+    );
+    return this.decodeLogs(result, index);
+  };
 
-  //   getEntryPriceAndFee = async (
-  //     collateral: BN,
-  //     size: BN,
-  //     side: PositionSide,
-  //     poolKey: PublicKey,
-  //     custodyKey: PublicKey
-  //   ): Promise<PriceAndFee> => {
-  //     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
-  //     console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
-
-  //     let transaction: Transaction = await program.methods
-  //       // @ts-ignore
-  //       .getEntryPriceAndFee({
-  //         collateral,
-  //         size,
-  //         side: side === "long" ? { long: {} } : { short: {} },
-  //       })
-  //       .accounts({
-  //         perpetuals: PERPETUALS_ADDRESS,
-  //         pool: poolKey,
-  //         custody: custodyKey,
-  //         custodyOracleAccount:
-  //           PoolConfig.getCustodyConfig(custodyKey)?.oracleAddress,
-  //       })
-  //       .transaction();
-
-  //     const result = await this.simulateTransaction(transaction);
-  //     const index = IDL.instructions.findIndex(
-  //       (f) => f.name === "getEntryPriceAndFee"
-  //     );
-  //     const res: any = this.decodeLogs(result, index);
-
-  //     return {
-  //       price: res.price,
-  //       fee: res.fee,
-  //     };
-  //   };
-
-  //   getExitPriceAndFee = async (
-  //     poolKey: PublicKey,
-  //     custodyKey: PublicKey,
-  //     position: PublicKey
-  //   ): Promise<PriceAndFee> => {
-  //     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
-  //     console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
-
-  //     const transaction = await program.methods
-  //       // @ts-ignore
-  //       .getExitPriceAndFee({})
-  //       .accounts({
-  //         perpetuals: this.poolConfig.perpetuals,
-  //         pool: poolKey,
-  //         position: position,
-  //         custody: custodyKey,
-  //         custodyOracleAccount:
-  //           PoolConfig.getCustodyConfig(custodyKey)?.oracleAddress,
-  //       })
-  //       .transaction();
-
-  //     const result = await this.simulateTransaction(transaction);
-  //     const index = IDL.instructions.findIndex(
-  //       (f) => f.name === "getExitPriceAndFee"
-  //     );
-  //     const res: any = this.decodeLogs(result, index);
-
-  //     return {
-  //       price: res.price,
-  //       fee: res.fee,
-  //     };
-  //   };
-
-  getLiquidationPrice = async (
+  getEntryPriceAndFee = async (
+    collateral: BN,
+    size: BN,
+    side: PositionSide,
     poolKey: PublicKey,
-    custodyKey: PublicKey,
-    position: PublicKey
-  ): Promise<BN> => {
+    custodyKey: PublicKey
+  ): Promise<PriceAndFee> => {
+    let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+    console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+
+    let transaction: Transaction = await program.methods
+      // @ts-ignore
+      .getEntryPriceAndFee({
+        collateral,
+        size,
+        side: side === "long" ? { long: {} } : { short: {} },
+      })
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: poolKey,
+        custody: custodyKey,
+        custodyOracleAccount:
+          PoolConfig.getCustodyConfig(custodyKey)?.oracleAddress,
+      })
+      .transaction();
+
+    const result = await this.simulateTransaction(transaction);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getEntryPriceAndFee"
+    );
+    const res: any = this.decodeLogs(result, index);
+
+    return {
+      price: res.price,
+      fee: res.fee,
+    };
+  };
+
+  getExitPriceAndFee = async (position: PublicKey): Promise<PriceAndFee> => {
+    let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+    console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+
+    const transaction = await program.methods
+      // @ts-ignore
+      .getExitPriceAndFee({})
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: position.pool,
+        position: position.address,
+        custody: position.custody,
+        custodyOracleAccount: position.oracleAccount,
+      })
+      .transaction();
+
+    const result = await this.simulateTransaction(transaction);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getExitPriceAndFee"
+    );
+    const res: any = this.decodeLogs(result, index);
+
+    return {
+      price: res.price,
+      fee: res.fee,
+    };
+  };
+
+  getLiquidationPrice = async (position: PositionAccount): Promise<BN> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
     console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
@@ -191,12 +182,11 @@ export class ViewHelper {
       // @ts-ignore
       .getLiquidationPrice({})
       .accounts({
-        perpetuals: this.poolConfig.perpetuals,
-        pool: poolKey,
-        position: position,
-        custody: custodyKey,
-        custodyOracleAccount:
-          PoolConfig.getCustodyConfig(custodyKey)?.oracleAddress,
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: position.pool,
+        position: position.address,
+        custody: position.custody,
+        custodyOracleAccount: position.oracleAccount,
       })
       .transaction();
 
@@ -207,23 +197,18 @@ export class ViewHelper {
     return this.decodeLogs(result, index);
   };
 
-  getLiquidationState = async (
-    poolKey: PublicKey,
-    custodyKey: PublicKey,
-    position: PublicKey
-  ): Promise<BN> => {
+  getLiquidationState = async (position: PositionAccount): Promise<BN> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
     const transaction = await program.methods
       // @ts-ignore
       .getLiquidationState({})
       .accounts({
-        perpetuals: this.poolConfig.perpetuals,
-        pool: poolKey,
-        position: position,
-        custody: custodyKey,
-        custodyOracleAccount:
-          PoolConfig.getCustodyConfig(custodyKey)?.oracleAddress,
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: position.pool,
+        position: position.address,
+        custody: position.custody,
+        custodyOracleAccount: position.oracleAccount,
       })
       .transaction();
 
@@ -259,19 +244,16 @@ export class ViewHelper {
   //     return this.decodeLogs<BN>(result, index);
   //   };
 
-  getPnl = async (
-    connection: Connection,
-    position: PositionAccount,
-    custody: CustodyAccount
-  ): Promise<ProfitAndLoss> => {
+  getPnl = async (position: PositionAccount): Promise<ProfitAndLoss> => {
     let { perpetual_program } = await getPerpetualProgramAndProvider();
     const transaction = await perpetual_program.methods
       .getPnl({})
       .accounts({
-        perpetuals: this.poolConfig.perpetuals,
-        pool: poolKey,
-        position: position,
-        custody: custodyKey,
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: position.pool,
+        position: position.address,
+        custody: position.custody,
+        custodyOracleAccount: position.oracleAccount,
       })
       .transaction();
 

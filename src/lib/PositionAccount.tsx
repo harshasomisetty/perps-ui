@@ -25,6 +25,7 @@ export class PositionAccount {
 
   public token: TokenE;
   public address: PublicKey;
+  public oracleAccount: PublicKey;
 
   constructor(
     position: Position,
@@ -51,6 +52,8 @@ export class PositionAccount {
 
     this.token = custodies[this.custody.toString()]?.getTokenE()!;
     this.address = address;
+    this.oracleAccount =
+      custodies[this.custody.toString()]?.oracle.oracleAccount!;
   }
 
   getLeverage(): number {
