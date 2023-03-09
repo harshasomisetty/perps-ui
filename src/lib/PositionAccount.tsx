@@ -39,8 +39,8 @@ export class PositionAccount {
     this.openTime = position.openTime;
     this.updateTime = position.updateTime;
 
-    (this.side = position.side.hasOwnProperty("long") ? Side.Long : Side.Short),
-      (this.price = position.price);
+    this.side = position.side.hasOwnProperty("long") ? Side.Long : Side.Short;
+    this.price = position.price;
     this.sizeUsd = position.sizeUsd;
     this.collateralUsd = position.collateralUsd;
     this.unrealizedProfitUsd = position.unrealizedProfitUsd;
@@ -57,7 +57,24 @@ export class PositionAccount {
     return this.sizeUsd.toNumber() / this.collateralUsd.toNumber();
   }
 
+  // TODO fix getTimestamp to proper date
   getTimestamp(): number {
     return Math.floor(Number(this.openTime) / 1000);
   }
+
+  getCollateralUsd(): number {
+    return Number(this.collateralUsd) / 10 ** 6;
+  }
+
+  getPrice(): number {
+    return Number(this.price) / 10 ** 6;
+  }
+
+  getSizeUsd(): number {
+    return Number(this.sizeUsd) / 10 ** 6;
+  }
+
+  // getLiquidationPrice(): number {
+  //   return this.getPrice() * this.getLeverage();
+  // }
 }

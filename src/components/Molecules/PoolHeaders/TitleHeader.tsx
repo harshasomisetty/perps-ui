@@ -8,11 +8,11 @@ import { PoolAccount } from "@/lib/PoolAccount";
 interface Props {
   className?: string;
   iconClassName?: string;
-  poolClassName?: string;
   pool: PoolAccount;
 }
 
 export function TitleHeader(props: Props) {
+  console.log("table header data", props.pool.getTokenList());
   return (
     <div className={twMerge("flex", "flex-col", "space-x-1", props.className)}>
       <div className="flex flex-row items-center">
@@ -30,13 +30,7 @@ export function TitleHeader(props: Props) {
         </a>
       </div>
       <div className="text-s mt-3 flex flex-row font-medium text-zinc-500">
-        <p>{tokenAddressToToken(Object.keys(props.pool.tokens)[0]!)}</p>
-
-        {Object.keys(props.pool.tokens)
-          .slice(1)
-          .map((tokenMint) => (
-            <p key={tokenMint.toString()}>, {tokenAddressToToken(tokenMint)}</p>
-          ))}
+        <p>{props.pool.getTokenList().join(", ")}</p>
       </div>
     </div>
   );

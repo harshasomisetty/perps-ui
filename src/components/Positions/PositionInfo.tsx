@@ -17,6 +17,8 @@ interface Props {
   className?: string;
   expanded?: boolean;
   position: PositionAccount;
+  pnl: number;
+  liqPrice: number;
   onClickExpand?(): void;
 }
 
@@ -24,14 +26,10 @@ export function PositionInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
   const stats = useDailyPriceStats(props.position.token);
 
-  const [pnl, setPnl] = useState(0);
-  const [liqPrice, setLiqPrice] = useState(0);
-
-  // use effect get liq price
-
   function getNetValue(): number {
     // let netValue = 0
-    let collateral = props.position.collateralUsd;
+    let collateral = props.position.getCollateralUsd();
+    console.log("getting net value", Number(collateral), props.pnl);
 
     // if (props.position.side === Side.Buy) {
     //   netValue = props.position.size * props.position.entryPrice;
@@ -40,7 +38,7 @@ export function PositionInfo(props: Props) {
     // }
 
     // console.log("net value", collateral, pnl, collateral + pnl);
-    return Number(collateral) + pnl;
+    return Number(props.position.getCollateralUsd()) + props.pnl;
   }
 
   return (
@@ -110,7 +108,7 @@ export function PositionInfo(props: Props) {
       <PositionColumn num={4}>
         <div className="flex items-center">
           <div className="text-sm text-white">
-            ${formatNumberCommas(props.position.collateralUsd)}
+            ${formatNumberCommas(props.position.getCollateralUsd())}
           </div>
           <button className="group ml-2">
             <EditIcon
@@ -127,7 +125,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={5}>
         <div className="text-sm text-white">
-          ${formatNumberCommas(props.position.price)}
+          ${formatNumberCommas(props.position.getPrice())}
         </div>
       </PositionColumn>
       <PositionColumn num={6}>
@@ -138,7 +136,7 @@ export function PositionInfo(props: Props) {
       <PositionColumn num={7}>
         <div className="flex items-center justify-between pr-2">
           <div className="text-sm text-white">
-            ${formatNumberCommas(liqPrice)}
+            ${formatNumberCommas(props.liqPrice)}
           </div>
           <div className="flex items-center space-x-2">
             <a

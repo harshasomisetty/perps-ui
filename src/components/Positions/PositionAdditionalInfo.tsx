@@ -3,13 +3,11 @@ import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
 import { useGlobalStore } from "@/stores/store";
 import { Side } from "@/lib/types";
 import { PositionAccount } from "@/lib/PositionAccount";
@@ -18,6 +16,8 @@ import { formatPrice } from "@/utils/formatters";
 interface Props {
   className?: string;
   position: PositionAccount;
+  pnl: number;
+  liqPrice: number;
 }
 
 export function PositionAdditionalInfo(props: Props) {
@@ -30,44 +30,6 @@ export function PositionAdditionalInfo(props: Props) {
 
   const positionPool = poolData[props.position.pool.toString()]!;
   const positionCustody = custodyData[props.position.custody.toString()]!;
-
-  let payToken = props.position.token;
-  let positionToken = props.position.token;
-
-  const [pnl, setPnl] = useState(0);
-  const [liqPrice, setLiqPrice] = useState(0);
-
-  useEffect(() => {
-    async function fetchData() {
-      let fetchedPrice = await getPnl(
-        connection,
-        props.position,
-        //@ts-ignore
-        custodyData[props.position.custody.toString()]
-      );
-      setPnl(fetchedPrice);
-
-      // console.log("pnl percentage", pnl, props.position.collateralUsd);
-    }
-    if (Object.keys(poolData).length > 0) {
-      fetchData();
-    }
-  }, [poolData]);
-
-  useEffect(() => {
-    async function fetchData() {
-      let fetchedPrice = await getLiquidationPrice(
-        connection,
-        props.position,
-        // @ts-ignore
-        custodyData[props.position.custody.toString()]
-      );
-      setLiqPrice(fetchedPrice);
-    }
-    if (Object.keys(poolData).length > 0) {
-      fetchData();
-    }
-  }, [poolData]);
 
   async function handleCloseTrade() {
     console.log("in close trade");
@@ -122,15 +84,17 @@ export function PositionAdditionalInfo(props: Props) {
           <div className="text-xs text-zinc-500">PnL</div>
           <PositionValueDelta
             className="mt-0.5"
-            valueDelta={pnl}
-            valueDeltaPercentage={pnl / Number(props.position.collateralUsd)}
+            valueDelta={props.pnl}
+            valueDeltaPercentage={
+              (props.pnl * 100) / props.position.getCollateralUsd()
+            }
           />
         </div>
         <div>
           <div className="text-xs text-zinc-500">Size</div>
           <div className="mt-1 flex items-center">
             <div className="text-sm text-white">
-              ${formatPrice(Number(props.position.sizeUsd))}
+              ${formatPrice(props.position.getSizeUsd())}
             </div>
             <button className="group ml-2">
               <EditIcon
@@ -151,8 +115,8 @@ export function PositionAdditionalInfo(props: Props) {
             $
             {formatPrice(
               props.position.side === Side.Long
-                ? stats.currentPrice - liqPrice
-                : liqPrice - stats.currentPrice
+                ? stats.currentPrice - props.liqPrice
+                : props.liqPrice - stats.currentPrice
             )}
           </div>
         </div>

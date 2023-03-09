@@ -7,7 +7,7 @@ export function getPoolSortedPositions(
 ) {
   let sortedPositions: Record<string, PositionAccount[]> = {};
 
-  console.log("positions in getPoolSortedPositions", positions);
+  // console.log("positions in getPoolSortedPositions", positions);
 
   Object.values(positions).forEach((position: PositionAccount) => {
     if (user && position.owner.toBase58() !== user.toBase58()) {

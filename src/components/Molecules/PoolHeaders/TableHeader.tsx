@@ -26,15 +26,7 @@ export function TableHeader(props: Props) {
           {props.pool.name}
         </p>
         <div className="flex flex-row truncate text-xs font-medium text-zinc-500">
-          <p>{tokenAddressToToken(Object.keys(props.pool.tokens)[0]!)}</p>
-
-          {Object.keys(props.pool.tokens)
-            .slice(1)
-            .map((tokenMint) => (
-              <p key={tokenMint.toString()}>
-                , {tokenAddressToToken(tokenMint)}
-              </p>
-            ))}
+          <p>{props.pool.getTokenList().join(", ")}</p>
         </div>
       </div>
     </div>
