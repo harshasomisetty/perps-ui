@@ -1,5 +1,5 @@
 import { CustodyAccount } from "@/lib/CustodyAccount";
-import { getTokenLabel, tokenAddressToToken } from "@/lib/Token";
+import { getTokenLabel, tokenAddressToToken, TokenE } from "@/lib/Token";
 import { perpsUser } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -64,6 +64,22 @@ export default function AirdropButton(props: Props) {
     }
     // @ts-ignore
     router.reload(window.location.pathname);
+  }
+
+  if (props.custody.getTokenE() === TokenE.USDC) {
+    return (
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href={"https://spl-token-faucet.com/?token-name=USDC-Dev"}
+      >
+        <SolidButton className="my-6 w-full bg-slate-500 hover:bg-slate-200">
+          Airdrop {'"'}
+          {getTokenLabel(props.custody.getTokenE())}
+          {'"'}
+        </SolidButton>
+      </a>
+    );
   }
 
   return (
