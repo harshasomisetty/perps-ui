@@ -1,29 +1,25 @@
 import { twMerge } from "tailwind-merge";
-import { PoolAccount } from "@/lib/PoolAccount";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
 import { useGlobalStore } from "@/stores/store";
-import { getLiquidityBalance, getLiquidityShare } from "@/utils/getters";
+import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 
 export default function Pools() {
   const poolData = useGlobalStore((state) => state.poolData);
-  console.log("global pool data", poolData);
-  const router = useRouter();
-  const stats = useDailyPriceStats();
-  // const { wallet, publicKey, signTransaction } = useWallet();
-
-  // const [selectedPool, setSelectedPool] = useState<null | Pool>(null);
   const { userLpTokens } = useUserData();
+  const stats = useDailyPriceStats();
 
+  const router = useRouter();
   if (!poolData) {
     return <p className="text-white">Loading...</p>;
   }
 
   if (Object.keys(stats).length === 0) {
-    return <>Loading stats</>;
+    return <LoadingSpinner className="text-4xl" />;
   }
 
   return (
@@ -78,7 +74,7 @@ export default function Pools() {
                   poolClassName="text-xs"
                 />
               </td>
-              <td>${formatNumberCommas(pool.getLiquidities(stats))}</td>
+              <td>${formatNumberCommas(pool.getLiquidities(stats!))}</td>
               <td>${formatNumberCommas(pool.getTradeVolumes())}</td>
               <td>${formatNumberCommas(pool.getFees())}</td>
               <td>${formatNumberCommas(pool.getOiLong())}</td>

@@ -9,23 +9,15 @@ import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { usePositions } from "@/hooks/usePositions";
 import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
-import { getTokenAddress } from "src/types/Token";
 import { useGlobalStore } from "@/stores/store";
-import { Position, Side } from "src/types";
-
-function formatPrice(num: number) {
-  const formatter = new Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
+import { Side } from "@/lib/types";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { formatPrice } from "@/utils/formatters";
 
 interface Props {
   className?: string;
-  position: Position;
+  position: PositionAccount;
 }
 
 export function PositionAdditionalInfo(props: Props) {
@@ -34,29 +26,24 @@ export function PositionAdditionalInfo(props: Props) {
   const stats = useDailyPriceStats(props.position.token);
 
   const poolData = useGlobalStore((state) => state.poolData);
+  const custodyData = useGlobalStore((state) => state.custodyData);
+
+  const positionPool = poolData[props.position.pool.toString()]!;
+  const positionCustody = custodyData[props.position.custody.toString()]!;
 
   let payToken = props.position.token;
   let positionToken = props.position.token;
-  const { fetchPositions } = usePositions();
 
   const [pnl, setPnl] = useState(0);
   const [liqPrice, setLiqPrice] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
-      let token = props.position.token;
-
-      let custody =
-        poolData[props.position.poolName].tokens[getTokenAddress(token)];
-
       let fetchedPrice = await getPnl(
-        wallet,
-        publicKey,
         connection,
-        props.position.poolAddress,
-        props.position.positionAccountAddress,
-        custody.custodyAccount,
-        custody.oracle
+        props.position,
+        //@ts-ignore
+        custodyData[props.position.custody.toString()]
       );
       setPnl(fetchedPrice);
 
@@ -69,20 +56,11 @@ export function PositionAdditionalInfo(props: Props) {
 
   useEffect(() => {
     async function fetchData() {
-      let token = props.position.token;
-      console.log("pos info", poolData, props.position.poolName);
-
-      let custody =
-        poolData[props.position.poolName].tokens[getTokenAddress(token)];
-
       let fetchedPrice = await getLiquidationPrice(
-        wallet,
-        publicKey,
         connection,
-        props.position.poolAddress,
-        props.position.positionAccountAddress,
-        custody.custodyAccount,
-        custody.oracle
+        props.position,
+        // @ts-ignore
+        custodyData[props.position.custody.toString()]
       );
       setLiqPrice(fetchedPrice);
     }
@@ -93,21 +71,19 @@ export function PositionAdditionalInfo(props: Props) {
 
   async function handleCloseTrade() {
     console.log("in close trade");
-    let pool = poolData[props.position.poolAddress.toString()];
     await closePosition(
-      pool,
-      wallet,
-      publicKey,
-      signTransaction,
+      positionPool,
+      //@ts-ignore
+      wallet!,
+      publicKey!,
+      signTransaction!,
       connection,
-      payToken,
-      positionToken,
-      props.position.positionAccountAddress,
-      props.position.side,
+      props.position,
+      positionCustody,
       new BN(stats.currentPrice * 10 ** 6)
     );
 
-    fetchPositions();
+    // fetchPositions();
   }
 
   return (
@@ -139,7 +115,7 @@ export function PositionAdditionalInfo(props: Props) {
         <div>
           <div className="text-xs text-zinc-500">Time</div>
           <div className="mt-1 text-sm text-white">
-            {format(props.position.timestamp, "d MMM yyyy • p")}
+            {format(props.position.getTimestamp(), "d MMM yyyy • p")}
           </div>
         </div>
         <div>
@@ -147,15 +123,14 @@ export function PositionAdditionalInfo(props: Props) {
           <PositionValueDelta
             className="mt-0.5"
             valueDelta={pnl}
-            valueDeltaPercentage={pnl / props.position.collateralUsd}
-            formatValueDelta={formatPrice}
+            valueDeltaPercentage={pnl / Number(props.position.collateralUsd)}
           />
         </div>
         <div>
           <div className="text-xs text-zinc-500">Size</div>
           <div className="mt-1 flex items-center">
             <div className="text-sm text-white">
-              ${formatPrice(props.position.sizeUsd)}
+              ${formatPrice(Number(props.position.sizeUsd))}
             </div>
             <button className="group ml-2">
               <EditIcon

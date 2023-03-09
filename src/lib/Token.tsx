@@ -148,7 +148,7 @@ export function getTokenId(token: TokenE) {
   }
 }
 
-export function tokenAddressToToken(address: string) {
+export function tokenAddressToToken(address: string): TokenE | null {
   switch (address) {
     case "So11111111111111111111111111111111111111112":
       return TokenE.SOL;

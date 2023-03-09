@@ -1,33 +1,9 @@
 import { twMerge } from "tailwind-merge";
 
-import { getTokenIcon, TokenE } from "src/types/Token";
+import { getTokenIcon, TokenE } from "@/lib/Token";
 import { Tab } from ".";
 import { cloneElement } from "react";
-
-function formatNumber(num: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
-
-function formatPrice(num: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
-
-function formatFees(num: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 4,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
-
+import { formatFees, formatNumber, formatPrice } from "@/utils/formatters";
 interface Props {
   className?: string;
   collateralToken: TokenE;

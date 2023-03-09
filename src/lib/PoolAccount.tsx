@@ -1,48 +1,121 @@
-import { AllStats } from "@/hooks/useDailyPriceStats";
-import { Custody, Pool } from "src/types";
-import { tokenAddressToToken, TokenE } from "src/types/Token";
+import { GeckoStats } from "@/hooks/useDailyPriceStats";
+import { tokenAddressToToken, TokenE } from "@/lib/Token";
+import { AccountMeta, Pool, Token } from "@/lib/types";
+import { PERPETUALS_PROGRAM_ID } from "@/utils/constants";
+import { BN } from "@project-serum/anchor";
+import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
+import { Mint } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
+import { CustodyAccount } from "./CustodyAccount";
 
 export class PoolAccount {
   public name: string;
-  public poolAddress: string;
-  public lpTokenMint: string;
-  public tokens: Record<string, Custody>;
-  public custodyMetas: AccountMeta[];
-  public lpDecimals: number;
-  public lpSupply: BN;
+  public tokens: Token[];
+  public aumUsd: BN;
+  public bump: number;
+  public lpTokenBump: number;
+  public inceptionTime: BN;
 
-  constructor(pool: Pool) {
+  public custodies: Record<string, CustodyAccount>;
+  public address: PublicKey;
+
+  // public lpDecimals: number = 8;
+  public lpData: Mint;
+
+  constructor(
+    pool: Pool,
+    custodies: Record<string, CustodyAccount>,
+    address: PublicKey,
+    lpData: Mint
+  ) {
     this.name = pool.name;
-    this.poolAddress = pool.poolAddress;
-    this.lpTokenMint = pool.lpTokenMint;
     this.tokens = pool.tokens;
-    this.custodyMetas = pool.custodyMetas;
-    this.lpDecimals = pool.lpDecimals;
-    this.lpSupply = pool.lpSupply;
+    this.aumUsd = pool.aumUsd;
+    this.bump = pool.bump;
+    this.lpTokenBump = pool.lpTokenBump;
+    this.inceptionTime = pool.inceptionTime;
+
+    let tempCustodies: Record<string, CustodyAccount> = {};
+    pool.tokens.forEach((token) => {
+      tempCustodies[token.custody.toString()] =
+        custodies[token.custody.toString()]!;
+    });
+
+    this.custodies = tempCustodies;
+
+    this.address = address;
+    this.lpData = lpData;
   }
 
-  getTokenNames() {
-    return Object.values(this.tokens).map((tokenCustody) => tokenCustody.name);
+  getCustodyStruct(publicKey: PublicKey): Token | undefined {
+    const token = this.tokens.find((t) => t.custody.equals(publicKey));
+    return token ?? this.tokens[0];
+  }
+
+  getCustodyAccount(token: TokenE): CustodyAccount | null {
+    return (
+      Object.values(this.custodies).find(
+        (custody) => custody.getTokenE() === token
+      ) ?? null
+    );
+  }
+
+  getPoolAddress(): PublicKey {
+    return findProgramAddressSync(
+      [Buffer.from("pool"), Buffer.from(this.name)],
+      PERPETUALS_PROGRAM_ID
+    )[0];
+  }
+
+  getLpTokenMint(): PublicKey {
+    return findProgramAddressSync(
+      [Buffer.from("lp_token_mint"), this.getPoolAddress().toBuffer()],
+      PERPETUALS_PROGRAM_ID
+    )[0];
   }
 
   getTokenList(): TokenE[] {
-    return Object.keys(this.tokens).map((token) => {
-      return tokenAddressToToken(token);
+    return Object.values(this.custodies).map((custody) => {
+      return custody?.getTokenE()!;
     });
   }
 
-  getLiquidities(stats: AllStats) {
+  getCustodyMetas(): AccountMeta[] {
+    let custodyMetas: AccountMeta[] = [];
+
+    Object.keys(this.custodies).forEach((custody) => {
+      custodyMetas.push({
+        pubkey: new PublicKey(custody),
+        isSigner: false,
+        isWritable: true,
+      });
+    });
+
+    Object.values(this.custodies).forEach((custody) => {
+      custodyMetas.push({
+        pubkey: custody.oracle.oracleAccount,
+        isSigner: false,
+        isWritable: true,
+      });
+    });
+
+    return custodyMetas;
+  }
+  getLiquidities(stats: GeckoStats): number | null {
     // get liquidities from token custodies
     if (Object.keys(stats).length == 0) {
-      return;
+      return null;
     }
 
-    // console.log("stats account", stats);
-    const totalAmount = Object.values(this.tokens).reduce(
-      (acc: number, tokenCustody) => {
+    const totalAmount = Object.values(this.custodies).reduce(
+      (acc: number, tokenCustody: CustodyAccount) => {
+        // @ts-ignore
         let singleLiq =
-          stats[tokenCustody.name].currentPrice *
-          ((Number(tokenCustody.owned) - Number(tokenCustody.locked)) /
+          // @ts-ignore
+          stats[tokenAddressToToken(tokenCustody.mint.toString())]
+            .currentPrice *
+          ((Number(tokenCustody.assets.owned) -
+            Number(tokenCustody.assets.locked)) /
             10 ** tokenCustody.decimals);
         return acc + singleLiq;
       },
@@ -52,9 +125,9 @@ export class PoolAccount {
     return totalAmount;
   }
 
-  getTradeVolumes() {
-    const totalAmount = Object.values(this.tokens).reduce(
-      (acc: number, tokenCustody: Custody) => {
+  getTradeVolumes(): number {
+    const totalAmount = Object.values(this.custodies).reduce(
+      (acc: number, tokenCustody: CustodyAccount) => {
         return (
           acc +
           Object.values(tokenCustody.volumeStats).reduce(
@@ -64,15 +137,14 @@ export class PoolAccount {
       },
       0
     );
-    // console.log("totalAmount", totalAmount);
 
     return totalAmount / 10 ** 6;
   }
 
-  getOiLong() {
-    const totalAmount = Object.values(this.tokens).reduce(
-      (acc: number, tokenCustody: Custody) => {
-        return Number(acc) + Number(tokenCustody.oiLong);
+  getOiLong(): number {
+    const totalAmount = Object.values(this.custodies).reduce(
+      (acc: number, tokenCustody: CustodyAccount) => {
+        return Number(acc) + Number(tokenCustody.tradeStats.oiLongUsd);
       },
       0
     );
@@ -80,10 +152,10 @@ export class PoolAccount {
     return totalAmount / 10 ** 6;
   }
 
-  getOiShort() {
-    const totalAmount = Object.values(this.tokens).reduce(
-      (acc: number, tokenCustody: Custody) => {
-        return Number(acc) + Number(tokenCustody.oiShort);
+  getOiShort(): number {
+    const totalAmount = Object.values(this.custodies).reduce(
+      (acc: number, tokenCustody: CustodyAccount) => {
+        return Number(acc) + Number(tokenCustody.tradeStats.oiShortUsd);
       },
       0
     );
@@ -91,9 +163,9 @@ export class PoolAccount {
     return totalAmount / 10 ** 6;
   }
 
-  getFees() {
-    const totalAmount = Object.values(this.tokens).reduce(
-      (acc: number, tokenCustody: Custody) => {
+  getFees(): number {
+    const totalAmount = Object.values(this.custodies).reduce(
+      (acc: number, tokenCustody: CustodyAccount) => {
         return (
           acc +
           Object.values(tokenCustody.collectedFees).reduce(

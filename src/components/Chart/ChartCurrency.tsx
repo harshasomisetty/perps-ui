@@ -3,7 +3,7 @@ import { cloneElement, useState } from "react";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { useRouter } from "next/router";
 
-import { TokenE, getTokenIcon, getTokenLabel } from "src/types/Token";
+import { TokenE, getTokenIcon, getTokenLabel } from "@/lib/Token";
 
 import { TokenSelectorList } from "../TokenSelectorList";
 

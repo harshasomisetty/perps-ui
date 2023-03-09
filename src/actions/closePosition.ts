@@ -1,49 +1,39 @@
-import { getTokenAddress, TokenE } from "src/types/Token";
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { getTokenAddress, TokenE } from "@/lib/Token";
+import { Position, Side } from "@/lib/types";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
-  PERPETUALS_PROGRAM_ID,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
-import { checkIfAccountExists } from "@/utils/retrieveData";
 import { BN, Wallet } from "@project-serum/anchor";
-import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
-import {
-  createAssociatedTokenAccountInstruction,
-  getAssociatedTokenAddress,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import {
-  Connection,
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-} from "@solana/web3.js";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
+import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 
 export async function closePosition(
   pool: PoolAccount,
   wallet: Wallet,
   publicKey: PublicKey,
-  signTransaction,
+  signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
-  payToken: TokenE,
-  positionToken: TokenE,
-  positionAccountAddress: String,
-  side: Side,
+  position: PositionAccount,
+  custody: CustodyAccount,
   price: BN
 ) {
   console.log("in close postion");
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
   console.log("pool", pool);
-  console.log("side:", side);
+  console.log("side:", position.side);
 
   // TODO: need to take slippage as param , this is now for testing
-  console.log("side", side.toString());
+  console.log("side", position.side.toString());
   const adjustedPrice =
-    side.toString() == "Long"
+    position.side.toString() == "Long"
       ? price.mul(new BN(50)).div(new BN(100))
       : price.mul(new BN(150)).div(new BN(100));
   console.log(
@@ -53,40 +43,15 @@ export async function closePosition(
     price.toString()
   );
 
-  // let lpTokenAccount = await getAssociatedTokenAddress(
-  //   pool.lpTokenMint,
-  //   publicKey
-  // );
-
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]!.mintAccount,
+    custody.mint,
     publicKey
   );
-  console.log("tokens", payToken, positionToken);
-
-  // let positionAccount = findProgramAddressSync(
-  //   [
-  //     "position",
-  //     publicKey.toBuffer(),
-  //     pool.poolAddress.toBuffer(),
-  //     pool.tokens[getTokenAddress(payToken)]?.custodyAccount.toBuffer(),
-  //     side == 'Long' ? [1] : [2],
-  //   ],
-  //   perpetual_program.programId
-  // )[0];
-
-  //   console.log(
-  //     "left and right",
-  //     positionAccount.toString(),
-  //     "ALxjVHPdhi7LCoVc2CUbVvPFmnWWCcnNcNAQ4emPg2tz"
-  //   );
 
   let transaction = new Transaction();
 
   try {
-    const positionAccount = new PublicKey(positionAccountAddress);
-
-    console.log("position account", positionAccount.toString());
+    // console.log("position account", positionAccount.toString());
 
     let tx = await perpetual_program.methods
       .closePosition({
@@ -97,13 +62,11 @@ export async function closePosition(
         receivingAccount: userCustodyTokenAccount,
         transferAuthority: TRANSFER_AUTHORITY,
         perpetuals: PERPETUALS_ADDRESS,
-        pool: pool.poolAddress,
-        position: positionAccount,
-        custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-        custodyOracleAccount:
-          pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-        custodyTokenAccount:
-          pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
+        pool: pool.address,
+        position: position.address,
+        custody: custody.address,
+        custodyOracleAccount: custody.oracle.oracleAccount,
+        custodyTokenAccount: custody.tokenAccount,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .transaction();

@@ -1,7 +1,7 @@
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 
-import { TokenE, getTokenIcon } from "src/types/Token";
+import { TokenE, getTokenIcon } from "@/lib/Token";
 import { Tab } from ".";
 
 function formatPrice(num: number) {

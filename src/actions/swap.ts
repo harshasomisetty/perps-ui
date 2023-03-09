@@ -1,4 +1,4 @@
-import { getTokenAddress, TokenE } from "src/types/Token";
+import { getTokenAddress, TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
@@ -55,7 +55,7 @@ export async function swap(
     publicKey
   );
 
-  console.log("tokens", dispensingToken, receivingToken);
+  // console.log("tokens", ispensingToken, receivingToken);
 
   let transaction = new Transaction();
 

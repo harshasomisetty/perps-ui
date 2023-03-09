@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 
-import { TokenE } from "src/types/Token";
+import { TokenE } from "@/lib/Token";
 
 function formatPrice(num: number) {
   const formatter = Intl.NumberFormat("en", {

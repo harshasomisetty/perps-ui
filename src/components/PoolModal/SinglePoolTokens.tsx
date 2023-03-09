@@ -1,41 +1,25 @@
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import {
-  getTokenIcon,
-  getTokenLabel,
-  tokenAddressToToken,
-} from "src/types/Token";
+import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 import { formatNumberCommas } from "@/utils/formatters";
-import { Pool } from "src/types";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { useGlobalStore } from "@/stores/store";
+import { LoadingSpinner } from "../Icons/LoadingSpinner";
 
 interface Props {
   className?: string;
-  pool: Pool;
-}
-
-function TableHeader() {
-  return (
-    <>
-      <p>Pool Tokens</p>
-      <p>Deposit Fee</p>
-      <p>Liquidity</p>
-      <p>Price</p>
-      <p>Amount</p>
-      <p>Current/Target Weight</p>
-      <p>Utilization</p>
-      <p>Utilization</p>
-    </>
-  );
+  pool: PoolAccount;
 }
 
 export default function SinglePoolTokens(props: Props) {
   const stats = useDailyPriceStats();
+  let poolData = useGlobalStore((state) => state.poolData);
 
   if (Object.keys(stats).length === 0) {
-    return <>Loading stats</>;
+    return <LoadingSpinner className="absolute text-4xl" />;
   } else {
     return (
       <div className="w-full ">
@@ -54,22 +38,26 @@ export default function SinglePoolTokens(props: Props) {
               </tr>
             </thead>
             <tbody className={twMerge("text-xs")}>
-              {Object.entries(props.pool.tokens).map(([tokenMint, custody]) => {
-                const token = tokenAddressToToken(tokenMint);
-                const icon = getTokenIcon(token);
+              {Object.values(props.pool.custodies).map((custody) => {
+                let pool = poolData[custody.pool.toString()];
+                let token = custody.getTokenE();
+
+                if (!token) return <></>;
+
                 return (
-                  <tr key={tokenMint} className="border-t border-zinc-700">
+                  <tr
+                    key={custody.mint.toString()}
+                    className="border-t border-zinc-700"
+                  >
                     <td className="py-4">
                       <div className="flex flex-row items-center space-x-1">
-                        {cloneElement(icon, {
+                        {cloneElement(getTokenIcon(custody.getTokenE()!), {
                           className: "h-10 w-10",
                         })}
                         <div className="flex flex-col">
-                          <p className="font-medium">
-                            {tokenAddressToToken(tokenMint)}
-                          </p>
+                          <p className="font-medium">{custody.getTokenE()!}</p>
                           <p className={twMerge("text-xs", "text-zinc-500")}>
-                            {getTokenLabel(token)}
+                            {getTokenLabel(custody.getTokenE()!)}
                           </p>
                         </div>
                         <a
@@ -81,32 +69,40 @@ export default function SinglePoolTokens(props: Props) {
                         </a>
                       </div>
                     </td>
-                    <td>{custody.fees.addLiquidity / 100}%</td>
+                    <td>{Number(custody.fees.addLiquidity) / 100}%</td>
                     <td>
                       $
                       {formatNumberCommas(
                         stats[token].currentPrice *
-                          (Number(custody.owned) / 10 ** custody.decimals)
+                          (Number(custody.assets.owned) /
+                            10 ** custody.decimals)
                       )}
                     </td>
                     <td>${formatNumberCommas(stats[token].currentPrice)}</td>
                     <td>
                       {formatNumberCommas(
-                        Number(custody.owned) / 10 ** custody.decimals
+                        Number(custody.assets.owned) / 10 ** custody.decimals
                       )}
                     </td>
                     <td>
                       {formatNumberCommas(
                         (100 *
                           stats[token].currentPrice *
-                          (Number(custody.owned) / 10 ** custody.decimals)) /
-                          props.pool.getLiquidities(stats)
+                          (Number(custody.assets.owned) /
+                            10 ** custody.decimals)) /
+                          props.pool.getLiquidities(stats)!
                       )}
-                      % / {custody.targetRatio}%
+                      % /{" "}
+                      {Number(
+                        pool?.getCustodyStruct(custody.address)!.targetRatio
+                      ) / 100}
+                      %
                     </td>
                     <td>
                       {formatNumberCommas(
-                        100 * (Number(custody.locked) / Number(custody.owned))
+                        100 *
+                          (Number(custody.assets.locked) /
+                            Number(custody.assets.owned))
                       )}
                       %
                     </td>
@@ -114,9 +110,7 @@ export default function SinglePoolTokens(props: Props) {
                       <a
                         target="_blank"
                         rel="noreferrer"
-                        href={`${ACCOUNT_URL(
-                          custody.custodyAccount.toString()
-                        )}`}
+                        href={`${ACCOUNT_URL(custody.address.toString())}`}
                       >
                         <NewTab />
                       </a>

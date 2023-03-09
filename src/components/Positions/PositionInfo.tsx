@@ -1,42 +1,35 @@
 import { twMerge } from "tailwind-merge";
-import { cloneElement, useEffect, useState } from "react";
+import { cloneElement, useState } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 
-import { getTokenAddress, getTokenIcon, getTokenLabel } from "src/types/Token";
+import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
-import { PositionValueDelta } from "./PositionValueDelta";
-import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { formatNumberCommas } from "@/utils/formatters";
-import { Position, Side } from "src/types";
+import { Side } from "@/lib/types";
+import { PositionAccount } from "@/lib/PositionAccount";
 
 interface Props {
   className?: string;
   expanded?: boolean;
-  position: Position;
+  position: PositionAccount;
   onClickExpand?(): void;
 }
 
 export function PositionInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
-
-  // const poolData = useGlobalStore((state) => state.poolData);
   const stats = useDailyPriceStats(props.position.token);
-
-  // const { publicKey, signTransaction, wallet } = useWallet();
-  // const { connection } = useConnection();
 
   const [pnl, setPnl] = useState(0);
   const [liqPrice, setLiqPrice] = useState(0);
 
   // use effect get liq price
 
-  function getNetValue() {
+  function getNetValue(): number {
     // let netValue = 0
     let collateral = props.position.collateralUsd;
 
@@ -47,9 +40,9 @@ export function PositionInfo(props: Props) {
     // }
 
     // console.log("net value", collateral, pnl, collateral + pnl);
-    return collateral + pnl;
+    return Number(collateral) + pnl;
   }
-  // TODO get mark price
+
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
       <PositionColumn num={1}>
@@ -81,7 +74,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={2}>
         <div className="text-sm text-white">
-          {props.position.leverage.toFixed(2)}x
+          {props.position.getLeverage()}x
         </div>
         <div
           className={twMerge(
@@ -134,7 +127,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={5}>
         <div className="text-sm text-white">
-          ${formatNumberCommas(props.position.entryPrice)}
+          ${formatNumberCommas(props.position.price)}
         </div>
       </PositionColumn>
       <PositionColumn num={6}>
@@ -148,15 +141,10 @@ export function PositionInfo(props: Props) {
             ${formatNumberCommas(liqPrice)}
           </div>
           <div className="flex items-center space-x-2">
-            {/* <button className="text-white" onClick={liqPrice}>
-              liq
-            </button> */}
             <a
               target="_blank"
               rel="noreferrer"
-              href={`${ACCOUNT_URL(
-                props.position.positionAccountAddress.toString()
-              )}`}
+              href={`${ACCOUNT_URL(props.position.address.toString())}`}
             >
               <NewTab className="fill-white" />
             </a>

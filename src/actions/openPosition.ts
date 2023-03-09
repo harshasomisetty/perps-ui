@@ -1,4 +1,4 @@
-import { getTokenAddress, TokenE } from "src/types/Token";
+import { TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
@@ -22,16 +22,18 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { Pool, Side } from "src/types";
+import { Side, TradeSide } from "@/lib/types";
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { PoolAccount } from "@/lib/PoolAccount";
 
 export async function openPosition(
-  pool: Pool,
   wallet: Wallet,
   publicKey: PublicKey,
   signTransaction: any,
   connection: Connection,
-  payToken: TokenE,
-  positionToken: TokenE,
+  pool: PoolAccount,
+  payCustody: CustodyAccount,
+  positionCustody: CustodyAccount,
   payAmount: BN,
   positionAmount: BN,
   price: BN,
@@ -45,21 +47,10 @@ export async function openPosition(
       ? price.mul(new BN(115)).div(new BN(100))
       : price.mul(new BN(90)).div(new BN(100));
 
-  console.log(
-    "inputs",
-    Number(payAmount),
-    Number(positionAmount),
-    Number(price),
-    Number(newPrice),
-    payToken,
-    side,
-    side.toString()
-  );
-
   console.log("pool", pool);
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]?.mintAccount,
+    positionCustody.mint,
     publicKey
   );
 
@@ -68,30 +59,26 @@ export async function openPosition(
     console.log("user custody token account does not exist");
   }
 
-  console.log("tokens", payToken, positionToken);
+  // console.log("tokens", payToken, positionToken);
   let positionAccount = findProgramAddressSync(
     [
-      "position",
+      Buffer.from("position"),
       publicKey.toBuffer(),
-      pool.poolAddress.toBuffer(),
-      pool.tokens[getTokenAddress(payToken)]?.custodyAccount.toBuffer(),
+      pool.address.toBuffer(),
+      Buffer.from(positionCustody.getTokenE().toString()),
+      // @ts-ignore
       side.toString() == "Long" ? [1] : [2],
     ],
     perpetual_program.programId
   )[0];
 
-  // console.log(
-  //   "left and right",
-  //   positionAccount.toString(),
-  //   "ALxjVHPdhi7LCoVc2CUbVvPFmnWWCcnNcNAQ4emPg2tz"
-  // );
-
   let transaction = new Transaction();
+  // TODO SWAP IF PAY != POSITION TOKEN
 
   try {
     // wrap sol if needed
-    if (payToken == TokenE.SOL) {
-      console.log("pay token name is sol", payToken);
+    if (positionCustody.getTokenE() == TokenE.SOL) {
+      console.log("pay token name is sol");
 
       const associatedTokenAccount = await getAssociatedTokenAddress(
         NATIVE_MINT,
@@ -143,13 +130,11 @@ export async function openPosition(
         fundingAccount: userCustodyTokenAccount,
         transferAuthority: TRANSFER_AUTHORITY,
         perpetuals: PERPETUALS_ADDRESS,
-        pool: pool.poolAddress,
+        pool: pool.address,
         position: positionAccount,
-        custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-        custodyOracleAccount:
-          pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-        custodyTokenAccount:
-          pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
+        custody: positionCustody.address,
+        custodyOracleAccount: positionCustody.oracle.oracleAccount,
+        custodyTokenAccount: positionCustody.tokenAccount,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })

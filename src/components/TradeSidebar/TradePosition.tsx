@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { asToken, TokenE, tokenAddressToToken } from "src/types/Token";
+import { asToken, TokenE } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { LeverageSlider } from "../LeverageSlider";
@@ -17,7 +17,6 @@ import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
-import { usePositions } from "@/hooks/usePositions";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
 
@@ -46,11 +45,8 @@ export function TradePosition(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
 
-  const { fetchPositions } = usePositions();
-
   const poolData = useGlobalStore((state) => state.poolData);
   const [pool, setPool] = useState<PoolAccount | null>(null);
-  console.log("trade position pool data", poolData);
 
   const stats = useDailyPriceStats();
   const router = useRouter();
@@ -58,23 +54,27 @@ export function TradePosition(props: Props) {
   const { pair } = router.query;
 
   async function handleTrade() {
+    const payCustody = pool?.getCustodyAccount(payToken);
+    const positionCustody = pool?.getCustodyAccount(positionToken);
     await openPosition(
-      pool,
+      // @ts-ignore
       wallet,
       publicKey,
       signTransaction,
       connection,
-      payToken,
-      positionToken,
+      pool,
+      payCustody,
+      positionCustody,
       new BN(payAmount * LAMPORTS_PER_SOL),
       new BN(positionAmount * LAMPORTS_PER_SOL),
       new BN(stats[payToken]?.currentPrice * 10 ** 6),
       props.side
     );
-    fetchPositions();
+    // fetchPositions();
   }
 
   useEffect(() => {
+    // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
   }, [pair]);
 
@@ -82,7 +82,7 @@ export function TradePosition(props: Props) {
     async function fetchData() {
       let tokenBalance = await fetchTokenBalance(
         payToken,
-        publicKey,
+        publicKey!,
         connection
       );
 
@@ -103,7 +103,8 @@ export function TradePosition(props: Props) {
   if (Object.keys(poolData).length === 0) {
     return <LoadingDots />;
   } else if (pool === null) {
-    console.log("setting pool", poolData);
+    // console.log("setting pool", poolData);
+    // @ts-ignore
     setPool(Object.values(poolData)[0]);
     return <LoadingDots />;
   } else {

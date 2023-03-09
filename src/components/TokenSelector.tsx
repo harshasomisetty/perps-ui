@@ -3,7 +3,7 @@ import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
 import { cloneElement, useState } from "react";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { TokenE, getTokenIcon } from "src/types/Token";
+import { TokenE, getTokenIcon } from "@/lib/Token";
 import { TokenSelectorList } from "./TokenSelectorList";
 
 function formatNumber(num: number) {
@@ -32,8 +32,6 @@ interface Props {
 export function TokenSelector(props: Props) {
   const stats = useDailyPriceStats();
   const [selectorOpen, setSelectorOpen] = useState(false);
-
-  // check if props.token is undefined
 
   if (props.token === undefined) {
     return (

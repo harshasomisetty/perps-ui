@@ -17,6 +17,28 @@ export interface Token {
   maxRatio: BN;
 }
 
+export interface Custody {
+  assets: Assets;
+  borrowRate: BorrowRateParams;
+  borrowRateState: BorrowRateState;
+  bump: number;
+  collectedFees: Stats;
+  decimals: number;
+  fees: Fees;
+  isStable: boolean;
+  longPositions: PositionStats;
+  mint: PublicKey;
+  oracle: OracleParams;
+  permissions: Permissions;
+  pool: PublicKey;
+  pricing: PricingParams;
+  shortPositions: PositionStats;
+  tokenAccount: PublicKey;
+  tokenAccountBump: number;
+  tradeStats: TradeStats;
+  volumeStats: Stats;
+}
+
 export interface BorrowRateParams {
   baseRate: BN;
   slope1: BN;
@@ -39,28 +61,6 @@ export interface PositionStats {
   totalLeverage: BN;
   cumulativeInterest: BN;
   cumulativeInterestSnapshot: BN;
-}
-
-export interface Custody {
-  pool: PublicKey;
-  mint: PublicKey;
-  tokenAccount: PublicKey;
-  decimals: number;
-  isStable: boolean;
-  oracle: Oracle;
-  pricing: PricingParams;
-  permissions: Permissions;
-  fees: Fees;
-  borrowRate: BorrowRateParams;
-  assets: Assets;
-  collectedFees: Stats;
-  volumeStats: Stats;
-  tradeStats: TradeStats;
-  longPositions: PositionStats;
-  shortPositions: PositionStats;
-  // borrow rate state
-  bump: number;
-  tokenAccountBump: number;
 }
 
 // export interface TokenCustody {
@@ -115,7 +115,7 @@ export enum FeesMode {
   Linear,
 }
 
-export interface Oracle {
+export interface OracleParams {
   oracleAccount: PublicKey;
   oracleType: OracleType;
   maxPriceError: BN;
@@ -168,13 +168,11 @@ export interface AccountMeta {
   isWritable: boolean;
 }
 
-// export class TradeSide {
-//   static Long = { long: {} };
-//   static Short = { short: {} };
-// }
+export class TradeSide {
+  static Long = { long: {} };
+  static Short = { short: {} };
+}
 
-// leverage = sizeUsd / collateralUsd
-// entryPrice = price
 export interface Position {
   owner: PublicKey;
   pool: PublicKey;

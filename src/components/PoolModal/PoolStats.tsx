@@ -1,27 +1,37 @@
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useEffect } from "react";
+import { getMint, Mint } from "@solana/spl-token";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { checkIfAccountExists } from "@/utils/retrieveData";
+import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
 import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { Pool } from "src/types";
-import { getLiquidityBalance, getLiquidityShare } from "@/utils/getters";
+import { LoadingSpinner } from "../Icons/LoadingSpinner";
 
 interface Props {
-  pool: Pool;
+  pool: PoolAccount;
   className?: string;
 }
 
 export default function PoolStats(props: Props) {
   const stats = useDailyPriceStats();
+  const { connection } = useConnection();
 
   const { userLpTokens } = useUserData();
 
-  if (Object.keys(stats).length === 0) {
-    return <>Loading stats</>;
+  const [lpMint, setLpMint] = useState<Mint | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const lpData = await getMint(connection, props.pool.getLpTokenMint());
+      setLpMint(lpData);
+    })();
+    // @ts-ignore
+  }, []);
+
+  if (Object.keys(stats).length === 0 || lpMint === null) {
+    return <LoadingSpinner className="absolute text-4xl" />;
   } else {
     return (
       <div

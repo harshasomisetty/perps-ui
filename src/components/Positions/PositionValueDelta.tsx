@@ -1,27 +1,13 @@
+import {
+  formatValueDelta,
+  formatValueDeltaPercentage,
+} from "@/utils/formatters";
 import { twMerge } from "tailwind-merge";
-
-function formatValueDelta(num: number) {
-  const formatter = new Intl.NumberFormat("en", {
-    maximumFractionDigits: 4,
-    minimumFractionDigits: 4,
-  });
-  return formatter.format(num);
-}
-
-function formatValueDeltaPercentage(num: number) {
-  const formatter = new Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
 
 interface Props {
   className?: string;
   valueDelta: number;
   valueDeltaPercentage: number;
-  formatValueDelta(value: number): string;
-  formatValueDeltaPercentage(value: number): string;
 }
 
 export function PositionValueDelta(props: Props) {
@@ -35,7 +21,7 @@ export function PositionValueDelta(props: Props) {
         )}
       >
         {props.valueDelta > 0 && "+"}
-        {props.formatValueDelta(props.valueDelta)}
+        {formatValueDelta(props.valueDelta)}
       </div>
       <div
         className={twMerge(
@@ -48,13 +34,8 @@ export function PositionValueDelta(props: Props) {
         )}
       >
         {props.valueDeltaPercentage > 0 && "+"}
-        {props.formatValueDeltaPercentage(props.valueDeltaPercentage)}%
+        {formatValueDeltaPercentage(props.valueDeltaPercentage)}%
       </div>
     </div>
   );
 }
-
-PositionValueDelta.defaultProps = {
-  formatValueDelta,
-  formatValueDeltaPercentage,
-};

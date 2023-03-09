@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
-
-import { getSymbol, TokenE } from "src/types/Token";
+import { getSymbol, TokenE } from "@/lib/Token";
 import { ChartCurrency } from "./ChartCurrency";
 import { DailyStats } from "./DailyStats";
 

@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;
-  children: [React.ReactNode, React.ReactNode];
+  children: [React.ReactNode, React.ReactNode, React.ReactNode];
 }
 
 export function PoolLayout(props: Props) {

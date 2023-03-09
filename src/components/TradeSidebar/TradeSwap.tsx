@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { TokenE } from "src/types/Token";
+import { TokenE } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { SolidButton } from "../SolidButton";

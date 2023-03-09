@@ -1,4 +1,5 @@
-import { getTokenLabel, tokenAddressToToken } from "src/types/Token";
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { getTokenLabel, tokenAddressToToken } from "@/lib/Token";
 import { perpsUser } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -14,17 +15,17 @@ import { SolidButton } from "./SolidButton";
 
 interface Props {
   className?: string;
-  mint: string;
+  custody: CustodyAccount;
 }
 export default function AirdropButton(props: Props) {
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
 
-  let mint = new PublicKey(props.mint);
-
   const router = useRouter();
+  let mint = props.custody.mint;
 
   async function handleAirdrop() {
+    if (!publicKey) return;
     if (mint.toString() === "So11111111111111111111111111111111111111112") {
       await connection.requestAirdrop(publicKey!, 1 * 10 ** 9);
     } else {
@@ -61,6 +62,7 @@ export default function AirdropButton(props: Props) {
         perpsUser
       );
     }
+    // @ts-ignore
     router.reload(window.location.pathname);
   }
 
@@ -70,7 +72,7 @@ export default function AirdropButton(props: Props) {
       onClick={handleAirdrop}
     >
       Airdrop {'"'}
-      {getTokenLabel(tokenAddressToToken(props.mint))}
+      {getTokenLabel(props.custody.getTokenE())}
       {'"'}
     </SolidButton>
   );

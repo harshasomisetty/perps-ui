@@ -5,9 +5,9 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 
 import { PoolTokens } from "./PoolTokens";
-import { Pool } from "src/types";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
+import { LoadingSpinner } from "./Icons/LoadingSpinner";
 
 interface Props {
   className?: string;
@@ -21,7 +21,7 @@ export function PoolSelector(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
 
   if (!props.pool) {
-    return <p>Loading props.pools</p>;
+    return <LoadingSpinner className="absolute text-4xl" />;
   }
 
   return (
@@ -42,7 +42,7 @@ export function PoolSelector(props: Props) {
           props.className
         )}
       >
-        <PoolTokens tokens={props.pool.getTokenNames()} />
+        <PoolTokens tokens={props.pool.getTokenList()} />
         <div className="truncate text-sm font-medium text-white">
           {props.pool.name}
         </div>
@@ -84,22 +84,22 @@ export function PoolSelector(props: Props) {
                 "w-full",
                 "hover:bg-zinc-700"
               )}
-              key={pool.poolAddress}
+              key={pool.address.toString()}
               onClick={() => props.onSelectPool?.(pool)}
             >
-              <PoolTokens tokens={pool.getTokenNames()} />
+              <PoolTokens tokens={pool.getTokenList()} />
               <div>
                 <div className="truncate text-sm font-medium text-white">
                   {pool.name}
                 </div>
                 <div className="text-xs text-zinc-500">
-                  {pool.getTokenNames().slice(0, 3).join(", ")}
-                  {pool.getTokenNames().length > 3
-                    ? ` +${pool.getTokenNames().length - 3} more`
+                  {pool.getTokenList().slice(0, 3).join(", ")}
+                  {pool.getTokenList().length > 3
+                    ? ` +${pool.getTokenList().length - 3} more`
                     : ""}
                 </div>
               </div>
-              {pool.poolAddress === props.pool.poolAddress ? (
+              {pool.address === props.pool.address ? (
                 <CheckmarkIcon className="h-4 w-4 fill-white" />
               ) : (
                 <div />

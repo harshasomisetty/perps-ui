@@ -63,7 +63,7 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
       new TorusWalletAdapter(),
       new LedgerWalletAdapter(),
     ],
-    [network]
+    []
   );
 
   return (
