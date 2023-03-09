@@ -162,6 +162,9 @@ export function TradePosition(props: Props) {
           className="mt-6"
           value={leverage}
           maxLeverage={50}
+          // maxLeverage={Number(
+          //   pool.getCustodyAccount(positionToken)?.pricing.maxLeverage
+          // )}
           onChange={(e) => {
             if (lastChanged === Input.Pay) {
               setPositionAmount(payAmount * e);

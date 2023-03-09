@@ -1,4 +1,4 @@
-import { LoadingDots } from "@/components/LoadingDots";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 import { ExistingPosition } from "@/components/Positions/ExistingPosition";
 import { NoPositions } from "@/components/Positions/NoPositions";
 import { useGlobalStore } from "@/stores/store";
@@ -10,14 +10,14 @@ interface Props {
 
 export default function Admin(props: Props) {
   const positionData = useGlobalStore((state) => state.positionData);
-  const positions = getPoolSortedPositions(positionData.data);
+  const positions = getPoolSortedPositions(positionData);
 
   return (
     <div className={props.className}>
       <header className="mb-5 flex items-center space-x-4">
         <div className="font-medium text-white">All Positions</div>
         {positionData.status === "pending" && (
-          <LoadingDots className="text-white" />
+          <LoadingSpinner className="text-4xl" />
         )}
       </header>
       {positionData.status === "success" &&
@@ -25,7 +25,10 @@ export default function Admin(props: Props) {
           return <ExistingPosition positions={positions} key={pool} />;
         })}
 
-      {positionData.status != "success" && <NoPositions />}
+      {positionData.status != "success" ||
+        (Object.values(positionData.data).length === 0 && (
+          <NoPositions emptyString="No Open Positions" />
+        ))}
     </div>
   );
 }

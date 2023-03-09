@@ -144,7 +144,7 @@ export function getTokenId(token: TokenE) {
     case TokenE.Bonk:
       return "bonk";
     case TokenE.TEST:
-      return "bitcoin";
+      return "litecoin";
   }
 }
 

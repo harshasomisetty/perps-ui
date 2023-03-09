@@ -3,9 +3,10 @@ import { PositionAccount } from "@/lib/PositionAccount";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
-  perpsUser,
+  DEFAULT_PERPS_USER,
 } from "@/utils/constants";
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+import { Connection, Transaction } from "@solana/web3.js";
+import { IDL } from "@/target/types/perpetuals";
 
 function baseToDecimal(base64String: string) {
   if (!base64String) {
@@ -22,51 +23,6 @@ function baseToDecimal(base64String: string) {
   return parseInt(binaryString, 2);
 }
 
-// export async function getEntryPrice(
-//   pool: PoolAccount,
-//   wallet: Wallet,
-//   publicKey: PublicKey,
-//   signTransaction: SignerWalletAdapterProps["signAllTransactions"],
-//   connection: Connection,
-//   collateral: number,
-//   size: number,
-//   side: string,
-//   payToken: TokenE
-// ) {
-//   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
-
-//   let transaction = new Transaction();
-
-// try {
-//   let getEntryPriceTx = await perpetual_program.methods
-//     .getEntryPriceAndFee({
-//       new BN(collateral),
-//       new BN(size),
-//       side: side === "long" ? { long: {} } : { short: {} },
-//     })
-//     .accounts({
-//       signer: publicKey,
-//       perpetuals: perpetualsAddress,
-//       pool: pool.poolAddress,
-//       custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-//       custodyOracleAccount:
-//         pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-//     })
-//     .transaction();
-
-//   transaction = transaction.add(getEntryPriceTx);
-//       let results = await connection.simulateTransaction(transaction, [
-//   perpsUser,
-// ]);
-
-// console.log("entry price", results.value.returnData?.data[0]);
-
-// } catch (err) {
-//   console.log(err);
-//   throw err;
-// }
-// }
-
 export async function getLiquidationPrice(
   connection: Connection,
   position: PositionAccount,
@@ -80,7 +36,7 @@ export async function getLiquidationPrice(
     let getLiqPriceTx = await perpetual_program.methods
       .getLiquidationPrice({})
       .accounts({
-        signer: perpsUser.publicKey,
+        signer: DEFAULT_PERPS_USER.publicKey,
         perpetuals: PERPETUALS_ADDRESS,
         pool: position.pool,
         position: position.address,
@@ -92,8 +48,14 @@ export async function getLiquidationPrice(
     transaction = transaction.add(getLiqPriceTx);
 
     let results = await connection.simulateTransaction(transaction, [
-      perpsUser,
+      DEFAULT_PERPS_USER,
     ]);
+
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getLiquidationPrice"
+    );
+    let logs = this.decodeLogs(result, index);
+    console.log("logs");
 
     let liqPrice = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;
 
@@ -118,7 +80,7 @@ export async function getPnl(
     let getPnlTx = await perpetual_program.methods
       .getPnl({})
       .accounts({
-        signer: perpsUser.publicKey,
+        signer: DEFAULT_PERPS_USER.publicKey,
         perpetuals: PERPETUALS_ADDRESS,
         pool: position.pool,
         position: position.address,
@@ -130,7 +92,7 @@ export async function getPnl(
     transaction = transaction.add(getPnlTx);
 
     let results = await connection.simulateTransaction(transaction, [
-      perpsUser,
+      DEFAULT_PERPS_USER,
     ]);
 
     let pnl = baseToDecimal(results.value.returnData?.data[0]) / 10 ** 8;

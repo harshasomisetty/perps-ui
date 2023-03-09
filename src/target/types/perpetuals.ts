@@ -417,11 +417,6 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "receivingSolAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -432,6 +427,45 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "withdrawSolFees",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawSolFeesParams"
           }
         }
       ],
@@ -1140,11 +1174,6 @@ export type Perpetuals = {
       "name": "getEntryPriceAndFee",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1180,11 +1209,6 @@ export type Perpetuals = {
     {
       "name": "getExitPriceAndFee",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -1227,11 +1251,6 @@ export type Perpetuals = {
       "name": "getPnl",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1273,11 +1292,6 @@ export type Perpetuals = {
       "name": "getLiquidationPrice",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1316,11 +1330,6 @@ export type Perpetuals = {
     {
       "name": "getLiquidationState",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -1361,11 +1370,6 @@ export type Perpetuals = {
       "name": "getOraclePrice",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1399,11 +1403,6 @@ export type Perpetuals = {
     {
       "name": "getSwapAmountAndFees",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -1450,11 +1449,6 @@ export type Perpetuals = {
     {
       "name": "getAssetsUnderManagement",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -2416,11 +2410,19 @@ export type Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "tokenAmount",
+            "name": "amount",
             "type": "u64"
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawSolFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            "name": "solAmount",
+            "name": "amount",
             "type": "u64"
           }
         ]
@@ -2728,7 +2730,7 @@ export type Perpetuals = {
             "type": "u128"
           },
           {
-            "name": "cumulativeInterest",
+            "name": "cumulativeInterestUsd",
             "type": "u64"
           },
           {
@@ -2951,6 +2953,9 @@ export type Perpetuals = {
           },
           {
             "name": "WithdrawFees"
+          },
+          {
+            "name": "WithdrawSolFees"
           },
           {
             "name": "SetTestOraclePrice"
@@ -3549,11 +3554,6 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "receivingSolAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -3564,6 +3564,45 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "withdrawSolFees",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawSolFeesParams"
           }
         }
       ],
@@ -4272,11 +4311,6 @@ export const IDL: Perpetuals = {
       "name": "getEntryPriceAndFee",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -4312,11 +4346,6 @@ export const IDL: Perpetuals = {
     {
       "name": "getExitPriceAndFee",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -4359,11 +4388,6 @@ export const IDL: Perpetuals = {
       "name": "getPnl",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -4405,11 +4429,6 @@ export const IDL: Perpetuals = {
       "name": "getLiquidationPrice",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -4448,11 +4467,6 @@ export const IDL: Perpetuals = {
     {
       "name": "getLiquidationState",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -4493,11 +4507,6 @@ export const IDL: Perpetuals = {
       "name": "getOraclePrice",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -4531,11 +4540,6 @@ export const IDL: Perpetuals = {
     {
       "name": "getSwapAmountAndFees",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -4582,11 +4586,6 @@ export const IDL: Perpetuals = {
     {
       "name": "getAssetsUnderManagement",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -5548,11 +5547,19 @@ export const IDL: Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "tokenAmount",
+            "name": "amount",
             "type": "u64"
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawSolFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            "name": "solAmount",
+            "name": "amount",
             "type": "u64"
           }
         ]
@@ -5860,7 +5867,7 @@ export const IDL: Perpetuals = {
             "type": "u128"
           },
           {
-            "name": "cumulativeInterest",
+            "name": "cumulativeInterestUsd",
             "type": "u64"
           },
           {
@@ -6083,6 +6090,9 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "WithdrawFees"
+          },
+          {
+            "name": "WithdrawSolFees"
           },
           {
             "name": "SetTestOraclePrice"

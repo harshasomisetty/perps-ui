@@ -14,8 +14,30 @@ function formatNumber(num: number) {
   return formatter.format(num);
 }
 
+function displayOnlyNumbersAndDecimals(text: string) {
+  const sanitizedText = text.replace(/(\.)|(\D+)/g, "");
+
+  // Ensure there is at most one decimal point
+  const decimalCount = (sanitizedText.match(/\./g) || []).length;
+  const hasDecimal = decimalCount > 0;
+  const hasMultipleDecimals = decimalCount > 1;
+  if (hasMultipleDecimals) {
+    return NaN;
+  } else if (hasDecimal) {
+    const splitText = sanitizedText.split(".");
+    if (splitText[1] && splitText[1].length > 2) {
+      return parseFloat(splitText[0] + "." + splitText[1].slice(0, 2));
+    } else {
+      return parseFloat(sanitizedText);
+    }
+  }
+
+  // Parse the sanitized string to a float
+  return parseFloat(sanitizedText);
+}
+
 function decimalTrim(num: number) {
-  return parseFloat(num.toFixed(2));
+  return parseFloat(num.toFixed(4));
 }
 
 interface Props {
@@ -101,7 +123,9 @@ export function TokenSelector(props: Props) {
             value={decimalTrim(props.amount) || ""}
             onChange={(e) => {
               const text = e.currentTarget.value;
-              props.onChangeAmount?.(Number(text));
+
+              console.log("text", text, parseFloat(text));
+              props.onChangeAmount?.(parseFloat(text));
 
               //   "all nujbers ratio",
               //   (Number(text) * stats[props.token].currentPrice) *

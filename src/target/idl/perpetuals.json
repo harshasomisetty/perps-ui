@@ -417,11 +417,6 @@
           "isSigner": false
         },
         {
-          "name": "receivingSolAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -432,6 +427,45 @@
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "withdrawSolFees",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawSolFeesParams"
           }
         }
       ],
@@ -1140,11 +1174,6 @@
       "name": "getEntryPriceAndFee",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1180,11 +1209,6 @@
     {
       "name": "getExitPriceAndFee",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -1227,11 +1251,6 @@
       "name": "getPnl",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1273,11 +1292,6 @@
       "name": "getLiquidationPrice",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1316,11 +1330,6 @@
     {
       "name": "getLiquidationState",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -1361,11 +1370,6 @@
       "name": "getOraclePrice",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "perpetuals",
           "isMut": false,
           "isSigner": false
@@ -1399,11 +1403,6 @@
     {
       "name": "getSwapAmountAndFees",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -1450,11 +1449,6 @@
     {
       "name": "getAssetsUnderManagement",
       "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
         {
           "name": "perpetuals",
           "isMut": false,
@@ -2416,11 +2410,19 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "tokenAmount",
+            "name": "amount",
             "type": "u64"
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawSolFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            "name": "solAmount",
+            "name": "amount",
             "type": "u64"
           }
         ]
@@ -2728,7 +2730,7 @@
             "type": "u128"
           },
           {
-            "name": "cumulativeInterest",
+            "name": "cumulativeInterestUsd",
             "type": "u64"
           },
           {
@@ -2953,6 +2955,9 @@
             "name": "WithdrawFees"
           },
           {
+            "name": "WithdrawSolFees"
+          },
+          {
             "name": "SetTestOraclePrice"
           },
           {
@@ -3129,6 +3134,6 @@
     }
   ],
   "metadata": {
-    "address": "2EG1SbxV3c4GxDkEfZHKJ3LTGepynpdyBfdNruNfafz2"
+    "address": "6mL61P7WnYn96PHSCnLemKuUQUQGDzaK5Jeh3pnyKLV8"
   }
 }

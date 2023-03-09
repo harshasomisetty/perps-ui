@@ -62,7 +62,9 @@ export function LeverageSlider(props: Props) {
           </Slider.Track>
         </Slider.Root>
       </div>
-      <div className="pl-3 pr-6 text-sm text-zinc-400">50x</div>
+      <div className="pl-3 pr-6 text-sm text-zinc-400">
+        {props.maxLeverage}x
+      </div>
       <div
         className={twMerge(
           "bg-zinc-900",

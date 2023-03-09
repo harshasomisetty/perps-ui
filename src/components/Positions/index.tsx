@@ -19,7 +19,7 @@ export function Positions(props: Props) {
     return <LoadingSpinner className="text-4xl" />;
   }
 
-  const positions = getPoolSortedPositions(positionData.data, publicKey);
+  const positions = getPoolSortedPositions(positionData, publicKey!);
 
   if (!publicKey) {
     return (
@@ -28,7 +28,7 @@ export function Positions(props: Props) {
           <div className="font-medium text-white">My Positions</div>
         </header>
 
-        <NoPositions />
+        <NoPositions emptyString="No Open Positions" />
       </div>
     );
   }
@@ -47,7 +47,9 @@ export function Positions(props: Props) {
         })}
 
       {positionData.status != "success" ||
-        (positionData.data.length === 0 && <NoPositions />)}
+        (Object.values(positionData.data).length === 0 && (
+          <NoPositions emptyString="No Open Positions" />
+        ))}
     </div>
   );
 }
