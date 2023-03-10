@@ -1,4 +1,3 @@
-import { getTokenAddress, Token, tokenAddressToToken } from "@/lib/Token";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
@@ -11,16 +10,16 @@ import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
 import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
-import { Pool } from "@/lib/Pool";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
 import router from "next/router";
 import AirdropButton from "../AirdropButton";
-import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
+import { getMint } from "@solana/spl-token";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
+import { PoolAccount } from "@/lib/PoolAccount";
 
 interface Props {
   className?: string;
-  pool: Pool;
+  pool: PoolAccount;
 }
 
 enum Tab {
@@ -41,19 +40,15 @@ export default function LiquidityCard(props: Props) {
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
-  let tokenList = Object.keys(props.pool?.tokens).map((token) => {
-    return tokenAddressToToken(token);
-  });
 
-  const [payToken, setPayToken] = useState(tokenList[0]);
+  const [payToken, setPayToken] = useState(props.pool.getTokenList()[0]);
 
-  const poolName = router.query.poolName as string;
   const stats = useDailyPriceStats();
 
   useEffect(() => {
     async function fetchData() {
       let tokenBalance = await fetchTokenBalance(
-        payToken,
+        payToken!,
         publicKey!,
         connection
       );
@@ -61,35 +56,36 @@ export default function LiquidityCard(props: Props) {
       setPayTokenBalance(tokenBalance);
 
       let lpBalance = await fetchLPBalance(
-        props.pool.lpTokenMint,
+        props.pool.getLpTokenMint(),
         publicKey!,
         connection
       );
 
       setLiqBalance(lpBalance);
 
-      const mintInfo = await getMint(connection, props.pool.lpTokenMint);
+      const mintInfo = await getMint(connection, props.pool.getLpTokenMint());
 
       setLiqRatio(
         Number(mintInfo.supply) /
           10 ** mintInfo.decimals /
-          props.pool.getLiquidities(stats)
+          props.pool.getLiquidities(stats)!
       );
     }
     if (publicKey && Object.values(stats).length > 0 && payToken) {
       fetchData();
     }
-  }, [payToken, stats]);
+  }, [connection, publicKey, props.pool, payToken, stats]);
 
   async function changeLiq() {
     console.log("before change", tab === Tab.Remove, liqAmount);
     await changeLiquidity(
       props.pool,
       wallet!,
-      publicKey,
-      signTransaction,
+      publicKey!,
+      // @ts-ignore
+      signTransaction!,
       connection,
-      payToken,
+      props.pool.getCustodyAccount(payToken!),
       tab === Tab.Add ? tokenAmount : 0,
       tab === Tab.Remove ? liqAmount : 0
     );
@@ -101,7 +97,6 @@ export default function LiquidityCard(props: Props) {
   //   setLiqAmount(tokenAmtUsd * liqRatio);
   // }
 
-  console.log("pool name", poolName);
   return (
     <div className={props.className}>
       <div
@@ -132,9 +127,14 @@ export default function LiquidityCard(props: Props) {
           </SidebarTab>
         </div>
 
-        {poolName == "TestPool1" &&
-          Object.keys(props.pool.tokens).map((token) => {
-            return <AirdropButton key={token} mint={token} />;
+        {props.pool.name == "TestPool1" &&
+          Object.values(props.pool.custodies).map((custody) => {
+            return (
+              <AirdropButton
+                key={custody.address.toString()}
+                custody={custody}
+              />
+            );
           })}
 
         <div>
@@ -157,12 +157,12 @@ export default function LiquidityCard(props: Props) {
             <TokenSelector
               className="mt-2"
               amount={tokenAmount}
-              token={payToken}
+              token={payToken!}
               onChangeAmount={setTokenAmount}
               onSelectToken={setPayToken}
               liqRatio={liqRatio}
               setLiquidity={setLiqAmount}
-              tokenList={tokenList}
+              tokenList={props.pool.getTokenList()}
             />
           ) : (
             <LpSelector
@@ -181,12 +181,13 @@ export default function LiquidityCard(props: Props) {
           {tab === Tab.Add ? (
             <LpSelector className="mt-2" amount={liqAmount} />
           ) : (
+            // @ts-ignore
             <TokenSelector
               className="mt-2"
               amount={tokenAmount}
-              token={payToken}
+              token={payToken!}
               onSelectToken={setPayToken}
-              tokenList={tokenList}
+              tokenList={props.pool.getTokenList()}
             />
           )}
         </div>

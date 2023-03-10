@@ -7,21 +7,37 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
+  BackpackWalletAdapter,
+  BraveWalletAdapter,
+  CloverWalletAdapter,
+  CoinbaseWalletAdapter,
+  ExodusWalletAdapter,
+  GlowWalletAdapter,
+  HuobiWalletAdapter,
   LedgerWalletAdapter,
   PhantomWalletAdapter,
   SlopeWalletAdapter,
+  SolletWalletAdapter,
+  SolongWalletAdapter,
   TorusWalletAdapter,
+  TrustWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import { AppProps } from "next/app";
 import { FC, useMemo } from "react";
 
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 import { Navbar } from "@/components/Navbar";
+import { useHydrateStore } from "@/hooks/useHydrateStore";
+
+const StoreUpdater = () => {
+  useHydrateStore();
+  return null;
+};
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -38,6 +54,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         pauseOnHover
       />
       <Navbar />
+      <StoreUpdater />
       <Component {...pageProps} />
     </Context>
   );
@@ -55,8 +72,18 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
       new SlopeWalletAdapter(),
       new TorusWalletAdapter(),
       new LedgerWalletAdapter(),
+      new BackpackWalletAdapter(),
+      new BraveWalletAdapter(),
+      new CloverWalletAdapter(),
+      new CoinbaseWalletAdapter(),
+      new ExodusWalletAdapter(),
+      new GlowWalletAdapter(),
+      new HuobiWalletAdapter(),
+      new SolletWalletAdapter(),
+      new SolongWalletAdapter(),
+      new TrustWalletAdapter(),
     ],
-    [network]
+    []
   );
 
   return (

@@ -62,7 +62,9 @@ export function LeverageSlider(props: Props) {
           </Slider.Track>
         </Slider.Root>
       </div>
-      <div className="pl-3 pr-6 text-sm text-zinc-400">50x</div>
+      <div className="pl-3 pr-6 text-sm text-zinc-400">
+        {props.maxLeverage}x
+      </div>
       <div
         className={twMerge(
           "bg-zinc-900",
@@ -84,7 +86,9 @@ export function LeverageSlider(props: Props) {
             const number = parseFloat(text);
             // in order to allow the user to input numbers between 1 and 10, we
             // set the value to 0 instead of 1 when the user clears the input
-            props.onChange?.(Number.isNaN(number) ? 0 : clamp(number, 1, 50));
+            props.onChange?.(
+              Number.isNaN(number) ? 0 : clamp(number, 1, props.maxLeverage)
+            );
           }}
           onBlur={(e) => {
             const text = e.currentTarget.value;
@@ -92,7 +96,9 @@ export function LeverageSlider(props: Props) {
             // when the user blurs, in contrast to when the user is typing, we
             // reset the value to 1 since we want to ensure this selector
             // only produces valid values
-            props.onChange?.(Number.isNaN(number) ? 1 : clamp(number, 1, 50));
+            props.onChange?.(
+              Number.isNaN(number) ? 1 : clamp(number, 1, props.maxLeverage)
+            );
           }}
         />
         <button onClick={() => props.onChange?.(1)}>

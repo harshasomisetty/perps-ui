@@ -1,30 +1,34 @@
-import { LoadingDots } from "@/components/LoadingDots";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 import { ExistingPosition } from "@/components/Positions/ExistingPosition";
 import { NoPositions } from "@/components/Positions/NoPositions";
-import { usePositions } from "@/hooks/usePositions";
-import { useEffect } from "react";
+import { useGlobalStore } from "@/stores/store";
+import { getPoolSortedPositions } from "@/utils/organizers";
 
 interface Props {
   className?: string;
 }
 
 export default function Admin(props: Props) {
-  const { positions } = usePositions();
+  const positionData = useGlobalStore((state) => state.positionData);
+  const positions = getPoolSortedPositions(positionData);
 
   return (
     <div className={props.className}>
       <header className="mb-5 flex items-center space-x-4">
         <div className="font-medium text-white">All Positions</div>
-        {positions.status === "pending" && (
-          <LoadingDots className="text-white" />
+        {positionData.status === "pending" && (
+          <LoadingSpinner className="text-4xl" />
         )}
       </header>
-      {positions.status === "success" &&
-        positions.data.map((pool, index) => (
-          <ExistingPosition poolPositions={pool} key={index} />
-        ))}
+      {positionData.status === "success" &&
+        Object.entries(positions).map(([pool, positions]) => {
+          return <ExistingPosition positions={positions} key={pool} />;
+        })}
 
-      {positions.status != "success" && <NoPositions />}
+      {positionData.status != "success" ||
+        (Object.values(positionData.data).length === 0 && (
+          <NoPositions emptyString="No Open Positions" />
+        ))}
     </div>
   );
 }

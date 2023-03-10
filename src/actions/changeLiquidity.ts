@@ -1,9 +1,10 @@
-import { Pool } from "@/lib/Pool";
-import { getTokenAddress, Token } from "@/lib/Token";
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { getTokenAddress, TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
-  perpetualsAddress,
-  transferAuthorityAddress,
+  PERPETUALS_ADDRESS,
+  TRANSFER_AUTHORITY,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -26,24 +27,25 @@ import {
 } from "@solana/web3.js";
 
 export async function changeLiquidity(
-  pool: Pool,
+  pool: PoolAccount,
   wallet: Wallet,
   publicKey: PublicKey,
   signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
-  payToken: Token,
+  custody: CustodyAccount,
   tokenAmount?: number,
   liquidityAmount?: number
 ) {
+  // @ts-ignore
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
   let lpTokenAccount = await getAssociatedTokenAddress(
-    pool.lpTokenMint,
+    pool.getLpTokenMint(),
     publicKey
   );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]?.mintAccount!,
+    custody.mint,
     publicKey
   );
 
@@ -56,13 +58,15 @@ export async function changeLiquidity(
           publicKey,
           lpTokenAccount,
           publicKey,
-          pool.lpTokenMint
+          pool.getLpTokenMint()
         )
       );
     }
 
-    if (payToken == Token.SOL) {
-      console.log("pay token name is sol", payToken);
+    if (custody.getTokenE() == TokenE.SOL) {
+      // assert tokenAmount is not 0
+
+      console.log("pay token name is sol", custody.getTokenE());
 
       const associatedTokenAccount = await getAssociatedTokenAddress(
         NATIVE_MINT,
@@ -85,74 +89,64 @@ export async function changeLiquidity(
       // get balance of associated token account
       console.log("sol ata exists");
       const balance = await connection.getBalance(associatedTokenAccount);
-      if (balance < tokenAmount * LAMPORTS_PER_SOL) {
+      if (balance < tokenAmount! * LAMPORTS_PER_SOL) {
         console.log("balance insufficient");
         transaction = transaction.add(
           SystemProgram.transfer({
             fromPubkey: publicKey,
             toPubkey: associatedTokenAccount,
-            lamports: tokenAmount * LAMPORTS_PER_SOL,
+            lamports: tokenAmount! * LAMPORTS_PER_SOL,
           }),
           createSyncNativeInstruction(associatedTokenAccount)
         );
       }
     }
 
-    console.log("custodies", pool.custodyMetas);
+    console.log("custodies", pool.getCustodyMetas());
     if (tokenAmount) {
       console.log("in add liq", tokenAmount);
       let amount;
-      if (payToken === Token.SOL) {
+      if (custody.getTokenE() === TokenE.SOL) {
         amount = new BN(tokenAmount * LAMPORTS_PER_SOL);
       } else {
-        amount = new BN(
-          tokenAmount * 10 ** pool.tokens[getTokenAddress(payToken)]?.decimals
-        );
+        amount = new BN(tokenAmount * 10 ** custody.decimals);
       }
-      console.log(
-        "sending add",
-        pool.tokens[getTokenAddress(payToken)]?.oracleAccount.toString()
-      );
       let addLiquidityTx = await perpetual_program.methods
         .addLiquidity({ amount })
         .accounts({
           owner: publicKey,
           fundingAccount: userCustodyTokenAccount, // user token account for custody token account
           lpTokenAccount,
-          transferAuthority: transferAuthorityAddress,
-          perpetuals: perpetualsAddress,
-          pool: pool.poolAddress,
-          custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-          custodyOracleAccount:
-            pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-          custodyTokenAccount:
-            pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
-          lpTokenMint: pool.lpTokenMint,
+          transferAuthority: TRANSFER_AUTHORITY,
+          perpetuals: PERPETUALS_ADDRESS,
+          pool: pool.address,
+          custody: custody.address,
+          custodyOracleAccount: custody.oracle.oracleAccount,
+          custodyTokenAccount: custody.tokenAccount,
+          lpTokenMint: pool.getLpTokenMint(),
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        .remainingAccounts(pool.custodyMetas)
+        .remainingAccounts(pool.getCustodyMetas())
         .transaction();
       transaction = transaction.add(addLiquidityTx);
     } else if (liquidityAmount) {
-      let lpAmount = new BN(liquidityAmount * 10 ** pool.lpDecimals);
+      let lpAmount = new BN(liquidityAmount * 10 ** pool.lpData.decimals);
       let removeLiquidityTx = await perpetual_program.methods
         .removeLiquidity({ lpAmount })
         .accounts({
           owner: publicKey,
           receivingAccount: userCustodyTokenAccount, // user token account for custody token account
           lpTokenAccount,
-          transferAuthority: transferAuthorityAddress,
-          perpetuals: perpetualsAddress,
-          pool: pool.poolAddress,
-          custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-          custodyOracleAccount:
-            pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-          custodyTokenAccount:
-            pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
-          lpTokenMint: pool.lpTokenMint,
+          transferAuthority: TRANSFER_AUTHORITY,
+          perpetuals: PERPETUALS_ADDRESS,
+          pool: pool.address,
+          custody: custody.address,
+          custodyOracleAccount: custody.oracle.oracleAccount,
+          custodyTokenAccount: custody.tokenAccount,
+          lpTokenMint: pool.getLpTokenMint(),
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        .remainingAccounts(pool.custodyMetas)
+        .remainingAccounts(pool.getCustodyMetas())
         .transaction();
       transaction = transaction.add(removeLiquidityTx);
     }

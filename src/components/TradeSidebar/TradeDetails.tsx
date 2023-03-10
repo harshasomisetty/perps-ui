@@ -1,37 +1,13 @@
 import { twMerge } from "tailwind-merge";
-
-import { getTokenIcon, Token } from "@/lib/Token";
+import { getTokenIcon, TokenE } from "@/lib/Token";
 import { Tab } from ".";
 import { cloneElement } from "react";
-
-function formatNumber(num: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
-
-function formatPrice(num: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
-
-function formatFees(num: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 4,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
+import { formatFees, formatNumber, formatPrice } from "@/utils/formatters";
 
 interface Props {
   className?: string;
-  collateralToken: Token;
-  positionToken: Token;
+  collateralToken: TokenE;
+  positionToken: TokenE;
   entryPrice: number;
   liquidationPrice: number;
   fees: number;
@@ -43,8 +19,8 @@ interface Props {
 
 export function TradeDetails(props: Props) {
   const icon = getTokenIcon(props.positionToken);
-  console.log("icon: ", icon);
-  console.log("props", props);
+
+  console.log("borrow rate", props.borrowRate);
   return (
     <div className={props.className}>
       <header className="mb-4 flex items-center">
@@ -68,17 +44,17 @@ export function TradeDetails(props: Props) {
           },
           {
             label: "Liq. Price",
-            value: `-`,
+            value: `$${formatNumber(props.liquidationPrice)}`,
           },
           {
             label: "Fees",
-            value: `-`,
+            value: `$${formatNumber(props.fees)}`,
           },
           {
             label: "Borrow Rate",
             value: (
               <>
-                {`${formatFees(props.borrowRate)}% `}
+                {`${formatFees(100 * props.borrowRate)}% / hr`}
                 <span className="text-zinc-500"> </span>
               </>
             ),

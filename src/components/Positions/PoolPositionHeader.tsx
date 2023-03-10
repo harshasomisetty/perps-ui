@@ -1,20 +1,31 @@
-import { PoolPositions } from "@/lib/Position";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { useGlobalStore } from "@/stores/store";
 import { PoolTokens } from "../PoolTokens";
 import { PositionColumn } from "./PositionColumn";
 
 interface Props {
   className?: string;
-  poolPositions: PoolPositions;
+  positions: PositionAccount[];
 }
 
 export default function PoolPositionHeader(props: Props) {
+  const allTokens = props.positions.map((position) => {
+    return position.token;
+  });
+
+  const tokens = Array.from(new Set(allTokens));
+
+  const poolData = useGlobalStore((state) => state.poolData);
+
+  if (!props.positions[0]) return <p>No Positions</p>;
+
   return (
     <>
       <PositionColumn num={1}>
         <div className="flex max-w-fit items-center rounded-t bg-zinc-800 py-1.5 px-2">
-          <PoolTokens tokens={props.poolPositions.tokens} />
+          <PoolTokens tokens={tokens} />
           <div className="ml-1 text-sm font-medium text-white">
-            {props.poolPositions.name}
+            {poolData[props.positions[0].pool.toString()]?.name}
           </div>
         </div>
       </PositionColumn>

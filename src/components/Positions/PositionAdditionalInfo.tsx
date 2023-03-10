@@ -1,33 +1,23 @@
-import { usePools } from "@/hooks/usePools";
-import { Pool } from "@/lib/Pool";
-import { Position, Side } from "@/lib/Position";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
 import { PositionValueDelta } from "./PositionValueDelta";
 import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { useRouter } from "next/router";
-import { usePositions } from "@/hooks/usePositions";
-import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
-import { getTokenAddress } from "@/lib/Token";
-
-function formatPrice(num: number) {
-  const formatter = new Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(num);
-}
+import { useGlobalStore } from "@/stores/store";
+import { Side } from "@/lib/types";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { formatPrice } from "@/utils/formatters";
 
 interface Props {
   className?: string;
-  position: Position;
+  position: PositionAccount;
+  pnl: number;
+  liqPrice: number;
 }
 
 export function PositionAdditionalInfo(props: Props) {
@@ -35,81 +25,27 @@ export function PositionAdditionalInfo(props: Props) {
   const { connection } = useConnection();
   const stats = useDailyPriceStats(props.position.token);
 
-  const { pools } = usePools();
+  const poolData = useGlobalStore((state) => state.poolData);
+  const custodyData = useGlobalStore((state) => state.custodyData);
 
-  let payToken = props.position.token;
-  let positionToken = props.position.token;
-  const { fetchPositions } = usePositions();
-
-  const [pnl, setPnl] = useState(0);
-  const [liqPrice, setLiqPrice] = useState(0);
-
-  useEffect(() => {
-    async function fetchData() {
-      let token = props.position.token;
-
-      let custody =
-        pools[props.position.poolName].tokens[getTokenAddress(token)];
-
-      let fetchedPrice = await getPnl(
-        wallet,
-        publicKey,
-        connection,
-        props.position.poolAddress,
-        props.position.positionAccountAddress,
-        custody.custodyAccount,
-        custody.oracleAccount
-      );
-      setPnl(fetchedPrice);
-
-      console.log("pnl percentage", pnl, props.position.collateralUsd);
-    }
-    if (pools) {
-      fetchData();
-    }
-  }, [pools]);
-
-  useEffect(() => {
-    async function fetchData() {
-      let token = props.position.token;
-      console.log("pos info", pools, props.position.poolName);
-
-      let custody =
-        pools[props.position.poolName].tokens[getTokenAddress(token)];
-
-      let fetchedPrice = await getLiquidationPrice(
-        wallet,
-        publicKey,
-        connection,
-        props.position.poolAddress,
-        props.position.positionAccountAddress,
-        custody.custodyAccount,
-        custody.oracleAccount
-      );
-      setLiqPrice(fetchedPrice);
-    }
-    if (pools) {
-      fetchData();
-    }
-  }, [pools]);
+  const positionPool = poolData[props.position.pool.toString()]!;
+  const positionCustody = custodyData[props.position.custody.toString()]!;
 
   async function handleCloseTrade() {
     console.log("in close trade");
-    let pool = pools[props.position.poolAddress.toString()];
     await closePosition(
-      pool,
-      wallet,
-      publicKey,
-      signTransaction,
+      positionPool,
+      //@ts-ignore
+      wallet!,
+      publicKey!,
+      signTransaction!,
       connection,
-      payToken,
-      positionToken,
-      props.position.positionAccountAddress,
-      props.position.side,
+      props.position,
+      positionCustody,
       new BN(stats.currentPrice * 10 ** 6)
     );
 
-    fetchPositions();
+    // fetchPositions();
   }
 
   return (
@@ -141,23 +77,24 @@ export function PositionAdditionalInfo(props: Props) {
         <div>
           <div className="text-xs text-zinc-500">Time</div>
           <div className="mt-1 text-sm text-white">
-            {format(props.position.timestamp, "d MMM yyyy • p")}
+            {format(props.position.getTimestamp(), "d MMM yyyy • p")}
           </div>
         </div>
         <div>
           <div className="text-xs text-zinc-500">PnL</div>
           <PositionValueDelta
             className="mt-0.5"
-            valueDelta={pnl}
-            valueDeltaPercentage={pnl / props.position.collateralUsd}
-            formatValueDelta={formatPrice}
+            valueDelta={props.pnl}
+            valueDeltaPercentage={
+              (props.pnl * 100) / props.position.getCollateralUsd()
+            }
           />
         </div>
         <div>
           <div className="text-xs text-zinc-500">Size</div>
           <div className="mt-1 flex items-center">
             <div className="text-sm text-white">
-              ${formatPrice(props.position.sizeUsd)}
+              ${formatPrice(props.position.getSizeUsd())}
             </div>
             <button className="group ml-2">
               <EditIcon
@@ -178,8 +115,8 @@ export function PositionAdditionalInfo(props: Props) {
             $
             {formatPrice(
               props.position.side === Side.Long
-                ? stats.currentPrice - liqPrice
-                : liqPrice - stats.currentPrice
+                ? stats.currentPrice - props.liqPrice
+                : props.liqPrice - stats.currentPrice
             )}
           </div>
         </div>

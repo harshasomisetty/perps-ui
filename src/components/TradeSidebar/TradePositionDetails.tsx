@@ -1,7 +1,7 @@
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 
-import { Token, getTokenIcon } from "@/lib/Token";
+import { TokenE, getTokenIcon } from "@/lib/Token";
 import { Tab } from ".";
 
 function formatPrice(num: number) {
@@ -26,7 +26,7 @@ interface Props {
   className?: string;
   entryPrice: number;
   exitPrice: number;
-  token: Token;
+  token: TokenE;
   side: Tab;
 }
 

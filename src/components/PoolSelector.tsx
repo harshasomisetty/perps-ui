@@ -5,21 +5,23 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 
 import { PoolTokens } from "./PoolTokens";
-import { Pool } from "@/lib/Pool";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { useGlobalStore } from "@/stores/store";
+import { LoadingSpinner } from "./Icons/LoadingSpinner";
 
 interface Props {
   className?: string;
-  pool: Pool;
-  onSelectPool?(pool: Pool): void;
-  pools: Record<string, Pool>;
+  pool: PoolAccount;
+  onSelectPool?(pool: PoolAccount): void;
 }
 
 export function PoolSelector(props: Props) {
   const [open, setOpen] = useState(false);
-  // console.log("props.pool", props.pool);
+
+  const poolData = useGlobalStore((state) => state.poolData);
 
   if (!props.pool) {
-    return <p>Loading props.pools</p>;
+    return <LoadingSpinner className="absolute text-4xl" />;
   }
 
   return (
@@ -40,9 +42,9 @@ export function PoolSelector(props: Props) {
           props.className
         )}
       >
-        <PoolTokens tokens={props.pool.tokenNames} />
+        <PoolTokens tokens={props.pool.getTokenList()} />
         <div className="truncate text-sm font-medium text-white">
-          {props.pool.poolName}
+          {props.pool.name}
         </div>
         <div
           className={twMerge(
@@ -66,7 +68,7 @@ export function PoolSelector(props: Props) {
           className="w-[392px] overflow-hidden rounded bg-zinc-900 shadow-2xl"
         >
           <Dropdown.Arrow className="fill-zinc-900" />
-          {Object.values(props.pools).map((pool) => (
+          {Object.values(poolData).map((pool) => (
             <Dropdown.Item
               className={twMerge(
                 "cursor-pointer",
@@ -82,22 +84,22 @@ export function PoolSelector(props: Props) {
                 "w-full",
                 "hover:bg-zinc-700"
               )}
-              key={pool.poolAddress}
+              key={pool.address.toString()}
               onClick={() => props.onSelectPool?.(pool)}
             >
-              <PoolTokens tokens={pool.tokenNames} />
+              <PoolTokens tokens={pool.getTokenList()} />
               <div>
                 <div className="truncate text-sm font-medium text-white">
-                  {pool.poolName}
+                  {pool.name}
                 </div>
                 <div className="text-xs text-zinc-500">
-                  {pool.tokenNames.slice(0, 3).join(", ")}
-                  {pool.tokenNames.length > 3
-                    ? ` +${pool.tokenNames.length - 3} more`
+                  {pool.getTokenList().slice(0, 3).join(", ")}
+                  {pool.getTokenList().length > 3
+                    ? ` +${pool.getTokenList().length - 3} more`
                     : ""}
                 </div>
               </div>
-              {pool.poolAddress === props.pool.poolAddress ? (
+              {pool.address === props.pool.address ? (
                 <CheckmarkIcon className="h-4 w-4 fill-white" />
               ) : (
                 <div />

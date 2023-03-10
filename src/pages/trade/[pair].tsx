@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-
 import { TradeLayout } from "@/components/Layouts/TradeLayout";
 import { CandlestickChart } from "@/components/Chart/CandlestickChart";
 import { TradeSidebar } from "@/components/TradeSidebar";
@@ -11,7 +10,7 @@ function getToken(pair: string) {
   return asToken(token || "");
 }
 
-function getComparisonCurrency(pair: string) {
+function getComparisonCurrency() {
   return "usd" as const;
 }
 
@@ -23,16 +22,17 @@ export default function Page() {
     return <></>;
   }
 
+  // @ts-ignore
   let token: ReturnType<typeof getToken> = asToken(pair.split("-")[0]);
   let currency: ReturnType<typeof getComparisonCurrency> =
-    getComparisonCurrency(pair);
+    getComparisonCurrency();
 
   if (pair && Array.isArray(pair)) {
     const tokenAndCurrency = pair[0];
 
     if (tokenAndCurrency) {
       token = getToken(tokenAndCurrency);
-      currency = getComparisonCurrency(tokenAndCurrency);
+      currency = getComparisonCurrency();
     }
   }
 

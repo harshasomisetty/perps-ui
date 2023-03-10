@@ -1,5 +1,6 @@
-import { getTokenLabel, tokenAddressToToken } from "@/lib/Token";
-import { perpsUser } from "@/utils/constants";
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { getTokenLabel, tokenAddressToToken, TokenE } from "@/lib/Token";
+import { DEFAULT_PERPS_USER } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import {
@@ -14,17 +15,17 @@ import { SolidButton } from "./SolidButton";
 
 interface Props {
   className?: string;
-  mint: string;
+  custody: CustodyAccount;
 }
 export default function AirdropButton(props: Props) {
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
 
-  let mint = new PublicKey(props.mint);
-
   const router = useRouter();
+  let mint = props.custody.mint;
 
   async function handleAirdrop() {
+    if (!publicKey) return;
     if (mint.toString() === "So11111111111111111111111111111111111111112") {
       await connection.requestAirdrop(publicKey!, 1 * 10 ** 9);
     } else {
@@ -47,7 +48,7 @@ export default function AirdropButton(props: Props) {
         createMintToCheckedInstruction(
           mint, // mint
           associatedAccount, // ata
-          perpsUser.publicKey, // payer
+          DEFAULT_PERPS_USER.publicKey, // payer
           100 * 10 ** 9, // amount
           9 // decimals
         )
@@ -58,10 +59,27 @@ export default function AirdropButton(props: Props) {
         publicKey,
         connection,
         signTransaction,
-        perpsUser
+        DEFAULT_PERPS_USER
       );
     }
+    // @ts-ignore
     router.reload(window.location.pathname);
+  }
+
+  if (props.custody.getTokenE() === TokenE.USDC) {
+    return (
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href={"https://spl-token-faucet.com/?token-name=USDC-Dev"}
+      >
+        <SolidButton className="my-6 w-full bg-slate-500 hover:bg-slate-200">
+          Airdrop {'"'}
+          {getTokenLabel(props.custody.getTokenE())}
+          {'"'}
+        </SolidButton>
+      </a>
+    );
   }
 
   return (
@@ -70,7 +88,7 @@ export default function AirdropButton(props: Props) {
       onClick={handleAirdrop}
     >
       Airdrop {'"'}
-      {getTokenLabel(tokenAddressToToken(props.mint))}
+      {getTokenLabel(props.custody.getTokenE())}
       {'"'}
     </SolidButton>
   );

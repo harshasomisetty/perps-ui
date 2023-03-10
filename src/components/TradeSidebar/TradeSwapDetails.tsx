@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 
-import { Token } from "@/lib/Token";
+import { TokenE } from "@/lib/Token";
 
 function formatPrice(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -14,9 +14,9 @@ interface Props {
   availableLiquidity: number;
   className?: string;
   fees: number;
-  payToken: Token;
+  payToken: TokenE;
   payTokenPrice: number;
-  receiveToken: Token;
+  receiveToken: TokenE;
   receiveTokenPrice: number;
 }
 

@@ -1,30 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { asToken, Token, tokenAddressToToken } from "@/lib/Token";
+import { asToken, TokenE } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
 import { LeverageSlider } from "../LeverageSlider";
 import { TradeDetails } from "./TradeDetails";
 import { SolidButton } from "../SolidButton";
-import { TradePositionDetails } from "./TradePositionDetails";
 import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
-import { Pool } from "@/lib/Pool";
-import { Tab } from ".";
 import { openPosition } from "src/actions/openPosition";
-import { usePools } from "@/hooks/usePools";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
-import { usePositions } from "@/hooks/usePositions";
+import { useGlobalStore } from "@/stores/store";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { Side } from "@/lib/types";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
 
 interface Props {
   className?: string;
-  side: Tab;
+  side: Side;
 }
 
 enum Input {
@@ -33,8 +33,8 @@ enum Input {
 }
 
 export function TradePosition(props: Props) {
-  const [payToken, setPayToken] = useState(Token.SOL);
-  const [positionToken, setPositionToken] = useState(Token.SOL);
+  const [payToken, setPayToken] = useState(TokenE.SOL);
+  const [positionToken, setPositionToken] = useState(TokenE.SOL);
   const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
 
   const [payAmount, setPayAmount] = useState(0.1);
@@ -47,36 +47,42 @@ export function TradePosition(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
 
-  const { fetchPositions } = usePositions();
+  const poolData = useGlobalStore((state) => state.poolData);
+  const [pool, setPool] = useState<PoolAccount | null>(null);
 
-  const { pools } = usePools();
-  const [pool, setPool] = useState<Pool | null>(null);
+  const [entryPrice, setEntryPrice] = useState(0);
+  const [liquidationPrice, setLiquidationPrice] = useState(0);
+  const [fee, setFee] = useState(0);
 
   const stats = useDailyPriceStats();
   const router = useRouter();
 
   const { pair } = router.query;
 
-  let tokenList: Token[] = [];
+  const timeoutRef = useRef(null);
 
   async function handleTrade() {
+    const payCustody = pool?.getCustodyAccount(payToken);
+    const positionCustody = pool?.getCustodyAccount(positionToken);
     await openPosition(
-      pool,
+      // @ts-ignore
       wallet,
       publicKey,
       signTransaction,
       connection,
-      payToken,
-      positionToken,
+      pool,
+      payCustody,
+      positionCustody,
       new BN(payAmount * LAMPORTS_PER_SOL),
       new BN(positionAmount * LAMPORTS_PER_SOL),
       new BN(stats[payToken]?.currentPrice * 10 ** 6),
       props.side
     );
-    fetchPositions();
+    // fetchPositions();
   }
 
   useEffect(() => {
+    // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
   }, [pair]);
 
@@ -84,7 +90,7 @@ export function TradePosition(props: Props) {
     async function fetchData() {
       let tokenBalance = await fetchTokenBalance(
         payToken,
-        publicKey,
+        publicKey!,
         connection
       );
 
@@ -95,19 +101,68 @@ export function TradePosition(props: Props) {
     }
   }, [connection, payToken, publicKey]);
 
-  const entryPrice = stats[payToken]?.currentPrice * payAmount || 0;
-  const liquidationPrice = entryPrice * leverage;
+  useEffect(() => {
+    async function fetchData() {
+      let { provider } = await getPerpetualProgramAndProvider(wallet as any);
+
+      const View = new ViewHelper(connection, provider);
+
+      console.log("in get entry");
+
+      let getEntryPrice = await View.getEntryPriceAndFee(
+        new BN(payAmount * LAMPORTS_PER_SOL),
+        new BN(positionAmount * LAMPORTS_PER_SOL),
+        props.side,
+        pool,
+        pool?.getCustodyAccount(positionToken)
+      );
+
+      console.log("get entry", getEntryPrice);
+
+      setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
+      setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);
+      setFee(Number(getEntryPrice.fee) / 10 ** 9);
+    }
+    console.log(
+      "in fetching entry outside",
+      pool,
+      payAmount,
+      positionAmount,
+      props.side
+    );
+    if (pool && payAmount && positionAmount && props.side) {
+      console.log("about to actually fetch");
+
+      // clear previous timeout, if it exists
+      clearTimeout(timeoutRef.current);
+
+      // set a new timeout to execute after 5 seconds
+      timeoutRef.current = setTimeout(() => {
+        fetchData();
+      }, 1000);
+    }
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
+  }, [wallet, pool, payAmount, positionAmount, props.side]);
+
+  // const entryPrice = stats[payToken]?.currentPrice * payAmount || 0;
+  // const liquidationPrice = entryPrice * leverage;
 
   if (!pair) {
     return <p>Pair not loaded</p>;
   }
 
-  if (pools === undefined) {
+  if (Object.keys(poolData).length === 0) {
     return <LoadingDots />;
   } else if (pool === null) {
-    setPool(Object.values(pools)[0]);
+    // console.log("setting pool", poolData);
+    // @ts-ignore
+    console.log("all pools", Object.values(poolData));
+    setPool(Object.values(poolData)[0]);
     return <LoadingDots />;
   } else {
+    console.log("sending borrow", pool.getCustodyAccount(positionToken));
     return (
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">
@@ -134,9 +189,7 @@ export function TradePosition(props: Props) {
             setLastChanged(Input.Pay);
           }}
           onSelectToken={setPayToken}
-          tokenList={Object.keys(pool.tokens).map((token) => {
-            return tokenAddressToToken(token);
-          })}
+          tokenList={pool.getTokenList()}
         />
         <div className="mt-4 text-sm font-medium text-white">
           Your {props.side}
@@ -154,21 +207,19 @@ export function TradePosition(props: Props) {
             setPositionToken(token);
             router.push("/trade/" + token + "-USD");
           }}
-          tokenList={Object.keys(pool.tokens).map((token) => {
-            return tokenAddressToToken(token);
-          })}
+          liqRatio={0}
+          setLiquidity={null}
+          tokenList={pool.getTokenList()}
         />
         <div className="mt-4 text-xs text-zinc-400">Pool</div>
-        <PoolSelector
-          className="mt-2"
-          pool={pool}
-          onSelectPool={setPool}
-          pools={pools}
-        />
+        <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
         <LeverageSlider
           className="mt-6"
           value={leverage}
-          maxLeverage={50}
+          // maxLeverage={50}
+          maxLeverage={Number(
+            pool.getCustodyAccount(positionToken)?.pricing.maxLeverage
+          )}
           onChange={(e) => {
             if (lastChanged === Input.Pay) {
               setPositionAmount(payAmount * e);
@@ -195,31 +246,16 @@ export function TradePosition(props: Props) {
           positionToken={positionToken}
           entryPrice={entryPrice}
           liquidationPrice={liquidationPrice}
-          fees={pool.getFees()}
+          fees={fee}
           availableLiquidity={pool.getLiquidities(stats)}
           borrowRate={
-            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
-            0
+            Number(
+              pool.getCustodyAccount(positionToken)?.borrowRateState.currentRate
+            ) /
+            10 ** 9
           }
           side={props.side}
         />
-        {/* <TradePositionDetails
-          availableLiquidity={pool.getLiquidities(stats)}
-          borrowFee={
-            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
-            0
-          }
-          className={twMerge(
-            "-mb-4",
-            "-mx-4",
-            "bg-zinc-900",
-            "mt-4",
-            "pb-5",
-            "pt-4",
-            "px-4"
-          )}
-          side={props.side}
-        /> */}
       </div>
     );
   }

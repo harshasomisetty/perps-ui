@@ -1,45 +1,34 @@
 import { twMerge } from "tailwind-merge";
-import { cloneElement, useEffect, useState } from "react";
+import { cloneElement, useState } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 
-import { getTokenAddress, getTokenIcon, getTokenLabel } from "@/lib/Token";
+import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
-import { PositionValueDelta } from "./PositionValueDelta";
-import { Position, Side } from "@/lib/Position";
-import { getLiquidationPrice, getPnl } from "src/actions/getPrices";
-import { usePools } from "@/hooks/usePools";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { formatNumberCommas } from "@/utils/formatters";
+import { Side } from "@/lib/types";
+import { PositionAccount } from "@/lib/PositionAccount";
 
 interface Props {
   className?: string;
   expanded?: boolean;
-  position: Position;
+  position: PositionAccount;
+  pnl: number;
+  liqPrice: number;
   onClickExpand?(): void;
 }
 
 export function PositionInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
-
-  const { pools } = usePools();
   const stats = useDailyPriceStats(props.position.token);
 
-  const { publicKey, signTransaction, wallet } = useWallet();
-  const { connection } = useConnection();
-
-  const [pnl, setPnl] = useState(0);
-  const [liqPrice, setLiqPrice] = useState(0);
-
-  // use effect get liq price
-
-  function getNetValue() {
+  function getNetValue(): number {
     // let netValue = 0
-    let collateral = props.position.collateralUsd;
+    let collateral = props.position.getCollateralUsd();
 
     // if (props.position.side === Side.Buy) {
     //   netValue = props.position.size * props.position.entryPrice;
@@ -47,11 +36,10 @@ export function PositionInfo(props: Props) {
     //   netValue = props.position.size * props.position.entryPrice * -1;
     // }
 
-    console.log("net value", collateral, pnl, collateral + pnl);
-    return collateral + pnl;
+    // console.log("net value", collateral, pnl, collateral + pnl);
+    return Number(props.position.getCollateralUsd()) + props.pnl;
   }
-  // TODO get mark price
-  console.log("stats full", stats);
+
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
       <PositionColumn num={1}>
@@ -83,7 +71,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={2}>
         <div className="text-sm text-white">
-          {props.position.leverage.toFixed(2)}x
+          {props.position.getLeverage()}x
         </div>
         <div
           className={twMerge(
@@ -119,7 +107,7 @@ export function PositionInfo(props: Props) {
       <PositionColumn num={4}>
         <div className="flex items-center">
           <div className="text-sm text-white">
-            ${formatNumberCommas(props.position.collateralUsd)}
+            ${formatNumberCommas(props.position.getCollateralUsd())}
           </div>
           <button className="group ml-2">
             <EditIcon
@@ -136,7 +124,7 @@ export function PositionInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={5}>
         <div className="text-sm text-white">
-          ${formatNumberCommas(props.position.entryPrice)}
+          ${formatNumberCommas(props.position.getPrice())}
         </div>
       </PositionColumn>
       <PositionColumn num={6}>
@@ -147,18 +135,13 @@ export function PositionInfo(props: Props) {
       <PositionColumn num={7}>
         <div className="flex items-center justify-between pr-2">
           <div className="text-sm text-white">
-            ${formatNumberCommas(liqPrice)}
+            ${formatNumberCommas(props.liqPrice)}
           </div>
           <div className="flex items-center space-x-2">
-            {/* <button className="text-white" onClick={liqPrice}>
-              liq
-            </button> */}
             <a
               target="_blank"
               rel="noreferrer"
-              href={`${ACCOUNT_URL(
-                props.position.positionAccountAddress.toString()
-              )}`}
+              href={`${ACCOUNT_URL(props.position.address.toString())}`}
             >
               <NewTab className="fill-white" />
             </a>

@@ -3,7 +3,7 @@ import CloseIcon from "@carbon/icons-react/lib/Close";
 import { cloneElement } from "react";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token, getTokenLabel, getTokenIcon, TOKEN_LIST } from "@/lib/Token";
+import { TokenE, getTokenLabel, getTokenIcon, TOKEN_LIST } from "@/lib/Token";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -16,8 +16,8 @@ function formatNumber(num: number) {
 interface Props {
   className?: string;
   onClose?(): void;
-  onSelectToken?(token: Token): void;
-  tokenList?: Token[];
+  onSelectToken?(token: TokenE): void;
+  tokenList?: TokenE[];
 }
 
 export function TokenSelectorList(props: Props) {

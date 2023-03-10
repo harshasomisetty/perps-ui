@@ -1,11 +1,8 @@
-import { Pool } from "@/lib/Pool";
-import { Side, TradeSide } from "@/lib/Position";
-import { getTokenAddress, Token } from "@/lib/Token";
+import { TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
-  perpetualsAddress,
-  PERPETUALS_PROGRAM_ID,
-  transferAuthorityAddress,
+  PERPETUALS_ADDRESS,
+  TRANSFER_AUTHORITY,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -25,15 +22,19 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import { Side, TradeSide } from "@/lib/types";
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 
 export async function openPosition(
-  pool: Pool,
   wallet: Wallet,
   publicKey: PublicKey,
-  signTransaction,
+  signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
-  payToken: Token,
-  positionToken: Token,
+  pool: PoolAccount,
+  payCustody: CustodyAccount,
+  positionCustody: CustodyAccount,
   payAmount: BN,
   positionAmount: BN,
   price: BN,
@@ -47,53 +48,43 @@ export async function openPosition(
       ? price.mul(new BN(115)).div(new BN(100))
       : price.mul(new BN(90)).div(new BN(100));
 
-  console.log(
-    "inputs",
-    Number(payAmount),
-    Number(positionAmount),
-    Number(price),
-    Number(newPrice),
-    payToken,
-    side,
-    side.toString()
-  );
-
   console.log("pool", pool);
 
+  console.log("position custo", positionCustody.getTokenE());
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
-    pool.tokens[getTokenAddress(payToken)]?.mintAccount,
+    positionCustody.mint,
     publicKey
   );
+
+  console.log("user custody token account", userCustodyTokenAccount.toString());
 
   // check if usercustodytoken account exists
   if (!(await checkIfAccountExists(userCustodyTokenAccount, connection))) {
     console.log("user custody token account does not exist");
   }
 
-  console.log("tokens", payToken, positionToken);
+  // console.log("tokens", payToken, positionToken);
   let positionAccount = findProgramAddressSync(
     [
-      "position",
+      Buffer.from("position"),
       publicKey.toBuffer(),
-      pool.poolAddress.toBuffer(),
-      pool.tokens[getTokenAddress(payToken)]?.custodyAccount.toBuffer(),
+      pool.address.toBuffer(),
+      positionCustody.address.toBuffer(),
+      // @ts-ignore
       side.toString() == "Long" ? [1] : [2],
     ],
     perpetual_program.programId
   )[0];
 
-  // console.log(
-  //   "left and right",
-  //   positionAccount.toString(),
-  //   "ALxjVHPdhi7LCoVc2CUbVvPFmnWWCcnNcNAQ4emPg2tz"
-  // );
+  console.log("pos accoutn", positionAccount.toString());
 
   let transaction = new Transaction();
+  // TODO SWAP IF PAY != POSITION TOKEN
 
   try {
     // wrap sol if needed
-    if (payToken == Token.SOL) {
-      console.log("pay token name is sol", payToken);
+    if (positionCustody.getTokenE() == TokenE.SOL) {
+      console.log("pay token name is sol");
 
       const associatedTokenAccount = await getAssociatedTokenAddress(
         NATIVE_MINT,
@@ -143,20 +134,28 @@ export async function openPosition(
       .accounts({
         owner: publicKey,
         fundingAccount: userCustodyTokenAccount,
-        transferAuthority: transferAuthorityAddress,
-        perpetuals: perpetualsAddress,
-        pool: pool.poolAddress,
+        transferAuthority: TRANSFER_AUTHORITY,
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
         position: positionAccount,
-        custody: pool.tokens[getTokenAddress(payToken)]?.custodyAccount,
-        custodyOracleAccount:
-          pool.tokens[getTokenAddress(payToken)]?.oracleAccount,
-        custodyTokenAccount:
-          pool.tokens[getTokenAddress(payToken)]?.tokenAccount,
+        custody: positionCustody.address,
+        custodyOracleAccount: positionCustody.oracle.oracleAccount,
+        custodyTokenAccount: positionCustody.tokenAccount,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .transaction();
     transaction = transaction.add(tx);
+
+    console.log("open pos tx", transaction);
+    console.log("tx keys");
+    // for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
+    //   console.log(
+    //     "key",
+    //     i,
+    //     transaction.instructions[0]!.keys[i]?.pubkey.toString()
+    //   );
+    // }
 
     await manualSendTransaction(
       transaction,

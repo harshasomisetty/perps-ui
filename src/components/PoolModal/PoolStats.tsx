@@ -1,53 +1,37 @@
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Pool, PoolObj } from "@/lib/Pool";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useEffect } from "react";
+import { getMint, Mint } from "@solana/spl-token";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { checkIfAccountExists } from "@/utils/retrieveData";
+import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
 import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { LoadingSpinner } from "../Icons/LoadingSpinner";
 
 interface Props {
-  pool: Pool;
+  pool: PoolAccount;
   className?: string;
 }
 
 export default function PoolStats(props: Props) {
   const stats = useDailyPriceStats();
-
-  const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
 
   const { userLpTokens } = useUserData();
 
-  function getLiquidityBalance(pool: PoolObj): number {
-    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
+  const [lpMint, setLpMint] = useState<Mint | null>(null);
 
-    let userLiquidity = (userLpBalance / lpSupply) * pool.getLiquidities(stats);
+  useEffect(() => {
+    (async () => {
+      const lpData = await getMint(connection, props.pool.getLpTokenMint());
+      setLpMint(lpData);
+    })();
+    // @ts-ignore
+  }, []);
 
-    if (Number.isNaN(userLiquidity)) {
-      return 0;
-    }
-
-    return userLiquidity;
-  }
-
-  function getLiquidityShare(pool: PoolObj): number {
-    let userLpBalance = userLpTokens[pool.poolAddress.toString()];
-    let lpSupply = pool.lpSupply / 10 ** pool.lpDecimals;
-
-    let userShare = (userLpBalance / lpSupply) * 100;
-
-    if (Number.isNaN(userShare)) {
-      return 0;
-    }
-    return userShare;
-  }
-
-  if (Object.keys(stats).length === 0) {
-    return <>Loading stats</>;
+  if (Object.keys(stats).length === 0 || lpMint === null) {
+    return <LoadingSpinner className="absolute text-4xl" />;
   } else {
     return (
       <div
@@ -87,11 +71,15 @@ export default function PoolStats(props: Props) {
           },
           {
             label: "Your Liquidity",
-            value: `$${formatNumberCommas(getLiquidityBalance(props.pool))}`,
+            value: `$${formatNumberCommas(
+              getLiquidityBalance(props.pool, userLpTokens, stats)
+            )}`,
           },
           {
             label: "Your Share",
-            value: `${formatNumberCommas(getLiquidityShare(props.pool))}%`,
+            value: `${formatNumberCommas(
+              Number(getLiquidityShare(props.pool, userLpTokens))
+            )}%`,
           },
         ].map(({ label, value }, i) => (
           <div

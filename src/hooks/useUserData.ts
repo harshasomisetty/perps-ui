@@ -1,12 +1,11 @@
-import { useUserStore } from "@/stores/userStore";
-import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { useGlobalStore } from "@/stores/store";
 import { fetchLPBalance } from "@/utils/retrieveData";
-import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 
 export function useUserData() {
   const [userLpTokens, setUserLpTokens] = useState<Record<string, number>>({});
+  const poolData = useGlobalStore((state) => state.poolData);
 
   const { publicKey, wallet } = useWallet();
   const { connection } = useConnection();
@@ -17,20 +16,10 @@ export function useUserData() {
       return;
     }
 
-    let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
-
-    let fetchedPools = await perpetual_program.account.pool.all();
-
     let lpTokenAccounts: Record<string, number> = {};
-
-    let promises = fetchedPools.map(async (pool) => {
-      let lpTokenMint = findProgramAddressSync(
-        ["lp_token_mint", pool.publicKey.toBuffer()],
-        perpetual_program.programId
-      )[0];
-
-      lpTokenAccounts[pool.publicKey.toString()] = await fetchLPBalance(
-        lpTokenMint,
+    let promises = Object.values(poolData).map(async (pool) => {
+      lpTokenAccounts[pool.address.toString()] = await fetchLPBalance(
+        pool.getLpTokenMint(),
         publicKey,
         connection
       );

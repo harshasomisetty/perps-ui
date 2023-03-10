@@ -1,20 +1,11 @@
 import { twMerge } from "tailwind-merge";
-
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { Token } from "@/lib/Token";
+import { TokenE } from "@/lib/Token";
 import { formatNumberCommas } from "@/utils/formatters";
-
-function formatNumber(number: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 4,
-    minimumFractionDigits: 0,
-  });
-  return formatter.format(number);
-}
 
 interface DailyStatsProps {
   className?: string;
-  token: Token;
+  token: TokenE;
 }
 
 export function DailyStats(props: DailyStatsProps) {

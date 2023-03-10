@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { getTokenId, Token, TOKEN_LIST } from "@/lib/Token";
+import { getTokenId, TokenE, TOKEN_LIST } from "@/lib/Token";
 
 interface Stats {
   change24hr: number;
@@ -9,14 +9,22 @@ interface Stats {
   low24hr: number;
 }
 
-export type AllStats = Record<Token, Stats>;
+export type GeckoStats = Record<TokenE, Stats>;
+
+type FetchedData = {
+  [key: string]: {
+    usd: number;
+    usd_24h_vol: number;
+    usd_24h_change: number;
+  };
+};
 
 const fetchAllStats = (() => {
-  let inFlight: null | Promise<AllStats> = null;
+  let inFlight: null | Promise<GeckoStats> = null;
 
   // TODO fix this firstData fetching hack when going to trading view
 
-  let firstData;
+  let firstData: GeckoStats;
 
   return () => {
     if (inFlight) {
@@ -31,22 +39,23 @@ const fetchAllStats = (() => {
       )}&vs_currencies=USD&include_24hr_vol=true&include_24hr_change=true`
     )
       .then((resp) => resp.json())
-      .then((data) => {
+      .then((data: FetchedData) => {
         if (!firstData) {
           firstData = data;
         }
+        // console.log("data", data);
         const allStats = TOKEN_LIST.reduce((acc, token) => {
           const tokenData = data[getTokenId(token)];
 
           acc[token] = {
-            change24hr: tokenData.usd_24h_change,
-            currentPrice: tokenData.usd,
+            change24hr: tokenData!.usd_24h_change,
+            currentPrice: tokenData!.usd,
             high24hr: 0,
             low24hr: 0,
           };
 
           return acc;
-        }, {} as AllStats);
+        }, {} as GeckoStats);
 
         inFlight = null;
 
@@ -56,9 +65,9 @@ const fetchAllStats = (() => {
         console.log("caught data fetching error");
         let data = firstData;
         const allStats = TOKEN_LIST.reduce((acc, token) => {
-          console.log("fetching data all stats");
-          console.log("token", token);
-          console.log("data", data);
+          // console.log("fetching data all stats");
+          // console.log("token", token);
+          // console.log("data", data);
           const tokenData = data[getTokenId(token)];
 
           acc[token] = {
@@ -69,7 +78,7 @@ const fetchAllStats = (() => {
           };
 
           return acc;
-        }, {} as AllStats);
+        }, {} as GeckoStats);
 
         inFlight = null;
 
@@ -80,12 +89,12 @@ const fetchAllStats = (() => {
   };
 })();
 
-export function useDailyPriceStats(): AllStats;
-export function useDailyPriceStats(token: Token): Stats;
-export function useDailyPriceStats(token?: Token) {
+export function useDailyPriceStats(): GeckoStats;
+export function useDailyPriceStats(token: TokenE): Stats;
+export function useDailyPriceStats(token?: TokenE) {
   const timer = useRef<number | null>(null);
 
-  const [allStats, setAllStats] = useState<Partial<AllStats>>({});
+  const [allStats, setAllStats] = useState<Partial<GeckoStats>>({});
 
   useEffect(() => {
     if (typeof window !== "undefined") {
