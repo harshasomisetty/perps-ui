@@ -18,9 +18,9 @@ interface Props {
 }
 
 export function TradeDetails(props: Props) {
-  console.log("props in trade details", props);
-
   const icon = getTokenIcon(props.positionToken);
+
+  console.log("borrow rate", props.borrowRate);
   return (
     <div className={props.className}>
       <header className="mb-4 flex items-center">
@@ -44,17 +44,17 @@ export function TradeDetails(props: Props) {
           },
           {
             label: "Liq. Price",
-            value: `-`,
+            value: `$${formatNumber(props.liquidationPrice)}`,
           },
           {
             label: "Fees",
-            value: `-`,
+            value: `$${formatNumber(props.fees)}`,
           },
           {
             label: "Borrow Rate",
             value: (
               <>
-                {`${formatFees(props.borrowRate)}% `}
+                {`${formatFees(100 * props.borrowRate)}% / hr`}
                 <span className="text-zinc-500"> </span>
               </>
             ),

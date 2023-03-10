@@ -74,7 +74,8 @@ export default function SinglePoolTokens(props: Props) {
                       $
                       {formatNumberCommas(
                         stats[token].currentPrice *
-                          (Number(custody.assets.owned) /
+                          ((Number(custody.assets.owned) -
+                            Number(custody.assets.locked)) /
                             10 ** custody.decimals)
                       )}
                     </td>

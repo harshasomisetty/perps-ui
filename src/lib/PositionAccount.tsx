@@ -57,7 +57,7 @@ export class PositionAccount {
   }
 
   getLeverage(): number {
-    return this.sizeUsd.toNumber() / this.collateralUsd.toNumber();
+    return (this.sizeUsd.toNumber() / this.collateralUsd.toNumber()).toFixed(3);
   }
 
   // TODO fix getTimestamp to proper date

@@ -18,11 +18,13 @@ import { IdlCoder } from "@/utils/IdlCoder";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PositionAccount } from "@/lib/PositionAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
+import { Side } from "@/lib/types";
 
 export type PositionSide = "long" | "short";
 
 export interface PriceAndFee {
-  price: BN;
+  liquidationPrice: BN;
+  entryPrice: BN;
   fee: BN;
 }
 
@@ -112,37 +114,39 @@ export class ViewHelper {
   getEntryPriceAndFee = async (
     collateral: BN,
     size: BN,
-    side: PositionSide,
+    side: Side,
     pool: PoolAccount,
-    custodyKey: CustodyAccount
+    custody: CustodyAccount
   ): Promise<PriceAndFee> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
     // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+    console.log("side", side);
 
     let transaction: Transaction = await program.methods
       // @ts-ignore
       .getEntryPriceAndFee({
         collateral,
         size,
-        side: side === "long" ? { long: {} } : { short: {} },
+        side: side === "Long" ? { long: {} } : { short: {} },
       })
       .accounts({
         perpetuals: PERPETUALS_ADDRESS,
-        pool: poolKey,
-        custody: custodyKey,
-        custodyOracleAccount:
-          PoolConfig.getCustodyConfig(custodyKey)?.oracleAddress,
+        pool: pool.address,
+        custody: custody.address,
+        custodyOracleAccount: custody.oracle.oracleAccount,
       })
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
+    console.log("got entry result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getEntryPriceAndFee"
     );
     const res: any = this.decodeLogs(result, index);
 
     return {
-      price: res.price,
+      liquidationPrice: res.liquidationPrice,
+      entryPrice: res.entryPrice,
       fee: res.fee,
     };
   };

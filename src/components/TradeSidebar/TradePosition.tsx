@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
@@ -10,7 +10,6 @@ import { TradeDetails } from "./TradeDetails";
 import { SolidButton } from "../SolidButton";
 import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
-import { Tab } from ".";
 import { openPosition } from "src/actions/openPosition";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
@@ -19,10 +18,13 @@ import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
+import { Side } from "@/lib/types";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
 
 interface Props {
   className?: string;
-  side: Tab;
+  side: Side;
 }
 
 enum Input {
@@ -48,10 +50,16 @@ export function TradePosition(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
   const [pool, setPool] = useState<PoolAccount | null>(null);
 
+  const [entryPrice, setEntryPrice] = useState(0);
+  const [liquidationPrice, setLiquidationPrice] = useState(0);
+  const [fee, setFee] = useState(0);
+
   const stats = useDailyPriceStats();
   const router = useRouter();
 
   const { pair } = router.query;
+
+  const timeoutRef = useRef(null);
 
   async function handleTrade() {
     const payCustody = pool?.getCustodyAccount(payToken);
@@ -93,8 +101,53 @@ export function TradePosition(props: Props) {
     }
   }, [connection, payToken, publicKey]);
 
-  const entryPrice = stats[payToken]?.currentPrice * payAmount || 0;
-  const liquidationPrice = entryPrice * leverage;
+  useEffect(() => {
+    async function fetchData() {
+      let { provider } = await getPerpetualProgramAndProvider(wallet as any);
+
+      const View = new ViewHelper(connection, provider);
+
+      console.log("in get entry");
+
+      let getEntryPrice = await View.getEntryPriceAndFee(
+        new BN(payAmount * LAMPORTS_PER_SOL),
+        new BN(positionAmount * LAMPORTS_PER_SOL),
+        props.side,
+        pool,
+        pool?.getCustodyAccount(positionToken)
+      );
+
+      console.log("get entry", getEntryPrice);
+
+      setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
+      setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);
+      setFee(Number(getEntryPrice.fee) / 10 ** 9);
+    }
+    console.log(
+      "in fetching entry outside",
+      pool,
+      payAmount,
+      positionAmount,
+      props.side
+    );
+    if (pool && payAmount && positionAmount && props.side) {
+      console.log("about to actually fetch");
+
+      // clear previous timeout, if it exists
+      clearTimeout(timeoutRef.current);
+
+      // set a new timeout to execute after 5 seconds
+      timeoutRef.current = setTimeout(() => {
+        fetchData();
+      }, 1000);
+    }
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
+  }, [wallet, pool, payAmount, positionAmount, props.side]);
+
+  // const entryPrice = stats[payToken]?.currentPrice * payAmount || 0;
+  // const liquidationPrice = entryPrice * leverage;
 
   if (!pair) {
     return <p>Pair not loaded</p>;
@@ -105,9 +158,11 @@ export function TradePosition(props: Props) {
   } else if (pool === null) {
     // console.log("setting pool", poolData);
     // @ts-ignore
+    console.log("all pools", Object.values(poolData));
     setPool(Object.values(poolData)[0]);
     return <LoadingDots />;
   } else {
+    console.log("sending borrow", pool.getCustodyAccount(positionToken));
     return (
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">
@@ -161,10 +216,10 @@ export function TradePosition(props: Props) {
         <LeverageSlider
           className="mt-6"
           value={leverage}
-          maxLeverage={50}
-          // maxLeverage={Number(
-          //   pool.getCustodyAccount(positionToken)?.pricing.maxLeverage
-          // )}
+          // maxLeverage={50}
+          maxLeverage={Number(
+            pool.getCustodyAccount(positionToken)?.pricing.maxLeverage
+          )}
           onChange={(e) => {
             if (lastChanged === Input.Pay) {
               setPositionAmount(payAmount * e);
@@ -191,31 +246,16 @@ export function TradePosition(props: Props) {
           positionToken={positionToken}
           entryPrice={entryPrice}
           liquidationPrice={liquidationPrice}
-          fees={pool.getFees()}
+          fees={fee}
           availableLiquidity={pool.getLiquidities(stats)}
           borrowRate={
-            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
-            0
+            Number(
+              pool.getCustodyAccount(positionToken)?.borrowRateState.currentRate
+            ) /
+            10 ** 9
           }
           side={props.side}
         />
-        {/* <TradePositionDetails
-          availableLiquidity={pool.getLiquidities(stats)}
-          borrowFee={
-            // pool.tokens[getTokenAddress(positionToken)]?.rate.currentRate
-            0
-          }
-          className={twMerge(
-            "-mb-4",
-            "-mx-4",
-            "bg-zinc-900",
-            "mt-4",
-            "pb-5",
-            "pt-4",
-            "px-4"
-          )}
-          side={props.side}
-        /> */}
       </div>
     );
   }

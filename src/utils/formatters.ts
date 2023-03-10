@@ -34,8 +34,8 @@ export function formatPrice(num: number) {
 
 export function formatFees(num: number) {
   const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 4,
-    minimumFractionDigits: 2,
+    maximumFractionDigits: 5,
+    minimumFractionDigits: 3,
   });
   return formatter.format(num);
 }

@@ -1203,7 +1203,7 @@
         }
       ],
       "returns": {
-        "defined": "PriceAndFee"
+        "defined": "NewPositionPricesAndFee"
       }
     },
     {
@@ -2799,6 +2799,26 @@
         "fields": [
           {
             "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewPositionPricesAndFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "entryPrice",
+            "type": "u64"
+          },
+          {
+            "name": "liquidationPrice",
             "type": "u64"
           },
           {

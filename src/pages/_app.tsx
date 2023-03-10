@@ -7,10 +7,20 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
+  BackpackWalletAdapter,
+  BraveWalletAdapter,
+  CloverWalletAdapter,
+  CoinbaseWalletAdapter,
+  ExodusWalletAdapter,
+  GlowWalletAdapter,
+  HuobiWalletAdapter,
   LedgerWalletAdapter,
   PhantomWalletAdapter,
   SlopeWalletAdapter,
+  SolletWalletAdapter,
+  SolongWalletAdapter,
   TorusWalletAdapter,
+  TrustWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import { AppProps } from "next/app";
@@ -62,6 +72,16 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
       new SlopeWalletAdapter(),
       new TorusWalletAdapter(),
       new LedgerWalletAdapter(),
+      new BackpackWalletAdapter(),
+      new BraveWalletAdapter(),
+      new CloverWalletAdapter(),
+      new CoinbaseWalletAdapter(),
+      new ExodusWalletAdapter(),
+      new GlowWalletAdapter(),
+      new HuobiWalletAdapter(),
+      new SolletWalletAdapter(),
+      new SolongWalletAdapter(),
+      new TrustWalletAdapter(),
     ],
     []
   );

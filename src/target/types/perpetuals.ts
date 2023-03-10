@@ -1203,7 +1203,7 @@ export type Perpetuals = {
         }
       ],
       "returns": {
-        "defined": "PriceAndFee"
+        "defined": "NewPositionPricesAndFee"
       }
     },
     {
@@ -2809,6 +2809,26 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "NewPositionPricesAndFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "entryPrice",
+            "type": "u64"
+          },
+          {
+            "name": "liquidationPrice",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "SwapAmountAndFees",
       "type": {
         "kind": "struct",
@@ -4340,7 +4360,7 @@ export const IDL: Perpetuals = {
         }
       ],
       "returns": {
-        "defined": "PriceAndFee"
+        "defined": "NewPositionPricesAndFee"
       }
     },
     {
@@ -5936,6 +5956,26 @@ export const IDL: Perpetuals = {
         "fields": [
           {
             "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewPositionPricesAndFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "entryPrice",
+            "type": "u64"
+          },
+          {
+            "name": "liquidationPrice",
             "type": "u64"
           },
           {

@@ -34,30 +34,32 @@ export async function getPoolData(
   let poolObjs: Record<string, PoolAccount> = {};
 
   await Promise.all(
-    Object.values(fetchedPools).map(async (pool: FetchPool) => {
-      let lpTokenMint = findProgramAddressSync(
-        [Buffer.from("lp_token_mint"), pool.publicKey.toBuffer()],
-        perpetual_program.programId
-      )[0];
+    Object.values(fetchedPools)
+      .sort((a, b) => a.account.name.localeCompare(b.account.name))
+      .map(async (pool: FetchPool) => {
+        let lpTokenMint = findProgramAddressSync(
+          [Buffer.from("lp_token_mint"), pool.publicKey.toBuffer()],
+          perpetual_program.programId
+        )[0];
 
-      const lpData = await getMint(provider.connection, lpTokenMint);
+        const lpData = await getMint(provider.connection, lpTokenMint);
 
-      let poolData: Pool = {
-        name: pool.account.name,
-        tokens: pool.account.tokens,
-        aumUsd: pool.account.aumUsd,
-        bump: pool.account.bump,
-        lpTokenBump: pool.account.lpTokenBump,
-        inceptionTime: pool.account.inceptionTime,
-      };
+        let poolData: Pool = {
+          name: pool.account.name,
+          tokens: pool.account.tokens,
+          aumUsd: pool.account.aumUsd,
+          bump: pool.account.bump,
+          lpTokenBump: pool.account.lpTokenBump,
+          inceptionTime: pool.account.inceptionTime,
+        };
 
-      poolObjs[pool.publicKey.toString()] = new PoolAccount(
-        poolData,
-        custodyInfos,
-        pool.publicKey,
-        lpData
-      );
-    })
+        poolObjs[pool.publicKey.toString()] = new PoolAccount(
+          poolData,
+          custodyInfos,
+          pool.publicKey,
+          lpData
+        );
+      })
   );
 
   return poolObjs;
