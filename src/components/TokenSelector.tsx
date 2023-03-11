@@ -5,6 +5,7 @@ import { cloneElement, useState } from "react";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { TokenE, getTokenIcon } from "@/lib/Token";
 import { TokenSelectorList } from "./TokenSelectorList";
+import { SolidButton } from "./SolidButton";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -49,6 +50,7 @@ interface Props {
   liqRatio: number;
   setLiquidity?: (amount: number) => void;
   tokenList?: TokenE[];
+  maxBalance?: number;
 }
 
 export function TokenSelector(props: Props) {
@@ -90,16 +92,34 @@ export function TokenSelector(props: Props) {
           props.className
         )}
       >
-        <button
-          className="group flex items-center"
-          onClick={() => setSelectorOpen(true)}
-        >
-          {cloneElement(getTokenIcon(props.token), {
-            className: "h-6 rounded-full w-6",
-          })}
-          <div className="ml-1 text-2xl text-white">{props.token}</div>
-          <ChevronRightIcon className="ml-2 fill-gray-500 transition-colors group-hover:fill-white" />
-        </button>
+        <div className="flex items-center">
+          <button
+            className="group flex items-center"
+            onClick={() => setSelectorOpen(true)}
+          >
+            {cloneElement(getTokenIcon(props.token), {
+              className: "h-6 rounded-full w-6",
+            })}
+            <div className="ml-1 text-2xl text-white">{props.token}</div>
+            <ChevronRightIcon className="ml-2 fill-gray-500 transition-colors group-hover:fill-white" />
+          </button>
+          {props.maxBalance && (
+            <button
+              className={twMerge(
+                "h-min",
+                "w-min",
+                "bg-purple-500",
+                "rounded",
+                "py-1",
+                "px-2",
+                "text-white"
+              )}
+              onClick={() => props.onChangeAmount(props.maxBalance)}
+            >
+              Max
+            </button>
+          )}
+        </div>
         <div>
           <input
             className={twMerge(
@@ -133,7 +153,7 @@ export function TokenSelector(props: Props) {
               // )
 
               // TODO liquidity should be subtract fees
-              console.log("liq ration", props.liqRatio);
+              // console.log("liq ration", props.liqRatio);
 
               props.setLiquidity?.(
                 Number(
@@ -146,6 +166,7 @@ export function TokenSelector(props: Props) {
               );
             }}
           />
+          {/* <p>test</p> */}
           {!!stats[props.token]?.currentPrice && (
             <div className="mt-0.5 text-right text-xs text-zinc-500">
               {formatNumber(props.amount * stats[props.token].currentPrice)}

@@ -189,6 +189,7 @@ export function TradePosition(props: Props) {
           }}
           onSelectToken={setPayToken}
           tokenList={pool.getTokenList()}
+          maxBalance={payTokenBalance}
         />
         <div className="mt-4 text-sm font-medium text-white">
           Your {props.side}

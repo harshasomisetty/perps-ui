@@ -163,6 +163,7 @@ export default function LiquidityCard(props: Props) {
               liqRatio={liqRatio}
               setLiquidity={setLiqAmount}
               tokenList={props.pool.getTokenList()}
+              maxBalance={payTokenBalance}
             />
           ) : (
             <LpSelector
