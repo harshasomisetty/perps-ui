@@ -98,7 +98,7 @@ export function getSymbol(token: TokenE) {
     case TokenE.stSOL:
       return "STSOLUSDT";
     case TokenE.TEST:
-      return "BTCUSD";
+      return "LTCUSD";
   }
 }
 

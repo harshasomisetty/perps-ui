@@ -30,3 +30,7 @@ export function getPoolSortedPositions(
 
   return sortedPositions;
 }
+
+export function countDictList(dict: Record<string, any[]>) {
+  return Object.values(dict).reduce((acc, val) => acc + val.length, 0);
+}

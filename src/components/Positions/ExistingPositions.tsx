@@ -11,7 +11,7 @@ interface Props {
   positions: PositionAccount[];
 }
 
-export function ExistingPosition(props: Props) {
+export function ExistingPositions(props: Props) {
   console.log("existingPositoins", props);
   return (
     <div className="mb-4">

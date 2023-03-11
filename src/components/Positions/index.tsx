@@ -1,9 +1,9 @@
 import { LoadingDots } from "../LoadingDots";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { ExistingPosition } from "./ExistingPosition";
+import { ExistingPositions } from "./ExistingPositions";
 import { NoPositions } from "./NoPositions";
 import { useGlobalStore } from "@/stores/store";
-import { getPoolSortedPositions } from "@/utils/organizers";
+import { countDictList, getPoolSortedPositions } from "@/utils/organizers";
 import { LoadingSpinner } from "../Icons/LoadingSpinner";
 
 interface Props {
@@ -20,6 +20,15 @@ export function Positions(props: Props) {
   }
 
   const positions = getPoolSortedPositions(positionData, publicKey!);
+
+  console.log(
+    "postion data",
+    positionData.status,
+    Object.values(positionData.data).length,
+    positionData.data,
+    "owner",
+    Object.values(positions)
+  );
 
   if (!publicKey) {
     return (
@@ -41,15 +50,13 @@ export function Positions(props: Props) {
           <LoadingDots className="text-white" />
         )}
       </header>
-      {positionData.status === "success" &&
+      {positionData.status === "success" && countDictList(positions) > 0 ? (
         Object.entries(positions).map(([pool, positions]) => {
-          return <ExistingPosition positions={positions} key={pool} />;
-        })}
-
-      {positionData.status != "success" ||
-        (Object.values(positionData.data).length === 0 && (
-          <NoPositions emptyString="No Open Positions" />
-        ))}
+          return <ExistingPositions positions={positions} key={pool} />;
+        })
+      ) : (
+        <NoPositions emptyString="No Open Positions" />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
-import { ExistingPosition } from "@/components/Positions/ExistingPosition";
+import { ExistingPositions } from "@/components/Positions/ExistingPositions";
 import { NoPositions } from "@/components/Positions/NoPositions";
 import { useGlobalStore } from "@/stores/store";
 import { getPoolSortedPositions } from "@/utils/organizers";
@@ -22,7 +22,7 @@ export default function Admin(props: Props) {
       </header>
       {positionData.status === "success" &&
         Object.entries(positions).map(([pool, positions]) => {
-          return <ExistingPosition positions={positions} key={pool} />;
+          return <ExistingPositions positions={positions} key={pool} />;
         })}
 
       {positionData.status != "success" ||

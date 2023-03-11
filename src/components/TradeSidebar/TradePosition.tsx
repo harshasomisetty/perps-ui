@@ -107,7 +107,7 @@ export function TradePosition(props: Props) {
 
       const View = new ViewHelper(connection, provider);
 
-      console.log("in get entry");
+      // console.log("in get entry");
 
       let getEntryPrice = await View.getEntryPriceAndFee(
         new BN(payAmount * LAMPORTS_PER_SOL),
@@ -117,21 +117,21 @@ export function TradePosition(props: Props) {
         pool?.getCustodyAccount(positionToken)
       );
 
-      console.log("get entry", getEntryPrice);
+      // console.log("get entry", getEntryPrice);
 
       setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
       setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);
       setFee(Number(getEntryPrice.fee) / 10 ** 9);
     }
-    console.log(
-      "in fetching entry outside",
-      pool,
-      payAmount,
-      positionAmount,
-      props.side
-    );
+    // console.log(
+    //   "in fetching entry outside",
+    //   pool,
+    //   payAmount,
+    //   positionAmount,
+    //   props.side
+    // );
     if (pool && payAmount && positionAmount && props.side) {
-      console.log("about to actually fetch");
+      // console.log("about to actually fetch");
 
       // clear previous timeout, if it exists
       clearTimeout(timeoutRef.current);
@@ -156,13 +156,12 @@ export function TradePosition(props: Props) {
   if (Object.keys(poolData).length === 0) {
     return <LoadingDots />;
   } else if (pool === null) {
-    // console.log("setting pool", poolData);
     // @ts-ignore
-    console.log("all pools", Object.values(poolData));
+    // console.log("all pools", Object.values(poolData));
     setPool(Object.values(poolData)[0]);
     return <LoadingDots />;
   } else {
-    console.log("sending borrow", pool.getCustodyAccount(positionToken));
+    // console.log("sending borrow", pool.getCustodyAccount(positionToken));
     return (
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">

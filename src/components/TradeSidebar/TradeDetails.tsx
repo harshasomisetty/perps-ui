@@ -20,7 +20,6 @@ interface Props {
 export function TradeDetails(props: Props) {
   const icon = getTokenIcon(props.positionToken);
 
-  console.log("borrow rate", props.borrowRate);
   return (
     <div className={props.className}>
       <header className="mb-4 flex items-center">

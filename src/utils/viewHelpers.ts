@@ -65,7 +65,7 @@ export class ViewHelper {
     instructionNumber: number
   ): T {
     const returnPrefix = `Program return: ${PERPETUALS_PROGRAM_ID} `;
-    console.log("Data:", data);
+    // console.log("Data:", data);
     if (data.value.logs && data.value.err === null) {
       let returnLog = data.value.logs.find((l: any) =>
         l.startsWith(returnPrefix)
@@ -120,7 +120,7 @@ export class ViewHelper {
   ): Promise<PriceAndFee> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
     // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
-    console.log("side", side);
+    // console.log("side", side);
 
     let transaction: Transaction = await program.methods
       // @ts-ignore
@@ -138,7 +138,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    console.log("got entry result", result);
+    // console.log("got entry result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getEntryPriceAndFee"
     );
