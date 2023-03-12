@@ -4,10 +4,10 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
-import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { LoadingSpinner } from "../Icons/LoadingSpinner";
+import { useGlobalStore } from "@/stores/store";
 
 interface Props {
   pool: PoolAccount;
@@ -18,7 +18,7 @@ export default function PoolGeneralStats(props: Props) {
   const stats = useDailyPriceStats();
   const { connection } = useConnection();
 
-  const { userLpTokens } = useUserData();
+  const userData = useGlobalStore((state) => state.userData);
 
   const [lpMint, setLpMint] = useState<Mint | null>(null);
 
@@ -72,13 +72,22 @@ export default function PoolGeneralStats(props: Props) {
           {
             label: "Your Liquidity",
             value: `$${formatNumberCommas(
-              getLiquidityBalance(props.pool, userLpTokens, stats)
+              getLiquidityBalance(
+                props.pool,
+                userData.getUserLpBalance(props.pool.address.toString()),
+                stats
+              )
             )}`,
           },
           {
             label: "Your Share",
             value: `${formatNumberCommas(
-              Number(getLiquidityShare(props.pool, userLpTokens))
+              Number(
+                getLiquidityShare(
+                  props.pool,
+                  userData.getUserLpBalance(props.pool.address.toString())
+                )
+              )
             )}%`,
           },
         ].map(({ label, value }, i) => (

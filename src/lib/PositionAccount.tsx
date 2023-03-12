@@ -32,7 +32,7 @@ export class PositionAccount {
     address: PublicKey,
     custodies: Record<string, CustodyAccount>
   ) {
-    console.log("printing entier new consturcture", position.openTime);
+    // console.log("printing entier new consturcture", position.openTime);
     this.owner = position.owner;
     this.pool = position.pool;
     this.custody = position.custody;

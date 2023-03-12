@@ -10,7 +10,6 @@ interface Props {
 }
 
 export function TableHeader(props: Props) {
-  console.log("table header data", props.pool.getTokenList());
   return (
     <div className="flex flex-row space-x-1">
       {Object.keys(props.pool.tokens).length > 0 ? (

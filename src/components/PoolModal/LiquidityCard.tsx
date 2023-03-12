@@ -16,6 +16,9 @@ import AirdropButton from "../AirdropButton";
 import { getMint } from "@solana/spl-token";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { PoolAccount } from "@/lib/PoolAccount";
+import { useGlobalStore } from "@/stores/store";
+import { getCustodyData } from "@/hooks/storeHelpers/fetchCustodies";
+import { getPoolData } from "@/hooks/storeHelpers/fetchPools";
 
 interface Props {
   className?: string;
@@ -44,6 +47,14 @@ export default function LiquidityCard(props: Props) {
   const [payToken, setPayToken] = useState(props.pool.getTokenList()[0]);
 
   const stats = useDailyPriceStats();
+
+  // let poolData = useGlobalStore((state) => state.poolData);
+  const setPoolData = useGlobalStore((state) => state.setPoolData);
+  const setCustodyData = useGlobalStore((state) => state.setCustodyData);
+
+  const userData = useGlobalStore((state) => state.userData);
+
+  console.log("global user data ", userData);
 
   useEffect(() => {
     async function fetchData() {
@@ -89,6 +100,12 @@ export default function LiquidityCard(props: Props) {
       tab === Tab.Add ? tokenAmount : 0,
       tab === Tab.Remove ? liqAmount : 0
     );
+
+    const custodyData = await getCustodyData();
+    const poolData = await getPoolData(custodyData);
+
+    setCustodyData(custodyData);
+    setPoolData(poolData);
 
     // router.reload(window.location.pathname);
   }
