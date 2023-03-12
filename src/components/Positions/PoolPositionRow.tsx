@@ -1,22 +1,21 @@
 import { twMerge } from "tailwind-merge";
 import { useEffect, useState } from "react";
 
-import { PositionInfo } from "./PositionInfo";
-import { PositionAdditionalInfo } from "./PositionAdditionalInfo";
 import { PositionAccount } from "@/lib/PositionAccount";
-import { getLiquidationPrice } from "src/actions/getPrices";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { LoadingDots } from "../LoadingDots";
 import { useGlobalStore } from "@/stores/store";
-import { ProfitAndLoss, ViewHelper } from "@/utils/viewHelpers";
+import { ViewHelper } from "@/utils/viewHelpers";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { LoadingDots } from "@/components/LoadingDots";
+import { PositionAdditionalInfo } from "@/components/Positions/PositionAdditionalInfo";
+import PositionBasicInfo from "@/components/Positions/PositionBasicInfo";
 
 interface Props {
   className?: string;
   position: PositionAccount;
 }
 
-export function SinglePosition(props: Props) {
+export default function PoolPositionRow(props: Props) {
   const { connection } = useConnection();
   const { publicKey, signTransaction, wallet } = useWallet();
 
@@ -67,7 +66,7 @@ export function SinglePosition(props: Props) {
 
   return (
     <div className={twMerge(expanded && "bg-zinc-800", props.className)}>
-      <PositionInfo
+      <PositionBasicInfo
         className="transition-colors"
         expanded={expanded}
         position={props.position}

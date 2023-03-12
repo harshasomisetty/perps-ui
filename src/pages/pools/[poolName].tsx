@@ -3,8 +3,8 @@ import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 import { PoolLayout } from "@/components/Layouts/PoolLayout";
 import { TitleHeader } from "@/components/Molecules/PoolHeaders/TitleHeader";
 import LiquidityCard from "@/components/PoolModal/LiquidityCard";
-import PoolStats from "@/components/PoolModal/PoolStats";
-import SinglePoolTokens from "@/components/PoolModal/SinglePoolTokens";
+import PoolGeneralStats from "@/components/PoolModal/PoolGeneralStats";
+import PoolTokenStats from "@/components/PoolModal/PoolTokenStats";
 import { useGlobalStore } from "@/stores/store";
 import { useRouter } from "next/router";
 
@@ -28,8 +28,8 @@ export default function SinglePool() {
           />
         </div>
         <div className="flex w-full flex-col">
-          <PoolStats pool={pool!} className="mb-8" />
-          <SinglePoolTokens pool={pool!} />
+          <PoolGeneralStats pool={pool!} className="mb-8" />
+          <PoolTokenStats pool={pool!} />
         </div>
         <LiquidityCard pool={pool} />
       </PoolLayout>

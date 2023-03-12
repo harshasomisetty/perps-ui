@@ -5,13 +5,13 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { format } from "date-fns";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
-import { PositionValueDelta } from "./PositionValueDelta";
-import { SolidButton } from "../SolidButton";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useGlobalStore } from "@/stores/store";
 import { Side } from "@/lib/types";
 import { PositionAccount } from "@/lib/PositionAccount";
 import { formatPrice } from "@/utils/formatters";
+import { SolidButton } from "@/components/SolidButton";
+import { PositionValueDelta } from "@/components/Positions/PositionValueDelta";
 
 interface Props {
   className?: string;
@@ -30,6 +30,9 @@ export function PositionAdditionalInfo(props: Props) {
 
   const positionPool = poolData[props.position.pool.toString()]!;
   const positionCustody = custodyData[props.position.custody.toString()]!;
+
+  console.log("POisiton in additiaonl", props.position);
+  console.log("posiiton open time", props.position.getTimestamp());
 
   async function handleCloseTrade() {
     console.log("in close trade");

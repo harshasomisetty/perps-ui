@@ -22,7 +22,7 @@ interface Props {
   onClickExpand?(): void;
 }
 
-export function PositionInfo(props: Props) {
+export default function PositionBasicInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
   const stats = useDailyPriceStats(props.position.token);
 

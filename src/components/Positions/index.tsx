@@ -50,13 +50,7 @@ export function Positions(props: Props) {
           <LoadingDots className="text-white" />
         )}
       </header>
-      {positionData.status === "success" && countDictList(positions) > 0 ? (
-        Object.entries(positions).map(([pool, positions]) => {
-          return <ExistingPositions positions={positions} key={pool} />;
-        })
-      ) : (
-        <NoPositions emptyString="No Open Positions" />
-      )}
+      <ExistingPositions publicKey={publicKey} />
     </div>
   );
 }

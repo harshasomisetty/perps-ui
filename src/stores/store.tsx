@@ -12,7 +12,7 @@ interface StoreState {
   poolData: Record<string, PoolAccount>;
   setPoolData: (pool: Record<string, PoolAccount>) => void;
 
-  custodyData: Record<string, Custody>;
+  custodyData: Record<string, CustodyAccount>;
   setCustodyData: (custody: Record<string, CustodyAccount>) => void;
 }
 

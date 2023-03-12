@@ -13,7 +13,7 @@ export function getPoolSortedPositions(
     Object.values(positionData.data).length > 0
   ) {
     Object.values(positionData.data).forEach((position: PositionAccount) => {
-      console.log("in loop", position);
+      // console.log("in loop", position);
       if (user && position.owner.toBase58() !== user.toBase58()) {
         return;
       }

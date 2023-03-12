@@ -14,7 +14,7 @@ interface Props {
   pool: PoolAccount;
 }
 
-export default function SinglePoolTokens(props: Props) {
+export default function PoolTokenStats(props: Props) {
   const stats = useDailyPriceStats();
   let poolData = useGlobalStore((state) => state.poolData);
 

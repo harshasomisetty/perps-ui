@@ -14,7 +14,7 @@ interface Props {
   className?: string;
 }
 
-export default function PoolStats(props: Props) {
+export default function PoolGeneralStats(props: Props) {
   const stats = useDailyPriceStats();
   const { connection } = useConnection();
 

@@ -21,6 +21,7 @@ import { PoolAccount } from "@/lib/PoolAccount";
 import { Side } from "@/lib/types";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
+import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
 
 interface Props {
   className?: string;
@@ -50,6 +51,9 @@ export function TradePosition(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
   const [pool, setPool] = useState<PoolAccount | null>(null);
 
+  const custodyData = useGlobalStore((state) => state.custodyData);
+  const setPositionData = useGlobalStore((state) => state.setPositionData);
+
   const [entryPrice, setEntryPrice] = useState(0);
   const [liquidationPrice, setLiquidationPrice] = useState(0);
   const [fee, setFee] = useState(0);
@@ -78,6 +82,8 @@ export function TradePosition(props: Props) {
       new BN(stats[payToken]?.currentPrice * 10 ** 6),
       props.side
     );
+    const positionInfos = await getPositionData(custodyData);
+    setPositionData(positionInfos);
     // fetchPositions();
   }
 
@@ -107,33 +113,20 @@ export function TradePosition(props: Props) {
 
       const View = new ViewHelper(connection, provider);
 
-      // console.log("in get entry");
-
       let getEntryPrice = await View.getEntryPriceAndFee(
         new BN(payAmount * LAMPORTS_PER_SOL),
         new BN(positionAmount * LAMPORTS_PER_SOL),
         props.side,
-        pool,
-        pool?.getCustodyAccount(positionToken)
+        pool!,
+        pool!.getCustodyAccount(positionToken)!
       );
-
-      // console.log("get entry", getEntryPrice);
 
       setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
       setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);
       setFee(Number(getEntryPrice.fee) / 10 ** 9);
     }
-    // console.log(
-    //   "in fetching entry outside",
-    //   pool,
-    //   payAmount,
-    //   positionAmount,
-    //   props.side
-    // );
-    if (pool && payAmount && positionAmount && props.side) {
-      // console.log("about to actually fetch");
 
-      // clear previous timeout, if it exists
+    if (pool && payAmount && positionAmount && props.side) {
       clearTimeout(timeoutRef.current);
 
       // set a new timeout to execute after 5 seconds
@@ -144,10 +137,8 @@ export function TradePosition(props: Props) {
     return () => {
       clearTimeout(timeoutRef.current);
     };
+    // @ts-ignore
   }, [wallet, pool, payAmount, positionAmount, props.side]);
-
-  // const entryPrice = stats[payToken]?.currentPrice * payAmount || 0;
-  // const liquidationPrice = entryPrice * leverage;
 
   if (!pair) {
     return <p>Pair not loaded</p>;
@@ -157,11 +148,9 @@ export function TradePosition(props: Props) {
     return <LoadingDots />;
   } else if (pool === null) {
     // @ts-ignore
-    // console.log("all pools", Object.values(poolData));
     setPool(Object.values(poolData)[0]);
     return <LoadingDots />;
   } else {
-    // console.log("sending borrow", pool.getCustodyAccount(positionToken));
     return (
       <div className={props.className}>
         <div className="flex items-center justify-between text-sm ">

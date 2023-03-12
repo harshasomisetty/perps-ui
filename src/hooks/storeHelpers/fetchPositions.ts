@@ -34,7 +34,7 @@ export async function getPositionData(
   let fetchedPositions: FetchPosition[] =
     await perpetual_program.account.position.all();
 
-  let postitionInfos: Record<string, PositionAccount> = fetchedPositions.reduce(
+  let positionInfos: Record<string, PositionAccount> = fetchedPositions.reduce(
     (acc: Record<string, PositionAccount>, position: FetchPosition) => (
       (acc[position.publicKey.toString()] = new PositionAccount(
         position.account,
@@ -48,6 +48,6 @@ export async function getPositionData(
 
   return {
     status: "success",
-    data: postitionInfos,
+    data: positionInfos,
   };
 }

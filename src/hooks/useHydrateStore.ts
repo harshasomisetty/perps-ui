@@ -11,9 +11,9 @@ export const useHydrateStore = () => {
 
   useEffect(() => {
     (async () => {
-      const custodyInfos = await getCustodyData();
-      const poolInfos = await getPoolData(custodyInfos);
-      const positionInfos = await getPositionData(custodyInfos);
+      const custodyData = await getCustodyData();
+      const poolInfos = await getPoolData(custodyData);
+      const positionInfos = await getPositionData(custodyData);
 
       // console.log("fetched the global store in hydrate", poolInfos);
       // console.log(
@@ -25,7 +25,7 @@ export const useHydrateStore = () => {
       //   positionInfos
       // );
 
-      setCustodyData(custodyInfos);
+      setCustodyData(custodyData);
       setPoolData(poolInfos);
       setPositionData(positionInfos);
     })();

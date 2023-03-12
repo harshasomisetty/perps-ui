@@ -21,16 +21,6 @@ export async function getPoolData(
   // @ts-ignore
   let fetchedPools: FetchPool[] = await perpetual_program.account.pool.all();
 
-  // let poolInfos: Record<string, PoolAccount> = fetchedPools.reduce(
-  //   (acc, { account, publicKey }) => (
-  //     (acc[account.name] = new PoolAccount(account, custodyInfos, publicKey)),
-  //     acc
-  //   ),
-  //   {}
-  // );
-
-  // return poolInfos;
-
   let poolObjs: Record<string, PoolAccount> = {};
 
   await Promise.all(

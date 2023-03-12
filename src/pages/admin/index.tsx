@@ -2,7 +2,7 @@ import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 import { ExistingPositions } from "@/components/Positions/ExistingPositions";
 import { NoPositions } from "@/components/Positions/NoPositions";
 import { useGlobalStore } from "@/stores/store";
-import { getPoolSortedPositions } from "@/utils/organizers";
+import { countDictList, getPoolSortedPositions } from "@/utils/organizers";
 
 interface Props {
   className?: string;
@@ -11,7 +11,6 @@ interface Props {
 export default function Admin(props: Props) {
   const positionData = useGlobalStore((state) => state.positionData);
   const positions = getPoolSortedPositions(positionData);
-
   return (
     <div className={props.className}>
       <header className="mb-5 flex items-center space-x-4">
@@ -20,15 +19,7 @@ export default function Admin(props: Props) {
           <LoadingSpinner className="text-4xl" />
         )}
       </header>
-      {positionData.status === "success" &&
-        Object.entries(positions).map(([pool, positions]) => {
-          return <ExistingPositions positions={positions} key={pool} />;
-        })}
-
-      {positionData.status != "success" ||
-        (Object.values(positionData.data).length === 0 && (
-          <NoPositions emptyString="No Open Positions" />
-        ))}
+      <ExistingPositions />
     </div>
   );
 }

@@ -32,6 +32,7 @@ export class PositionAccount {
     address: PublicKey,
     custodies: Record<string, CustodyAccount>
   ) {
+    console.log("printing entier new consturcture", position.openTime);
     this.owner = position.owner;
     this.pool = position.pool;
     this.custody = position.custody;
@@ -62,6 +63,7 @@ export class PositionAccount {
 
   // TODO fix getTimestamp to proper date
   getTimestamp(): number {
+    console.log("in get time", Number(this.openTime), Number(this.updateTime));
     return Math.floor(Number(this.openTime) / 1000);
   }
 
