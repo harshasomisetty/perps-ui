@@ -19,17 +19,6 @@ export function Positions(props: Props) {
     return <LoadingSpinner className="text-4xl" />;
   }
 
-  const positions = getPoolSortedPositions(positionData, publicKey!);
-
-  console.log(
-    "postion data",
-    positionData.status,
-    Object.values(positionData.data).length,
-    positionData.data,
-    "owner",
-    Object.values(positions)
-  );
-
   if (!publicKey) {
     return (
       <div className={props.className}>

@@ -36,7 +36,7 @@ enum Input {
 export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState(TokenE.SOL);
   const [positionToken, setPositionToken] = useState(TokenE.SOL);
-  const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
+  const [payTokenBalance, setPayTokenBalance] = useState<number>();
 
   const [payAmount, setPayAmount] = useState(0.1);
   const [positionAmount, setPositionAmount] = useState(0.2);
@@ -49,7 +49,7 @@ export function TradePosition(props: Props) {
   const { connection } = useConnection();
 
   const poolData = useGlobalStore((state) => state.poolData);
-  const [pool, setPool] = useState<PoolAccount | null>(null);
+  const [pool, setPool] = useState<PoolAccount>();
 
   const custodyData = useGlobalStore((state) => state.custodyData);
   const setPositionData = useGlobalStore((state) => state.setPositionData);
@@ -62,6 +62,8 @@ export function TradePosition(props: Props) {
   const router = useRouter();
 
   const { pair } = router.query;
+
+  const userData = useGlobalStore((state) => state.userData);
 
   const timeoutRef = useRef(null);
 
@@ -91,21 +93,6 @@ export function TradePosition(props: Props) {
     // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
   }, [pair]);
-
-  useEffect(() => {
-    async function fetchData() {
-      let tokenBalance = await fetchTokenBalance(
-        payToken,
-        publicKey!,
-        connection
-      );
-
-      setPayTokenBalance(tokenBalance);
-    }
-    if (publicKey) {
-      fetchData();
-    }
-  }, [connection, payToken, publicKey]);
 
   useEffect(() => {
     async function fetchData() {
@@ -140,112 +127,123 @@ export function TradePosition(props: Props) {
     // @ts-ignore
   }, [wallet, pool, payAmount, positionAmount, props.side]);
 
-  if (!pair) {
-    return <p>Pair not loaded</p>;
+  // let payTokenBalance = 0;
+
+  useEffect(() => {
+    if (Object.values(poolData).length > 0) {
+      setPool(Object.values(poolData)[0]);
+    }
+  }, [poolData]);
+
+  useEffect(() => {
+    if (Object.values(userData.lpBalances).length > 0) {
+      setPayTokenBalance(
+        userData.tokenBalances[Object.values(poolData)[0].getTokenList()[0]]
+      );
+    }
+  }, [userData]);
+
+  if (!pair || !pool) {
+    return <LoadingDots />;
   }
 
-  if (Object.keys(poolData).length === 0) {
-    return <LoadingDots />;
-  } else if (pool === null) {
-    // @ts-ignore
-    setPool(Object.values(poolData)[0]);
-    return <LoadingDots />;
-  } else {
-    return (
-      <div className={props.className}>
-        <div className="flex items-center justify-between text-sm ">
-          <div className="font-medium text-white">You Pay</div>
-          {publicKey && (
-            <div
-              className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
-              onClick={() => setPayAmount(payTokenBalance)}
-            >
-              <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
-              <p className="font-normal">{payToken}</p>
-              <p className="text-zinc-400"> Balance</p>
-            </div>
-          )}
-        </div>
-        <TokenSelector
-          className="mt-2"
-          amount={payAmount}
-          token={payToken}
-          onChangeAmount={(e) => {
-            console.log("token selector wrp on change", e);
-            setPayAmount(e);
-            setPositionAmount(e * leverage);
-            setLastChanged(Input.Pay);
-          }}
-          onSelectToken={setPayToken}
-          tokenList={pool.getTokenList()}
-          maxBalance={payTokenBalance}
-        />
-        <div className="mt-4 text-sm font-medium text-white">
-          Your {props.side}
-        </div>
-        <TokenSelector
-          className="mt-2"
-          amount={positionAmount}
-          token={positionToken}
-          onChangeAmount={(e) => {
-            setPayAmount(e / leverage);
-            setPositionAmount(e);
-            setLastChanged(Input.Position);
-          }}
-          onSelectToken={(token) => {
-            setPositionToken(token);
-            router.push("/trade/" + token + "-USD");
-          }}
-          liqRatio={0}
-          setLiquidity={null}
-          tokenList={pool.getTokenList()}
-        />
-        <div className="mt-4 text-xs text-zinc-400">Pool</div>
-        <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
-        <LeverageSlider
-          className="mt-6"
-          value={leverage}
-          // maxLeverage={50}
-          maxLeverage={Number(
-            pool.getCustodyAccount(positionToken)?.pricing.maxLeverage
-          )}
-          onChange={(e) => {
-            if (lastChanged === Input.Pay) {
-              setPositionAmount(payAmount * e);
-            } else {
-              setPayAmount(positionAmount / e);
-            }
-            setLeverage(e);
-          }}
-        />
-        <SolidButton className="mt-6 w-full" onClick={handleTrade}>
-          Place Order
-        </SolidButton>
-        <TradeDetails
-          className={twMerge(
-            "-mb-4",
-            "-mx-4",
-            "bg-zinc-900",
-            "mt-4",
-            "pb-5",
-            "pt-4",
-            "px-4"
-          )}
-          collateralToken={payToken}
-          positionToken={positionToken}
-          entryPrice={entryPrice}
-          liquidationPrice={liquidationPrice}
-          fees={fee}
-          availableLiquidity={pool.getLiquidities(stats)}
-          borrowRate={
-            Number(
-              pool.getCustodyAccount(positionToken)?.borrowRateState.currentRate
-            ) /
-            10 ** 9
-          }
-          side={props.side}
-        />
+  return (
+    <div className={props.className}>
+      <div className="flex items-center justify-between text-sm ">
+        <div className="font-medium text-white">You Pay</div>
+        {publicKey && (
+          <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer">
+            {payTokenBalance ? (
+              <>
+                <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
+                <p className="font-normal">{payToken}</p>
+                <p className="text-zinc-400"> Balance</p>
+              </>
+            ) : (
+              <LoadingDots />
+            )}
+          </div>
+        )}
       </div>
-    );
-  }
+      <TokenSelector
+        className="mt-2"
+        amount={payAmount}
+        token={payToken}
+        onChangeAmount={(e) => {
+          console.log("token selector wrp on change", e);
+          setPayAmount(e);
+          setPositionAmount(e * leverage);
+          setLastChanged(Input.Pay);
+        }}
+        onSelectToken={setPayToken}
+        tokenList={pool.getTokenList()}
+        maxBalance={payTokenBalance}
+      />
+      <div className="mt-4 text-sm font-medium text-white">
+        Your {props.side}
+      </div>
+      <TokenSelector
+        className="mt-2"
+        amount={positionAmount}
+        token={positionToken}
+        onChangeAmount={(e) => {
+          setPayAmount(e / leverage);
+          setPositionAmount(e);
+          setLastChanged(Input.Position);
+        }}
+        onSelectToken={(token) => {
+          setPositionToken(token);
+          router.push("/trade/" + token + "-USD");
+        }}
+        liqRatio={0}
+        setLiquidity={null}
+        tokenList={pool.getTokenList()}
+      />
+      <div className="mt-4 text-xs text-zinc-400">Pool</div>
+      <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
+      <LeverageSlider
+        className="mt-6"
+        value={leverage}
+        // maxLeverage={50}
+        maxLeverage={Number(
+          pool.getCustodyAccount(positionToken)?.pricing.maxLeverage
+        )}
+        onChange={(e) => {
+          if (lastChanged === Input.Pay) {
+            setPositionAmount(payAmount * e);
+          } else {
+            setPayAmount(positionAmount / e);
+          }
+          setLeverage(e);
+        }}
+      />
+      <SolidButton className="mt-6 w-full" onClick={handleTrade}>
+        Place Order
+      </SolidButton>
+      <TradeDetails
+        className={twMerge(
+          "-mb-4",
+          "-mx-4",
+          "bg-zinc-900",
+          "mt-4",
+          "pb-5",
+          "pt-4",
+          "px-4"
+        )}
+        collateralToken={payToken}
+        positionToken={positionToken}
+        entryPrice={entryPrice}
+        liquidationPrice={liquidationPrice}
+        fees={fee}
+        availableLiquidity={pool.getLiquidities(stats)}
+        borrowRate={
+          Number(
+            pool.getCustodyAccount(positionToken)?.borrowRateState.currentRate
+          ) /
+          10 ** 9
+        }
+        side={props.side}
+      />
+    </div>
+  );
 }

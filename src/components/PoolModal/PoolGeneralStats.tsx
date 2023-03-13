@@ -1,7 +1,4 @@
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { getMint, Mint } from "@solana/spl-token";
-import { useConnection } from "@solana/wallet-adapter-react";
-import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
 import { formatNumberCommas } from "@/utils/formatters";
@@ -16,21 +13,10 @@ interface Props {
 
 export default function PoolGeneralStats(props: Props) {
   const stats = useDailyPriceStats();
-  const { connection } = useConnection();
 
   const userData = useGlobalStore((state) => state.userData);
 
-  const [lpMint, setLpMint] = useState<Mint | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const lpData = await getMint(connection, props.pool.getLpTokenMint());
-      setLpMint(lpData);
-    })();
-    // @ts-ignore
-  }, []);
-
-  if (Object.keys(stats).length === 0 || lpMint === null) {
+  if (Object.keys(stats).length === 0 || props.pool.lpData === null) {
     return <LoadingSpinner className="absolute text-4xl" />;
   } else {
     return (

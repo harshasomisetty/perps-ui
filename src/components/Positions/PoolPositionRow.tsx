@@ -33,27 +33,16 @@ export default function PoolPositionRow(props: Props) {
 
       const View = new ViewHelper(connection, provider);
 
-      let fetchedPrice = await View.getPnl(props.position);
+      let fetchedPnlPrice = await View.getPnl(props.position);
 
-      let finalPnl = Number(fetchedPrice.profit)
-        ? Number(fetchedPrice.profit)
-        : -1 * Number(fetchedPrice.loss);
+      let finalPnl = Number(fetchedPnlPrice.profit)
+        ? Number(fetchedPnlPrice.profit)
+        : -1 * Number(fetchedPnlPrice.loss);
       setPnl(finalPnl / 10 ** 6);
-    }
-    if (Object.keys(poolData).length > 0) {
-      fetchData();
-    }
-  }, [poolData]);
 
-  useEffect(() => {
-    async function fetchData() {
-      let { provider } = await getPerpetualProgramAndProvider(wallet as any);
+      let fetchedLiqPrice = await View.getLiquidationPrice(props.position);
 
-      const View = new ViewHelper(connection, provider);
-
-      let fetchedPrice = await View.getLiquidationPrice(props.position);
-
-      setLiqPrice(Number(fetchedPrice) / 10 ** 6);
+      setLiqPrice(Number(fetchedLiqPrice) / 10 ** 6);
     }
     if (Object.keys(poolData).length > 0) {
       fetchData();

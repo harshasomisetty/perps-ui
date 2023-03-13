@@ -31,9 +31,6 @@ export function PositionAdditionalInfo(props: Props) {
   const positionPool = poolData[props.position.pool.toString()]!;
   const positionCustody = custodyData[props.position.custody.toString()]!;
 
-  console.log("POisiton in additiaonl", props.position);
-  console.log("posiiton open time", props.position.getTimestamp());
-
   async function handleCloseTrade() {
     console.log("in close trade");
     await closePosition(

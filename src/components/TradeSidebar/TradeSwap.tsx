@@ -25,13 +25,13 @@ interface Props {
 export function TradeSwap(props: Props) {
   const [payToken, setPayToken] = useState(TokenE.SOL);
   const [payAmount, setPayAmount] = useState(1);
-  const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
+  // const [payTokenBalance, setPayTokenBalance] = useState<number | null>(null);
 
   const [receiveToken, setReceiveToken] = useState(TokenE.TEST);
   const [receiveAmount, setReceiveAmount] = useState(0);
-  const [receiveTokenBalance, setReceiveTokenBalance] = useState<number | null>(
-    null
-  );
+  // const [receiveTokenBalance, setReceiveTokenBalance] = useState<number | null>(
+  //   null
+  // );
 
   const allPriceStats = useDailyPriceStats();
 
@@ -75,117 +75,108 @@ export function TradeSwap(props: Props) {
     router.reload(window.location.pathname);
   }
 
+  const userData = useGlobalStore((state) => state.userData);
+
+  let payTokenBalance = userData.tokenBalances[payToken];
+
+  let receiveTokenBalance = userData.tokenBalances[receiveToken];
+
   useEffect(() => {
-    async function fetchData() {
-      let payTokenBalance = await fetchTokenBalance(
-        payToken,
-        publicKey!,
-        connection
-      );
-
-      let receiveTokenBalance = await fetchTokenBalance(
-        receiveToken,
-        publicKey!,
-        connection
-      );
-
-      setPayTokenBalance(payTokenBalance);
-      setReceiveTokenBalance(receiveTokenBalance);
+    if (Object.values(poolData).length > 0) {
+      setPool(Object.values(poolData)[0]);
     }
-    if (publicKey) {
-      fetchData();
-    }
-  }, [connection, payToken, publicKey]);
+  }, [poolData]);
 
-  if (Object.keys(poolData).length === 0) {
+  if (!pool) {
     return <LoadingDots />;
-  } else if (pool === null) {
-    // console.log("setting pool", poolData);
-    // @ts-ignore
-    setPool(Object.values(poolData)[0]);
-    return <LoadingDots />;
-  } else {
-    return (
-      <div className={props.className}>
-        <div className="flex items-center justify-between text-sm">
-          <div className="text-sm font-medium text-white">You Pay</div>
-          <div
-            className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
-            onClick={() => setPayAmount(payTokenBalance)}
-          >
-            <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
-            <p className="font-normal">{payToken}</p>
-            <p className="text-zinc-400"> Balance</p>
-          </div>
-        </div>
-        <TokenSelector
-          className="mt-2"
-          amount={payAmount}
-          token={payToken}
-          onChangeAmount={setPayAmount}
-          onSelectToken={setPayToken}
-          tokenList={pool.getTokenList()}
-        />
+  }
+
+  return (
+    <div className={props.className}>
+      <div className="flex items-center justify-between text-sm">
+        <div className="text-sm font-medium text-white">You Pay</div>
         <div
-          className="mt-4 mb-2 flex justify-center"
-          onClick={() => {
-            setPayToken(receiveToken);
-            setReceiveToken(payToken);
-          }}
+          className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
+          onClick={() => setPayAmount(payTokenBalance)}
         >
-          {" "}
-          <ArrowsVertical
-            className={twMerge(
-              "fill-gray-500",
-              "h-5",
-              "transition-colors",
-              "w-5",
-              "hover:fill-white"
-            )}
-          />
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <div className="text-sm font-medium text-white">You Receive</div>
-          <div
-            className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
-            onClick={() => setReceiveAmount(receiveTokenBalance)}
-          >
-            <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
-            <p className="font-normal">{receiveToken}</p>
-            <p className="text-zinc-400"> Balance</p>
-          </div>
-        </div>
-        <TokenSelector
-          className="mt-2"
-          amount={receiveAmount}
-          token={receiveToken}
-          onChangeAmount={setReceiveAmount}
-          onSelectToken={setReceiveToken}
-          tokenList={pool.getTokenList().filter((token) => token !== payToken)}
-        />
-        <div className="mt-4 text-xs text-zinc-400">Pool</div>
-        <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
-        <SolidButton className="mt-6 w-full" onClick={handleSwap}>
-          Swap
-        </SolidButton>
-        <TradeSwapDetails
-          className={twMerge(
-            "-mb-4",
-            "-mx-4",
-            "bg-zinc-900",
-            "mt-4",
-            "pb-5",
-            "pt-4",
-            "px-4"
+          {payTokenBalance ? (
+            <>
+              <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
+              <p className="font-normal">{payToken}</p>
+              <p className="text-zinc-400"> Balance</p>
+            </>
+          ) : (
+            <LoadingDots />
           )}
-          fees={12.3}
-          payToken={payToken}
-          availableLiquidity={pool!.getLiquidities(allPriceStats)!}
-          payTokenPrice={allPriceStats[payToken]?.currentPrice || 0}
-          receiveToken={receiveToken}
-          receiveTokenPrice={allPriceStats[receiveToken]?.currentPrice || 0}
+        </div>
+      </div>
+      <TokenSelector
+        className="mt-2"
+        amount={payAmount}
+        token={payToken}
+        onChangeAmount={setPayAmount}
+        onSelectToken={setPayToken}
+        tokenList={pool.getTokenList()}
+      />
+      <div
+        className="mt-4 mb-2 flex justify-center"
+        onClick={() => {
+          setPayToken(receiveToken);
+          setReceiveToken(payToken);
+        }}
+      >
+        {" "}
+        <ArrowsVertical
+          className={twMerge(
+            "fill-gray-500",
+            "h-5",
+            "transition-colors",
+            "w-5",
+            "hover:fill-white"
+          )}
         />
       </div>
-    );
-  }
+      <div className="flex items-center justify-between text-sm">
+        <div className="text-sm font-medium text-white">You Receive</div>
+        <div
+          className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
+          onClick={() => setReceiveAmount(receiveTokenBalance)}
+        >
+          <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
+          <p className="font-normal">{receiveToken}</p>
+          <p className="text-zinc-400"> Balance</p>
+        </div>
+      </div>
+      <TokenSelector
+        className="mt-2"
+        amount={receiveAmount}
+        token={receiveToken}
+        onChangeAmount={setReceiveAmount}
+        onSelectToken={setReceiveToken}
+        tokenList={pool.getTokenList().filter((token) => token !== payToken)}
+      />
+      <div className="mt-4 text-xs text-zinc-400">Pool</div>
+      <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
+      <SolidButton className="mt-6 w-full" onClick={handleSwap}>
+        Swap
+      </SolidButton>
+      <TradeSwapDetails
+        className={twMerge(
+          "-mb-4",
+          "-mx-4",
+          "bg-zinc-900",
+          "mt-4",
+          "pb-5",
+          "pt-4",
+          "px-4"
+        )}
+        fees={12.3}
+        payToken={payToken}
+        availableLiquidity={pool!.getLiquidities(allPriceStats)!}
+        payTokenPrice={allPriceStats[payToken]?.currentPrice || 0}
+        receiveToken={receiveToken}
+        receiveTokenPrice={allPriceStats[receiveToken]?.currentPrice || 0}
+      />
+    </div>
+  );
 }

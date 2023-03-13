@@ -17,24 +17,13 @@ export const useHydrateStore = () => {
   const setUserData = useGlobalStore((state) => state.setUserData);
 
   const { connection } = useConnection();
-  const { publicKey, wallet } = useWallet();
+  const { publicKey } = useWallet();
 
   useEffect(() => {
     (async () => {
-      // console.log("in hydrate fetching global data");
       const custodyData = await getCustodyData();
       const poolData = await getPoolData(custodyData);
       const positionInfos = await getPositionData(custodyData);
-
-      // console.log("fetched the global store in hydrate", poolData);
-      // console.log(
-      //   "fetched the global custodies store in hydrate",
-      //   custodyInfos
-      // );
-      // console.log(
-      //   "fetched the global positionInfos store in hydrate",
-      //   positionInfos
-      // );
 
       setCustodyData(custodyData);
       setPoolData(poolData);
@@ -43,16 +32,9 @@ export const useHydrateStore = () => {
   }, []);
 
   useEffect(() => {
-    console.log(
-      "testing if runs",
-      publicKey,
-      Object.values(poolData).length > 0
-    );
     if (publicKey && Object.values(poolData).length > 0) {
       (async () => {
-        console.log("in hydrate fetching user data");
         const userData = await getAllUserData(connection, publicKey, poolData);
-        console.log("got suer data", userData);
         setUserData(userData);
       })();
     }

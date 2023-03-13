@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
 import { TokenSelector } from "@/components/TokenSelector";
@@ -10,10 +10,7 @@ import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
 import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
-import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
-import router from "next/router";
 import AirdropButton from "../AirdropButton";
-import { getMint } from "@solana/spl-token";
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
@@ -35,11 +32,7 @@ export default function LiquidityCard(props: Props) {
 
   const [tab, setTab] = useState(Tab.Add);
 
-  const [payTokenBalance, setPayTokenBalance] = useState(0);
-  const [liqBalance, setLiqBalance] = useState(0);
   const [liqAmount, setLiqAmount] = useState(0);
-
-  const [liqRatio, setLiqRatio] = useState(0);
 
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -54,38 +47,14 @@ export default function LiquidityCard(props: Props) {
 
   const userData = useGlobalStore((state) => state.userData);
 
-  console.log("global user data ", userData);
+  // @ts-ignore
+  let payTokenBalance = userData.tokenBalances[props.pool.getTokenList()[0]];
+  let liqBalance = userData.lpBalances[props.pool.address.toString()];
 
-  useEffect(() => {
-    async function fetchData() {
-      let tokenBalance = await fetchTokenBalance(
-        payToken!,
-        publicKey!,
-        connection
-      );
-
-      setPayTokenBalance(tokenBalance);
-
-      let lpBalance = await fetchLPBalance(
-        props.pool.getLpTokenMint(),
-        publicKey!,
-        connection
-      );
-
-      setLiqBalance(lpBalance);
-
-      const mintInfo = await getMint(connection, props.pool.getLpTokenMint());
-
-      setLiqRatio(
-        Number(mintInfo.supply) /
-          10 ** mintInfo.decimals /
-          props.pool.getLiquidities(stats)!
-      );
-    }
-    if (publicKey && Object.values(stats).length > 0 && payToken) {
-      fetchData();
-    }
-  }, [connection, publicKey, props.pool, payToken, stats]);
+  let liqRatio =
+    Number(props.pool.lpData.supply) /
+    10 ** props.pool.lpData.decimals /
+    props.pool.getLiquidities(stats)!;
 
   async function changeLiq() {
     console.log("before change", tab === Tab.Remove, liqAmount);
@@ -160,13 +129,19 @@ export default function LiquidityCard(props: Props) {
               <>
                 {" "}
                 <div className="text-sm font-medium text-white">You Add</div>
-                {publicKey && <div>Balance: {payTokenBalance.toFixed(2)}</div>}
+                {publicKey && (
+                  <div>
+                    Balance: {payTokenBalance && payTokenBalance.toFixed(2)}
+                  </div>
+                )}
               </>
             ) : (
               <>
                 {" "}
                 <div className="text-sm font-medium text-white">You Remove</div>
-                {publicKey && <div>Balance: {liqBalance.toFixed(2)}</div>}
+                {publicKey && (
+                  <div>Balance: {liqBalance && liqBalance.toFixed(2)}</div>
+                )}
               </>
             )}
           </div>
@@ -193,7 +168,9 @@ export default function LiquidityCard(props: Props) {
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Receive</div>
-            {publicKey && <div>Balance: {liqBalance.toFixed(2)}</div>}
+            {publicKey && (
+              <div>Balance: {liqBalance && liqBalance.toFixed(2)}</div>
+            )}
           </div>
 
           {tab === Tab.Add ? (

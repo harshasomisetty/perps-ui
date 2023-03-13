@@ -104,7 +104,16 @@ export class ViewHelper {
       })
       .transaction();
 
+    for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
+      console.log(
+        "key",
+        i,
+        transaction.instructions[0]!.keys[i]?.pubkey.toString()
+      );
+    }
+
     const result = await this.simulateTransaction(transaction);
+    console.log("got aum results", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAssetsUnderManagement"
     );
@@ -195,7 +204,18 @@ export class ViewHelper {
       })
       .transaction();
 
+    for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
+      console.log(
+        "key",
+        i,
+        transaction.instructions[0]!.keys[i]?.pubkey.toString()
+      );
+    }
+
     const result = await this.simulateTransaction(transaction);
+
+    console.log("got aum results", result);
+
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getLiquidationPrice"
     );

@@ -7,6 +7,7 @@ import { CustodyAccount } from "@/lib/CustodyAccount";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { getMint } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
+import { ViewHelper } from "@/utils/viewHelpers";
 
 interface FetchPool {
   account: Pool;
@@ -33,6 +34,12 @@ export async function getPoolData(
         )[0];
 
         const lpData = await getMint(provider.connection, lpTokenMint);
+
+        const View = new ViewHelper(provider.connection, provider);
+
+        console.log("trying to fetch aum");
+        // let fetchedAum = await View.getAssetsUnderManagement(pool.publicKey);
+        // console.log("got aum", Number(fetchedAum));
 
         let poolData: Pool = {
           name: pool.account.name,
