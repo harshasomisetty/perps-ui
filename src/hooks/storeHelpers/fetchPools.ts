@@ -37,10 +37,6 @@ export async function getPoolData(
 
         const View = new ViewHelper(provider.connection, provider);
 
-        console.log("trying to fetch aum");
-        // let fetchedAum = await View.getAssetsUnderManagement(pool.publicKey);
-        // console.log("got aum", Number(fetchedAum));
-
         let poolData: Pool = {
           name: pool.account.name,
           tokens: pool.account.tokens,
@@ -56,6 +52,12 @@ export async function getPoolData(
           pool.publicKey,
           lpData
         );
+
+        let fetchedAum = await View.getAssetsUnderManagement(
+          poolObjs[pool.publicKey.toString()]
+        );
+
+        poolObjs[pool.publicKey.toString()].setAum(fetchedAum);
       })
   );
 

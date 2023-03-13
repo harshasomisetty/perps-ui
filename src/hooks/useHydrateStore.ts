@@ -14,6 +14,7 @@ export const useHydrateStore = () => {
 
   const poolData = useGlobalStore((state) => state.poolData);
 
+  const userData = useGlobalStore((state) => state.userData);
   const setUserData = useGlobalStore((state) => state.setUserData);
 
   const { connection } = useConnection();
@@ -32,7 +33,11 @@ export const useHydrateStore = () => {
   }, []);
 
   useEffect(() => {
-    if (publicKey && Object.values(poolData).length > 0) {
+    if (
+      publicKey &&
+      Object.values(poolData).length > 0
+      // && Object.values(userData.lpBalances).length == 0
+    ) {
       (async () => {
         const userData = await getAllUserData(connection, publicKey, poolData);
         setUserData(userData);

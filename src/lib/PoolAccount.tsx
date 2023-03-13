@@ -178,4 +178,8 @@ export class PoolAccount {
 
     return totalAmount / 10 ** 6;
   }
+
+  setAum(aum: BN) {
+    this.aumUsd = aum;
+  }
 }

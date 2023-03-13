@@ -92,7 +92,7 @@ export class ViewHelper {
     }
   }
 
-  getAssetsUnderManagement = async (poolKey: PublicKey): Promise<BN> => {
+  getAssetsUnderManagement = async (pool: PoolAccount): Promise<BN> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
     const transaction = await program.methods
@@ -100,20 +100,12 @@ export class ViewHelper {
       .getAssetsUnderManagement({})
       .accounts({
         perpetuals: PERPETUALS_ADDRESS,
-        pool: poolKey,
+        pool: pool.address,
       })
+      .remainingAccounts(pool.getCustodyMetas())
       .transaction();
 
-    for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-      console.log(
-        "key",
-        i,
-        transaction.instructions[0]!.keys[i]?.pubkey.toString()
-      );
-    }
-
     const result = await this.simulateTransaction(transaction);
-    console.log("got aum results", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAssetsUnderManagement"
     );
@@ -204,18 +196,7 @@ export class ViewHelper {
       })
       .transaction();
 
-    for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-      console.log(
-        "key",
-        i,
-        transaction.instructions[0]!.keys[i]?.pubkey.toString()
-      );
-    }
-
     const result = await this.simulateTransaction(transaction);
-
-    console.log("got aum results", result);
-
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getLiquidationPrice"
     );
@@ -243,6 +224,8 @@ export class ViewHelper {
     );
     return this.decodeLogs(result, index);
   };
+
+  // getAddLiquidity = async (pool:
 
   //   getOraclePrice = async (
   //     poolKey: PublicKey,

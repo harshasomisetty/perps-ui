@@ -2,7 +2,6 @@ import { PoolAccount } from "@/lib/PoolAccount";
 import { TokenE } from "@/lib/Token";
 import { UserAccount } from "@/lib/UserAccount";
 import { fetchLPBalance, fetchTokenBalance } from "@/utils/retrieveData";
-import { BN } from "@project-serum/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 
 export default async function getUserLpAll(
@@ -10,9 +9,6 @@ export default async function getUserLpAll(
   publicKey: PublicKey,
   poolData: Record<string, PoolAccount>
 ): Promise<Record<string, number>> {
-  //   const userData = useGlobalStore((state) => state.userData);
-  //   const poolData = useGlobalStore((state) => state.poolData);
-
   let lpTokenAccounts: Record<string, number> = {};
   let promises = Object.values(poolData).map(async (pool) => {
     lpTokenAccounts[pool.address.toString()] = await fetchLPBalance(
