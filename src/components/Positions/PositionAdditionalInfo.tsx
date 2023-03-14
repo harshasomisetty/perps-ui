@@ -5,7 +5,6 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { format } from "date-fns";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { useGlobalStore } from "@/stores/store";
 import { Side } from "@/lib/types";
 import { PositionAccount } from "@/lib/PositionAccount";
@@ -23,7 +22,7 @@ interface Props {
 export function PositionAdditionalInfo(props: Props) {
   const { publicKey, signTransaction, wallet } = useWallet();
   const { connection } = useConnection();
-  const stats = useDailyPriceStats(props.position.token);
+  const stats = useGlobalStore((state) => state.priceStats);
 
   const poolData = useGlobalStore((state) => state.poolData);
   const custodyData = useGlobalStore((state) => state.custodyData);
@@ -42,11 +41,13 @@ export function PositionAdditionalInfo(props: Props) {
       connection,
       props.position,
       positionCustody,
-      new BN(stats.currentPrice * 10 ** 6)
+      new BN(stats[props.position.token].currentPrice * 10 ** 6)
     );
 
     // fetchPositions();
   }
+
+  if (Object.values(stats).length === 0) return <p>sdf</p>;
 
   return (
     <div
@@ -115,8 +116,8 @@ export function PositionAdditionalInfo(props: Props) {
             $
             {formatPrice(
               props.position.side === Side.Long
-                ? stats.currentPrice - props.liqPrice
-                : props.liqPrice - stats.currentPrice
+                ? stats[props.position.token].currentPrice - props.liqPrice
+                : props.liqPrice - stats[props.position.token].currentPrice
             )}
           </div>
         </div>

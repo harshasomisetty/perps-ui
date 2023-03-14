@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { asToken, TokenE } from "@/lib/Token";
 
 import { TokenSelector } from "../TokenSelector";
@@ -14,7 +13,6 @@ import { openPosition } from "src/actions/openPosition";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { fetchTokenBalance } from "@/utils/retrieveData";
 import { LoadingDots } from "../LoadingDots";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
@@ -58,7 +56,7 @@ export function TradePosition(props: Props) {
   const [liquidationPrice, setLiquidationPrice] = useState(0);
   const [fee, setFee] = useState(0);
 
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
   const router = useRouter();
 
   const { pair } = router.query;
@@ -142,9 +140,31 @@ export function TradePosition(props: Props) {
     // @ts-ignore
   }, [wallet, pool, payAmount, positionAmount, props.side]);
 
-  // let payTokenBalance = 0;
-  if (!pair || !pool) {
-    return <LoadingDots />;
+  if (!pair) {
+    return (
+      <div>
+        <p>no pair</p>
+        <LoadingDots />
+      </div>
+    );
+  }
+
+  if (!pool) {
+    return (
+      <div>
+        <p>no pool</p>
+        <LoadingDots />
+      </div>
+    );
+  }
+
+  if (Object.values(stats).length === 0) {
+    return (
+      <div>
+        <p>no stats</p>
+        <LoadingDots />
+      </div>
+    );
   }
 
   return (
@@ -195,8 +215,6 @@ export function TradePosition(props: Props) {
           setPositionToken(token);
           router.push("/trade/" + token + "-USD");
         }}
-        liqRatio={0}
-        setLiquidity={null}
         tokenList={pool.getTokenList()}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
@@ -237,7 +255,7 @@ export function TradePosition(props: Props) {
         fees={fee}
         availableLiquidity={pool
           .getCustodyAccount(positionToken!)
-          ?.getCustodyLiquidity()}
+          ?.getCustodyLiquidity(stats!)}
         borrowRate={
           Number(
             pool.getCustodyAccount(positionToken)?.borrowRateState.currentRate

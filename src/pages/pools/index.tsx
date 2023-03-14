@@ -1,7 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { formatNumberCommas } from "@/utils/formatters";
 import { useGlobalStore } from "@/stores/store";
 import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
@@ -11,7 +10,7 @@ import { NoPositions } from "@/components/Positions/NoPositions";
 export default function Pools() {
   const poolData = useGlobalStore((state) => state.poolData);
   const userData = useGlobalStore((state) => state.userData);
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
 
   const router = useRouter();
   if (!poolData) {

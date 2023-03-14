@@ -1,5 +1,4 @@
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
+import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
@@ -15,7 +14,7 @@ interface Props {
 }
 
 export default function PoolTokenStats(props: Props) {
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
   let poolData = useGlobalStore((state) => state.poolData);
 
   console.log("stats", stats);

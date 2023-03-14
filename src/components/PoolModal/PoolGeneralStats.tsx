@@ -1,4 +1,3 @@
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { twMerge } from "tailwind-merge";
 import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
 import { formatNumberCommas } from "@/utils/formatters";
@@ -12,7 +11,7 @@ interface Props {
 }
 
 export default function PoolGeneralStats(props: Props) {
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
 
   const userData = useGlobalStore((state) => state.userData);
 

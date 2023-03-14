@@ -84,8 +84,7 @@ export class ViewHelper {
         { type: returnType },
         Array.from([...(IDL.accounts ?? []), ...(IDL.types ?? [])])
       );
-      // return coder.decode(returnData);
-      console.log("coder.decode(returnData); ::: ", coder.decode(returnData));
+      // console.log("coder.decode(returnData); ::: ", coder.decode(returnData));
       return coder.decode(returnData);
     } else {
       throw new Error(`No Logs Found `, { cause: data });

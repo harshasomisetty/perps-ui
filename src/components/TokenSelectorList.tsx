@@ -1,9 +1,8 @@
 import { twMerge } from "tailwind-merge";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import { cloneElement } from "react";
-
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { TokenE, getTokenLabel, getTokenIcon, TOKEN_LIST } from "@/lib/Token";
+import { useGlobalStore } from "@/stores/store";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -21,7 +20,7 @@ interface Props {
 }
 
 export function TokenSelectorList(props: Props) {
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
 
   return (
     <div

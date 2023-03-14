@@ -2,10 +2,9 @@ import { twMerge } from "tailwind-merge";
 import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
 import { cloneElement, useState } from "react";
 
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { TokenE, getTokenIcon } from "@/lib/Token";
 import { TokenSelectorList } from "./TokenSelectorList";
-import { SolidButton } from "./SolidButton";
+import { useGlobalStore } from "@/stores/store";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -13,28 +12,6 @@ function formatNumber(num: number) {
     minimumFractionDigits: 2,
   });
   return formatter.format(num);
-}
-
-function displayOnlyNumbersAndDecimals(text: string) {
-  const sanitizedText = text.replace(/(\.)|(\D+)/g, "");
-
-  // Ensure there is at most one decimal point
-  const decimalCount = (sanitizedText.match(/\./g) || []).length;
-  const hasDecimal = decimalCount > 0;
-  const hasMultipleDecimals = decimalCount > 1;
-  if (hasMultipleDecimals) {
-    return NaN;
-  } else if (hasDecimal) {
-    const splitText = sanitizedText.split(".");
-    if (splitText[1] && splitText[1].length > 2) {
-      return parseFloat(splitText[0] + "." + splitText[1].slice(0, 2));
-    } else {
-      return parseFloat(sanitizedText);
-    }
-  }
-
-  // Parse the sanitized string to a float
-  return parseFloat(sanitizedText);
 }
 
 function decimalTrim(num: number) {
@@ -47,14 +24,12 @@ interface Props {
   token: TokenE;
   onChangeAmount?(amount: number): void;
   onSelectToken?(token: TokenE): void;
-  liqRatio: number;
-  setLiquidity?: (amount: number) => void;
   tokenList?: TokenE[];
   maxBalance?: number;
 }
 
 export function TokenSelector(props: Props) {
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
   const [selectorOpen, setSelectorOpen] = useState(false);
 
   if (props.token === undefined) {

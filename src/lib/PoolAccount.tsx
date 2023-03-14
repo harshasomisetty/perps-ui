@@ -1,5 +1,5 @@
-import { GeckoStats } from "@/hooks/useDailyPriceStats";
-import { tokenAddressToToken, TokenE } from "@/lib/Token";
+import { GeckoStats } from "@/hooks/storeHelpers/fetchPrices";
+import { TokenE } from "@/lib/Token";
 import { AccountMeta, Pool, Token } from "@/lib/types";
 import { PERPETUALS_PROGRAM_ID } from "@/utils/constants";
 import { BN } from "@project-serum/anchor";

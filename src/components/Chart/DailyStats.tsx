@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { TokenE } from "@/lib/Token";
 import { formatNumberCommas } from "@/utils/formatters";
+import { useGlobalStore } from "@/stores/store";
 
 interface DailyStatsProps {
   className?: string;
@@ -9,7 +9,11 @@ interface DailyStatsProps {
 }
 
 export function DailyStats(props: DailyStatsProps) {
-  const stats = useDailyPriceStats(props.token);
+  const stats = useGlobalStore((state) => state.priceStats);
+
+  console.log("daily sats", stats);
+
+  if (Object.values(stats).length === 0) return <p>sdf</p>;
 
   return (
     <div
@@ -18,7 +22,7 @@ export function DailyStats(props: DailyStatsProps) {
       <div>
         <div className="text-xs text-zinc-500">Current Price</div>
         <div className="text-sm text-white">
-          ${formatNumberCommas(stats.currentPrice)}
+          ${formatNumberCommas(stats[props.token].currentPrice)}
         </div>
       </div>
       <div>
@@ -26,12 +30,12 @@ export function DailyStats(props: DailyStatsProps) {
         <div
           className={twMerge(
             "text-sm",
-            stats.change24hr < 0 && "text-rose-400",
-            stats.change24hr === 0 && "text-white",
-            stats.change24hr > 0 && "text-emerald-400"
+            stats[props.token].change24hr < 0 && "text-rose-400",
+            stats[props.token].change24hr === 0 && "text-white",
+            stats[props.token].change24hr > 0 && "text-emerald-400"
           )}
         >
-          ${formatNumberCommas(stats.change24hr)}
+          ${formatNumberCommas(stats[props.token].change24hr)}
         </div>
       </div>
     </div>
