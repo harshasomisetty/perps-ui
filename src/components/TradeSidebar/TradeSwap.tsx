@@ -36,7 +36,7 @@ export function TradeSwap(props: Props) {
   const [payAmount, setPayAmount] = useState<number>(1);
   const [receiveToken, setReceiveToken] = useState<TokenE>();
   const [receiveAmount, setReceiveAmount] = useState<number>(0);
-  const [fee, setFee] = useState<number>();
+  const [fee, setFee] = useState<number>(9);
 
   const userData = useGlobalStore((state) => state.userData);
   // convert to state
@@ -91,6 +91,7 @@ export function TradeSwap(props: Props) {
           f
       );
 
+      console.log("setting fee????", f);
       // .amountOut.sub(swapInfo.feeIn)
       setFee(f);
 
@@ -213,7 +214,7 @@ export function TradeSwap(props: Props) {
       <div className="mt-4">
         <p className="text-sm text-zinc-400">Estimated Fees</p>
         <div className="flex flex-row space-x-1">
-          {!fee ? (
+          {!fee || typeof fee != "undefined" ? (
             <>
               <p className="text-sm text-white">${fee.toFixed(4)}</p>
               <p className="text-sm text-zinc-500">
@@ -239,7 +240,9 @@ export function TradeSwap(props: Props) {
           "px-4"
         )}
         payToken={payToken}
-        availableLiquidity={pool!.getLiquidities(stats)!}
+        availableLiquidity={pool
+          .getCustodyAccount(receiveToken!)
+          ?.getCustodyLiquidity(stats)}
         payTokenPrice={stats[payToken]?.currentPrice || 0}
         receiveToken={receiveToken}
         receiveTokenPrice={stats[receiveToken]?.currentPrice || 0}

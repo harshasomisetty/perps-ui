@@ -18,6 +18,8 @@ export default function PoolTokenStats(props: Props) {
   const stats = useDailyPriceStats();
   let poolData = useGlobalStore((state) => state.poolData);
 
+  console.log("stats", stats);
+
   if (Object.keys(stats).length === 0) {
     return <LoadingSpinner className="absolute text-4xl" />;
   } else {
@@ -71,13 +73,7 @@ export default function PoolTokenStats(props: Props) {
                     </td>
                     <td>{Number(custody.fees.addLiquidity) / 100}%</td>
                     <td>
-                      $
-                      {formatNumberCommas(
-                        stats[token].currentPrice *
-                          ((Number(custody.assets.owned) -
-                            Number(custody.assets.locked)) /
-                            10 ** custody.decimals)
-                      )}
+                      ${formatNumberCommas(custody.getCustodyLiquidity(stats))}
                     </td>
                     <td>${formatNumberCommas(stats[token].currentPrice)}</td>
                     <td>

@@ -145,7 +145,7 @@ export async function swap(
       minAmountOut,
     };
 
-    let tx = await perpetual_program.methods
+    let swapTx = await perpetual_program.methods
       .swap(params)
       .accounts({
         owner: publicKey,
@@ -166,7 +166,7 @@ export async function swap(
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .transaction();
-    transaction = transaction.add(tx);
+    transaction = transaction.add(swapTx);
 
     console.log("swap tx", transaction);
     console.log("tx keys");

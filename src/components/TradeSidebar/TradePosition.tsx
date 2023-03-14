@@ -235,7 +235,9 @@ export function TradePosition(props: Props) {
         entryPrice={entryPrice}
         liquidationPrice={liquidationPrice}
         fees={fee}
-        availableLiquidity={pool.getLiquidities(stats)}
+        availableLiquidity={pool
+          .getCustodyAccount(positionToken!)
+          ?.getCustodyLiquidity()}
         borrowRate={
           Number(
             pool.getCustodyAccount(positionToken)?.borrowRateState.currentRate
