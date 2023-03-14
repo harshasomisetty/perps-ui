@@ -274,41 +274,39 @@ export class ViewHelper {
     };
   };
 
-  //   getSwapAmountAndFees = async (
-  //     amountIn: BN,
-  //     poolKey: PublicKey,
-  //     receivingCustodyKey: PublicKey,
-  //     dispensingCustodykey: PublicKey
-  //   ): Promise<SwapAmountAndFees> => {
-  //     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+  getSwapAmountAndFees = async (
+    amountIn: BN,
+    pool: PoolAccount,
+    receivingCustody: CustodyAccount,
+    dispensingCustody: CustodyAccount
+  ): Promise<SwapAmountAndFees> => {
+    let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
-  //     let transaction = await program.methods
-  //       // @ts-ignore
-  //       .getSwapAmountAndFees({
-  //         amountIn,
-  //       })
-  //       .accounts({
-  //         perpetuals: this.poolConfig.perpetuals,
-  //         pool: poolKey,
-  //         receivingCustody: receivingCustodyKey,
-  //         receivingCustodyOracleAccount:
-  //           PoolConfig.getCustodyConfig(receivingCustodyKey)?.oracleAddress,
-  //         dispensingCustody: dispensingCustodykey,
-  //         dispensingCustodyOracleAccount:
-  //           PoolConfig.getCustodyConfig(dispensingCustodykey)?.oracleAddress,
-  //       })
-  //       .transaction();
+    let transaction = await program.methods
+      // @ts-ignore
+      .getSwapAmountAndFees({
+        amountIn,
+      })
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
+        receivingCustody: receivingCustody.address,
+        receivingCustodyOracleAccount: receivingCustody.oracle.oracleAccount,
+        dispensingCustody: dispensingCustody.address,
+        dispensingCustodyOracleAccount: dispensingCustody.oracle.oracleAccount,
+      })
+      .transaction();
 
-  //     const result = await this.simulateTransaction(transaction);
-  //     const index = IDL.instructions.findIndex(
-  //       (f) => f.name === "getSwapAmountAndFees"
-  //     );
-  //     const res: any = this.decodeLogs(result, index);
+    const result = await this.simulateTransaction(transaction);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getSwapAmountAndFees"
+    );
+    const res: any = this.decodeLogs(result, index);
 
-  //     return {
-  //       amountOut: res.amountOut,
-  //       feeIn: res.feeIn,
-  //       feeOut: res.feeOut,
-  //     };
-  //   };
+    return {
+      amountOut: res.amountOut,
+      feeIn: res.feeIn,
+      feeOut: res.feeOut,
+    };
+  };
 }

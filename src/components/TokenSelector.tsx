@@ -145,25 +145,12 @@ export function TokenSelector(props: Props) {
               const text = e.currentTarget.value;
 
               console.log("text", text, parseFloat(text));
-              props.onChangeAmount?.(parseFloat(text));
-
-              //   "all nujbers ratio",
-              //   (Number(text) * stats[props.token].currentPrice) *
-              //     props.liqRatio
-              // )
-
-              // TODO liquidity should be subtract fees
-              // console.log("liq ration", props.liqRatio);
-
-              props.setLiquidity?.(
-                Number(
-                  (
-                    Number(text) *
-                    stats[props.token].currentPrice *
-                    props.liqRatio
-                  ).toFixed(2)
-                )
-              );
+              if (text === "0" || isNaN(parseFloat(text))) {
+                props.onChangeAmount?.(0);
+                console.log("set 0");
+              } else {
+                props.onChangeAmount?.(parseFloat(text));
+              }
             }}
           />
           {/* <p>test</p> */}

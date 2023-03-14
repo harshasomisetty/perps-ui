@@ -63,7 +63,7 @@ export class PositionAccount {
 
   // TODO fix getTimestamp to proper date
   getTimestamp(): number {
-    console.log("in get time", Number(this.openTime), Number(this.updateTime));
+    // console.log("in get time", Number(this.openTime), Number(this.updateTime));
     return Math.floor(Number(this.openTime) / 1000);
   }
 

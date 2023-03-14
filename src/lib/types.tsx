@@ -160,6 +160,7 @@ export enum Side {
   None = "None",
   Long = "Long",
   Short = "Short",
+  Swap = "Swap",
 }
 
 export interface AccountMeta {

@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function TradeSidebar(props: Props) {
-  const [side, setSide] = useState(Side.Long);
+  const [side, setSide] = useState(Side.Swap);
 
   return (
     <div className={props.className}>
