@@ -1,5 +1,4 @@
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { getTokenIcon, getTokenLabel, tokenAddressToToken } from "@/lib/Token";
+import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
@@ -7,16 +6,18 @@ import NewTab from "@carbon/icons-react/lib/NewTab";
 import { formatNumberCommas } from "@/utils/formatters";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
-import { LoadingSpinner } from "../Icons/LoadingSpinner";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 
 interface Props {
   className?: string;
   pool: PoolAccount;
 }
 
-export default function SinglePoolTokens(props: Props) {
-  const stats = useDailyPriceStats();
+export default function PoolTokenStats(props: Props) {
+  const stats = useGlobalStore((state) => state.priceStats);
   let poolData = useGlobalStore((state) => state.poolData);
+
+  console.log("stats", stats);
 
   if (Object.keys(stats).length === 0) {
     return <LoadingSpinner className="absolute text-4xl" />;
@@ -71,13 +72,7 @@ export default function SinglePoolTokens(props: Props) {
                     </td>
                     <td>{Number(custody.fees.addLiquidity) / 100}%</td>
                     <td>
-                      $
-                      {formatNumberCommas(
-                        stats[token].currentPrice *
-                          ((Number(custody.assets.owned) -
-                            Number(custody.assets.locked)) /
-                            10 ** custody.decimals)
-                      )}
+                      ${formatNumberCommas(custody.getCustodyLiquidity(stats))}
                     </td>
                     <td>${formatNumberCommas(stats[token].currentPrice)}</td>
                     <td>

@@ -1,8 +1,6 @@
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { PositionAccount } from "@/lib/PositionAccount";
-import { getTokenAddress, TokenE } from "@/lib/Token";
-import { Position, Side } from "@/lib/types";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,

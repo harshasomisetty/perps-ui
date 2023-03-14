@@ -1,7 +1,7 @@
+import { PoolTokens } from "@/components/PoolTokens";
+import { PositionColumn } from "@/components/Positions/PositionColumn";
 import { PositionAccount } from "@/lib/PositionAccount";
 import { useGlobalStore } from "@/stores/store";
-import { PoolTokens } from "../PoolTokens";
-import { PositionColumn } from "./PositionColumn";
 
 interface Props {
   className?: string;

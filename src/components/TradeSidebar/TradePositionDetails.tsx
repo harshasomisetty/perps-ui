@@ -1,8 +1,7 @@
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
-
 import { TokenE, getTokenIcon } from "@/lib/Token";
-import { Tab } from ".";
+import { Side } from "@/lib/types";
 
 function formatPrice(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -27,7 +26,7 @@ interface Props {
   entryPrice: number;
   exitPrice: number;
   token: TokenE;
-  side: Tab;
+  side: Side;
 }
 
 export function TradePositionDetails(props: Props) {

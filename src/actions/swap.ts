@@ -1,14 +1,12 @@
-import { getTokenAddress, TokenE } from "@/lib/Token";
+import { TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
-  PERPETUALS_PROGRAM_ID,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import { BN, Wallet } from "@project-serum/anchor";
-import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import {
   createAssociatedTokenAccountInstruction,
   createSyncNativeInstruction,
@@ -18,14 +16,12 @@ import {
 } from "@solana/spl-token";
 import {
   Connection,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
 import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { CustodyAccount } from "@/lib/CustodyAccount";
 
 export async function swap(
   wallet: Wallet,
@@ -52,13 +48,13 @@ export async function swap(
   // to: receiving_account;
   // constraint = receiving_account.mint == dispensing_custody.mint,
 
-  const receivingCustody = pool.getCustodyAccount(topToken);
+  const receivingCustody = pool.getCustodyAccount(topToken)!;
   let fundingAccount = await getAssociatedTokenAddress(
     receivingCustody.mint,
     publicKey
   );
 
-  const dispensingCustody = pool.getCustodyAccount(bottomToken);
+  const dispensingCustody = pool.getCustodyAccount(bottomToken)!;
 
   let receivingAccount = await getAssociatedTokenAddress(
     dispensingCustody.mint,
@@ -145,7 +141,7 @@ export async function swap(
       minAmountOut,
     };
 
-    let tx = await perpetual_program.methods
+    let swapTx = await perpetual_program.methods
       .swap(params)
       .accounts({
         owner: publicKey,
@@ -166,7 +162,7 @@ export async function swap(
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .transaction();
-    transaction = transaction.add(tx);
+    transaction = transaction.add(swapTx);
 
     console.log("swap tx", transaction);
     console.log("tx keys");

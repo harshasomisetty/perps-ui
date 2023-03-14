@@ -1,3 +1,4 @@
+import { GeckoStats } from "@/hooks/storeHelpers/fetchPrices";
 import { PublicKey } from "@solana/web3.js";
 import { tokenAddressToToken, TokenE } from "./Token";
 import {
@@ -68,6 +69,22 @@ export class CustodyAccount {
   }
 
   getTokenE(): TokenE {
-    return tokenAddressToToken(this.mint.toString());
+    return tokenAddressToToken(this.mint.toString())!;
+  }
+
+  getCustodyLiquidity(stats: GeckoStats): number {
+    if (Object.values(stats).length === 0) {
+      throw new Error("stats not loaded");
+    }
+    try {
+      return (
+        (stats[this.getTokenE()].currentPrice *
+          Number(this.assets.owned.sub(this.assets.locked))) /
+        10 ** this.decimals
+      );
+    } catch (e) {
+      console.log("stats error", e, stats);
+      throw e;
+    }
   }
 }

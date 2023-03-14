@@ -1,10 +1,9 @@
-import { LoadingDots } from "../LoadingDots";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { ExistingPosition } from "./ExistingPosition";
-import { NoPositions } from "./NoPositions";
 import { useGlobalStore } from "@/stores/store";
-import { getPoolSortedPositions } from "@/utils/organizers";
-import { LoadingSpinner } from "../Icons/LoadingSpinner";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
+import { NoPositions } from "@/components/Positions/NoPositions";
+import { LoadingDots } from "@/components/LoadingDots";
+import { ExistingPositions } from "@/components/Positions/ExistingPositions";
 
 interface Props {
   className?: string;
@@ -18,8 +17,6 @@ export function Positions(props: Props) {
   if (positionData.status === "pending") {
     return <LoadingSpinner className="text-4xl" />;
   }
-
-  const positions = getPoolSortedPositions(positionData, publicKey!);
 
   if (!publicKey) {
     return (
@@ -41,15 +38,7 @@ export function Positions(props: Props) {
           <LoadingDots className="text-white" />
         )}
       </header>
-      {positionData.status === "success" &&
-        Object.entries(positions).map(([pool, positions]) => {
-          return <ExistingPosition positions={positions} key={pool} />;
-        })}
-
-      {positionData.status != "success" ||
-        (Object.values(positionData.data).length === 0 && (
-          <NoPositions emptyString="No Open Positions" />
-        ))}
+      <ExistingPositions publicKey={publicKey} />
     </div>
   );
 }

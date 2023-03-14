@@ -1,5 +1,4 @@
 import { PoolTokens } from "@/components/PoolTokens";
-import { tokenAddressToToken } from "@/lib/Token";
 import { twMerge } from "tailwind-merge";
 import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
@@ -12,7 +11,6 @@ interface Props {
 }
 
 export function TitleHeader(props: Props) {
-  console.log("table header data", props.pool.getTokenList());
   return (
     <div className={twMerge("flex", "flex-col", "space-x-1", props.className)}>
       <div className="flex flex-row items-center">

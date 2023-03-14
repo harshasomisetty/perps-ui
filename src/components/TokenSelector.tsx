@@ -1,10 +1,9 @@
 import { twMerge } from "tailwind-merge";
 import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
 import { cloneElement, useState } from "react";
-
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { TokenE, getTokenIcon } from "@/lib/Token";
-import { TokenSelectorList } from "./TokenSelectorList";
+import { useGlobalStore } from "@/stores/store";
+import { TokenSelectorList } from "@/components/TokenSelectorList";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -12,28 +11,6 @@ function formatNumber(num: number) {
     minimumFractionDigits: 2,
   });
   return formatter.format(num);
-}
-
-function displayOnlyNumbersAndDecimals(text: string) {
-  const sanitizedText = text.replace(/(\.)|(\D+)/g, "");
-
-  // Ensure there is at most one decimal point
-  const decimalCount = (sanitizedText.match(/\./g) || []).length;
-  const hasDecimal = decimalCount > 0;
-  const hasMultipleDecimals = decimalCount > 1;
-  if (hasMultipleDecimals) {
-    return NaN;
-  } else if (hasDecimal) {
-    const splitText = sanitizedText.split(".");
-    if (splitText[1] && splitText[1].length > 2) {
-      return parseFloat(splitText[0] + "." + splitText[1].slice(0, 2));
-    } else {
-      return parseFloat(sanitizedText);
-    }
-  }
-
-  // Parse the sanitized string to a float
-  return parseFloat(sanitizedText);
 }
 
 function decimalTrim(num: number) {
@@ -46,13 +23,12 @@ interface Props {
   token: TokenE;
   onChangeAmount?(amount: number): void;
   onSelectToken?(token: TokenE): void;
-  liqRatio: number;
-  setLiquidity?: (amount: number) => void;
   tokenList?: TokenE[];
+  maxBalance?: number;
 }
 
 export function TokenSelector(props: Props) {
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
   const [selectorOpen, setSelectorOpen] = useState(false);
 
   if (props.token === undefined) {
@@ -90,16 +66,34 @@ export function TokenSelector(props: Props) {
           props.className
         )}
       >
-        <button
-          className="group flex items-center"
-          onClick={() => setSelectorOpen(true)}
-        >
-          {cloneElement(getTokenIcon(props.token), {
-            className: "h-6 rounded-full w-6",
-          })}
-          <div className="ml-1 text-2xl text-white">{props.token}</div>
-          <ChevronRightIcon className="ml-2 fill-gray-500 transition-colors group-hover:fill-white" />
-        </button>
+        <div className="flex items-center">
+          <button
+            className="group flex items-center"
+            onClick={() => setSelectorOpen(true)}
+          >
+            {cloneElement(getTokenIcon(props.token), {
+              className: "h-6 rounded-full w-6",
+            })}
+            <div className="ml-1 text-2xl text-white">{props.token}</div>
+            <ChevronRightIcon className="ml-2 fill-gray-500 transition-colors group-hover:fill-white" />
+          </button>
+          {props.maxBalance && (
+            <button
+              className={twMerge(
+                "h-min",
+                "w-min",
+                "bg-purple-500",
+                "rounded",
+                "py-1",
+                "px-2",
+                "text-white"
+              )}
+              onClick={() => props.onChangeAmount(props.maxBalance)}
+            >
+              Max
+            </button>
+          )}
+        </div>
         <div>
           <input
             className={twMerge(
@@ -125,27 +119,15 @@ export function TokenSelector(props: Props) {
               const text = e.currentTarget.value;
 
               console.log("text", text, parseFloat(text));
-              props.onChangeAmount?.(parseFloat(text));
-
-              //   "all nujbers ratio",
-              //   (Number(text) * stats[props.token].currentPrice) *
-              //     props.liqRatio
-              // )
-
-              // TODO liquidity should be subtract fees
-              console.log("liq ration", props.liqRatio);
-
-              props.setLiquidity?.(
-                Number(
-                  (
-                    Number(text) *
-                    stats[props.token].currentPrice *
-                    props.liqRatio
-                  ).toFixed(2)
-                )
-              );
+              if (text === "0" || isNaN(parseFloat(text))) {
+                props.onChangeAmount?.(0);
+                console.log("set 0");
+              } else {
+                props.onChangeAmount?.(parseFloat(text));
+              }
             }}
           />
+          {/* <p>test</p> */}
           {!!stats[props.token]?.currentPrice && (
             <div className="mt-0.5 text-right text-xs text-zinc-500">
               {formatNumber(props.amount * stats[props.token].currentPrice)}

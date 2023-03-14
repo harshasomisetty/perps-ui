@@ -1,8 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
 import { TableHeader } from "@/components/Molecules/PoolHeaders/TableHeader";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
 import { useGlobalStore } from "@/stores/store";
 import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
@@ -11,8 +9,8 @@ import { NoPositions } from "@/components/Positions/NoPositions";
 
 export default function Pools() {
   const poolData = useGlobalStore((state) => state.poolData);
-  const { userLpTokens } = useUserData();
-  const stats = useDailyPriceStats();
+  const userData = useGlobalStore((state) => state.userData);
+  const stats = useGlobalStore((state) => state.priceStats);
 
   const router = useRouter();
   if (!poolData) {
@@ -83,19 +81,36 @@ export default function Pools() {
                 <td>${formatNumberCommas(pool.getFees())}</td>
                 <td>${formatNumberCommas(pool.getOiLong())}</td>
                 <td>${formatNumberCommas(pool.getOiShort())}</td>
-                {getLiquidityBalance(pool, userLpTokens, stats) > 0 ? (
+                {getLiquidityBalance(
+                  pool,
+                  userData.getUserLpBalance(pool.address.toString()),
+                  stats
+                ) > 0 ? (
                   <td>
                     $
                     {formatNumberCommas(
-                      getLiquidityBalance(pool, userLpTokens, stats)
+                      getLiquidityBalance(
+                        pool,
+                        userData.getUserLpBalance(pool.address.toString()),
+                        stats
+                      )
                     )}
                   </td>
                 ) : (
                   <td>-</td>
                 )}
-                {getLiquidityShare(pool, userLpTokens) > 0 ? (
+                {getLiquidityShare(
+                  pool,
+                  userData.getUserLpBalance(pool.address.toString())
+                ) > 0 ? (
                   <td>
-                    {formatNumberCommas(getLiquidityShare(pool, userLpTokens))}%
+                    {formatNumberCommas(
+                      getLiquidityShare(
+                        pool,
+                        userData.getUserLpBalance(pool.address.toString())
+                      )
+                    )}
+                    %
                   </td>
                 ) : (
                   <td>-</td>

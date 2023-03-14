@@ -104,7 +104,6 @@ export async function openPosition(
         );
       }
 
-      // get balance of associated token account
       console.log("sol ata exists");
       const balance = await connection.getBalance(associatedTokenAccount);
       if (balance < payAmount.toNumber()) {
@@ -146,16 +145,6 @@ export async function openPosition(
       })
       .transaction();
     transaction = transaction.add(tx);
-
-    console.log("open pos tx", transaction);
-    console.log("tx keys");
-    // for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-    //   console.log(
-    //     "key",
-    //     i,
-    //     transaction.instructions[0]!.keys[i]?.pubkey.toString()
-    //   );
-    // }
 
     await manualSendTransaction(
       transaction,

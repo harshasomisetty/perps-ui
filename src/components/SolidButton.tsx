@@ -1,9 +1,8 @@
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
+import { notify } from "@/components/Notify";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { forwardRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { LoadingSpinner } from "./Icons/LoadingSpinner";
-
-import { notify } from "./Notify";
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   pending?: boolean;

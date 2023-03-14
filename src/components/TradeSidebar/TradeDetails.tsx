@@ -1,8 +1,8 @@
 import { twMerge } from "tailwind-merge";
 import { getTokenIcon, TokenE } from "@/lib/Token";
-import { Tab } from ".";
 import { cloneElement } from "react";
 import { formatFees, formatNumber, formatPrice } from "@/utils/formatters";
+import { Side } from "@/lib/types";
 
 interface Props {
   className?: string;
@@ -13,14 +13,13 @@ interface Props {
   fees: number;
   availableLiquidity: number;
   borrowRate: number;
-  side: Tab;
+  side: Side;
   onSubmit?(): void;
 }
 
 export function TradeDetails(props: Props) {
   const icon = getTokenIcon(props.positionToken);
 
-  console.log("borrow rate", props.borrowRate);
   return (
     <div className={props.className}>
       <header className="mb-4 flex items-center">

@@ -3,11 +3,10 @@ import CheckmarkIcon from "@carbon/icons-react/lib/Checkmark";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { twMerge } from "tailwind-merge";
 import { useState } from "react";
-
-import { PoolTokens } from "./PoolTokens";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
-import { LoadingSpinner } from "./Icons/LoadingSpinner";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
+import { PoolTokens } from "@/components/PoolTokens";
 
 interface Props {
   className?: string;

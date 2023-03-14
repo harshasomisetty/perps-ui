@@ -1,6 +1,6 @@
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { getTokenAddress, TokenE } from "@/lib/Token";
+import { TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
@@ -151,18 +151,6 @@ export async function changeLiquidity(
       transaction = transaction.add(removeLiquidityTx);
     }
 
-    console.log("add liquidity tx", transaction);
-    console.log("tx keys");
-
-    if (transaction.instructions.length > 0) {
-      for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-        console.log(
-          "key",
-          i,
-          transaction.instructions[0]!.keys[i]?.pubkey.toString()
-        );
-      }
-    }
     await manualSendTransaction(
       transaction,
       publicKey,

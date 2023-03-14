@@ -1,36 +1,21 @@
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
-import { getMint, Mint } from "@solana/spl-token";
-import { useConnection } from "@solana/wallet-adapter-react";
-import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
-import { useUserData } from "@/hooks/useUserData";
 import { formatNumberCommas } from "@/utils/formatters";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { LoadingSpinner } from "../Icons/LoadingSpinner";
+import { useGlobalStore } from "@/stores/store";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 
 interface Props {
   pool: PoolAccount;
   className?: string;
 }
 
-export default function PoolStats(props: Props) {
-  const stats = useDailyPriceStats();
-  const { connection } = useConnection();
+export default function PoolGeneralStats(props: Props) {
+  const stats = useGlobalStore((state) => state.priceStats);
 
-  const { userLpTokens } = useUserData();
+  const userData = useGlobalStore((state) => state.userData);
 
-  const [lpMint, setLpMint] = useState<Mint | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const lpData = await getMint(connection, props.pool.getLpTokenMint());
-      setLpMint(lpData);
-    })();
-    // @ts-ignore
-  }, []);
-
-  if (Object.keys(stats).length === 0 || lpMint === null) {
+  if (Object.keys(stats).length === 0 || props.pool.lpData === null) {
     return <LoadingSpinner className="absolute text-4xl" />;
   } else {
     return (
@@ -72,13 +57,22 @@ export default function PoolStats(props: Props) {
           {
             label: "Your Liquidity",
             value: `$${formatNumberCommas(
-              getLiquidityBalance(props.pool, userLpTokens, stats)
+              getLiquidityBalance(
+                props.pool,
+                userData.getUserLpBalance(props.pool.address.toString()),
+                stats
+              )
             )}`,
           },
           {
             label: "Your Share",
             value: `${formatNumberCommas(
-              Number(getLiquidityShare(props.pool, userLpTokens))
+              Number(
+                getLiquidityShare(
+                  props.pool,
+                  userData.getUserLpBalance(props.pool.address.toString())
+                )
+              )
             )}%`,
           },
         ].map(({ label, value }, i) => (

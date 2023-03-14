@@ -1,5 +1,4 @@
 import { twMerge } from "tailwind-merge";
-
 import { TokenE } from "@/lib/Token";
 
 function formatPrice(num: number) {
@@ -13,7 +12,6 @@ function formatPrice(num: number) {
 interface Props {
   availableLiquidity: number;
   className?: string;
-  fees: number;
   payToken: TokenE;
   payTokenPrice: number;
   receiveToken: TokenE;
@@ -36,10 +34,6 @@ export function TradeSwapDetails(props: Props) {
           {
             label: "Available Liquidity",
             value: `$${formatPrice(props.availableLiquidity)}`,
-          },
-          {
-            label: "Fees",
-            value: `$${formatPrice(props.fees)}`,
           },
         ].map(({ label, value }, i) => (
           <div

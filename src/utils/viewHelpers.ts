@@ -65,7 +65,7 @@ export class ViewHelper {
     instructionNumber: number
   ): T {
     const returnPrefix = `Program return: ${PERPETUALS_PROGRAM_ID} `;
-    console.log("Data:", data);
+    // console.log("Data:", data);
     if (data.value.logs && data.value.err === null) {
       let returnLog = data.value.logs.find((l: any) =>
         l.startsWith(returnPrefix)
@@ -84,15 +84,14 @@ export class ViewHelper {
         { type: returnType },
         Array.from([...(IDL.accounts ?? []), ...(IDL.types ?? [])])
       );
-      // return coder.decode(returnData);
-      console.log("coder.decode(returnData); ::: ", coder.decode(returnData));
+      // console.log("coder.decode(returnData); ::: ", coder.decode(returnData));
       return coder.decode(returnData);
     } else {
       throw new Error(`No Logs Found `, { cause: data });
     }
   }
 
-  getAssetsUnderManagement = async (poolKey: PublicKey): Promise<BN> => {
+  getAssetsUnderManagement = async (pool: PoolAccount): Promise<BN> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
     const transaction = await program.methods
@@ -100,8 +99,9 @@ export class ViewHelper {
       .getAssetsUnderManagement({})
       .accounts({
         perpetuals: PERPETUALS_ADDRESS,
-        pool: poolKey,
+        pool: pool.address,
       })
+      .remainingAccounts(pool.getCustodyMetas())
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
@@ -120,7 +120,7 @@ export class ViewHelper {
   ): Promise<PriceAndFee> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
     // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
-    console.log("side", side);
+    // console.log("side", side);
 
     let transaction: Transaction = await program.methods
       // @ts-ignore
@@ -138,7 +138,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    console.log("got entry result", result);
+    // console.log("got entry result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getEntryPriceAndFee"
     );
@@ -224,6 +224,8 @@ export class ViewHelper {
     return this.decodeLogs(result, index);
   };
 
+  // getAddLiquidity = async (pool:
+
   //   getOraclePrice = async (
   //     poolKey: PublicKey,
   //     ema: boolean,
@@ -271,41 +273,39 @@ export class ViewHelper {
     };
   };
 
-  //   getSwapAmountAndFees = async (
-  //     amountIn: BN,
-  //     poolKey: PublicKey,
-  //     receivingCustodyKey: PublicKey,
-  //     dispensingCustodykey: PublicKey
-  //   ): Promise<SwapAmountAndFees> => {
-  //     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+  getSwapAmountAndFees = async (
+    amountIn: BN,
+    pool: PoolAccount,
+    receivingCustody: CustodyAccount,
+    dispensingCustody: CustodyAccount
+  ): Promise<SwapAmountAndFees> => {
+    let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
-  //     let transaction = await program.methods
-  //       // @ts-ignore
-  //       .getSwapAmountAndFees({
-  //         amountIn,
-  //       })
-  //       .accounts({
-  //         perpetuals: this.poolConfig.perpetuals,
-  //         pool: poolKey,
-  //         receivingCustody: receivingCustodyKey,
-  //         receivingCustodyOracleAccount:
-  //           PoolConfig.getCustodyConfig(receivingCustodyKey)?.oracleAddress,
-  //         dispensingCustody: dispensingCustodykey,
-  //         dispensingCustodyOracleAccount:
-  //           PoolConfig.getCustodyConfig(dispensingCustodykey)?.oracleAddress,
-  //       })
-  //       .transaction();
+    let transaction = await program.methods
+      // @ts-ignore
+      .getSwapAmountAndFees({
+        amountIn,
+      })
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
+        receivingCustody: receivingCustody.address,
+        receivingCustodyOracleAccount: receivingCustody.oracle.oracleAccount,
+        dispensingCustody: dispensingCustody.address,
+        dispensingCustodyOracleAccount: dispensingCustody.oracle.oracleAccount,
+      })
+      .transaction();
 
-  //     const result = await this.simulateTransaction(transaction);
-  //     const index = IDL.instructions.findIndex(
-  //       (f) => f.name === "getSwapAmountAndFees"
-  //     );
-  //     const res: any = this.decodeLogs(result, index);
+    const result = await this.simulateTransaction(transaction);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getSwapAmountAndFees"
+    );
+    const res: any = this.decodeLogs(result, index);
 
-  //     return {
-  //       amountOut: res.amountOut,
-  //       feeIn: res.feeIn,
-  //       feeOut: res.feeOut,
-  //     };
-  //   };
+    return {
+      amountOut: res.amountOut,
+      feeIn: res.feeIn,
+      feeOut: res.feeOut,
+    };
+  };
 }

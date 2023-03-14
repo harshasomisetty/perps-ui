@@ -1,12 +1,12 @@
-import { GeckoStats } from "@/hooks/useDailyPriceStats";
-import { tokenAddressToToken, TokenE } from "@/lib/Token";
+import { GeckoStats } from "@/hooks/storeHelpers/fetchPrices";
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { TokenE } from "@/lib/Token";
 import { AccountMeta, Pool, Token } from "@/lib/types";
 import { PERPETUALS_PROGRAM_ID } from "@/utils/constants";
 import { BN } from "@project-serum/anchor";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { Mint } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
-import { CustodyAccount } from "./CustodyAccount";
 
 export class PoolAccount {
   public name: string;
@@ -103,26 +103,27 @@ export class PoolAccount {
   }
   getLiquidities(stats: GeckoStats): number | null {
     // get liquidities from token custodies
-    if (Object.keys(stats).length == 0) {
-      return null;
-    }
+    // if (Object.keys(stats).length == 0) {
+    //   return null;
+    // }
 
-    const totalAmount = Object.values(this.custodies).reduce(
-      (acc: number, tokenCustody: CustodyAccount) => {
-        // @ts-ignore
-        let singleLiq =
-          // @ts-ignore
-          stats[tokenAddressToToken(tokenCustody.mint.toString())]
-            .currentPrice *
-          ((Number(tokenCustody.assets.owned) -
-            Number(tokenCustody.assets.locked)) /
-            10 ** tokenCustody.decimals);
-        return acc + singleLiq;
-      },
-      0
-    );
+    // const totalAmount = Object.values(this.custodies).reduce(
+    //   (acc: number, tokenCustody: CustodyAccount) => {
+    //     // @ts-ignore
+    //     let singleLiq =
+    //       // @ts-ignore
+    //       stats[tokenAddressToToken(tokenCustody.mint.toString())]
+    //         .currentPrice *
+    //       ((Number(tokenCustody.assets.owned) -
+    //         Number(tokenCustody.assets.locked)) /
+    //         10 ** tokenCustody.decimals);
+    //     return acc + singleLiq;
+    //   },
+    //   0
+    // );
 
-    return totalAmount;
+    // return totalAmount;
+    return this.aumUsd.toNumber() / 10 ** 6;
   }
 
   getTradeVolumes(): number {
@@ -177,5 +178,9 @@ export class PoolAccount {
     );
 
     return totalAmount / 10 ** 6;
+  }
+
+  setAum(aum: BN) {
+    this.aumUsd = aum;
   }
 }

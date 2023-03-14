@@ -55,10 +55,9 @@ export async function fetchLPBalance(
 
 export function getLiquidityBalance(
   pool: PoolAccount,
-  userLpTokens: Record<string, number>,
+  userLpBalance: number,
   stats: Record<string, any>
 ): number {
-  let userLpBalance = userLpTokens[pool.address.toString()];
   let lpSupply = Number(pool.lpData.supply) / 10 ** pool.lpData.decimals;
   let userLiquidity = (userLpBalance! / lpSupply) * pool.getLiquidities(stats)!;
 
@@ -71,9 +70,8 @@ export function getLiquidityBalance(
 
 export function getLiquidityShare(
   pool: PoolAccount,
-  userLpTokens: Record<string, number>
+  userLpBalance: number
 ): number {
-  let userLpBalance = userLpTokens[pool.address.toString()];
   let lpSupply = Number(pool.lpData.supply) / 10 ** pool.lpData.decimals;
 
   let userShare = (userLpBalance! / lpSupply) * 100;

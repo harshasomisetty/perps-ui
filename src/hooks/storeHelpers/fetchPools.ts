@@ -1,5 +1,3 @@
-// function getCustodyInfos(fetchedCustodies, custodyAccounts, pool) {
-//   let custodyInfos: Record<string, Custody> = {};
 import { PoolAccount } from "@/lib/PoolAccount";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { Pool } from "@/lib/types";
@@ -7,6 +5,7 @@ import { CustodyAccount } from "@/lib/CustodyAccount";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { getMint } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
+import { ViewHelper } from "@/utils/viewHelpers";
 
 interface FetchPool {
   account: Pool;
@@ -21,16 +20,6 @@ export async function getPoolData(
   // @ts-ignore
   let fetchedPools: FetchPool[] = await perpetual_program.account.pool.all();
 
-  // let poolInfos: Record<string, PoolAccount> = fetchedPools.reduce(
-  //   (acc, { account, publicKey }) => (
-  //     (acc[account.name] = new PoolAccount(account, custodyInfos, publicKey)),
-  //     acc
-  //   ),
-  //   {}
-  // );
-
-  // return poolInfos;
-
   let poolObjs: Record<string, PoolAccount> = {};
 
   await Promise.all(
@@ -43,6 +32,8 @@ export async function getPoolData(
         )[0];
 
         const lpData = await getMint(provider.connection, lpTokenMint);
+
+        const View = new ViewHelper(provider.connection, provider);
 
         let poolData: Pool = {
           name: pool.account.name,
@@ -59,6 +50,12 @@ export async function getPoolData(
           pool.publicKey,
           lpData
         );
+
+        let fetchedAum = await View.getAssetsUnderManagement(
+          poolObjs[pool.publicKey.toString()]
+        );
+
+        poolObjs[pool.publicKey.toString()].setAum(fetchedAum);
       })
   );
 
