@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
+
 import { TokenE } from "@/lib/Token";
 import { swap } from "src/actions/swap";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { twMerge } from "tailwind-merge";
+import { PoolSelector } from "../PoolSelector";
+import { LoadingDots } from "../LoadingDots";
 import ArrowsVertical from "@carbon/icons-react/lib/ArrowsVertical";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
@@ -26,7 +28,7 @@ export function TradeSwap(props: Props) {
   const { connection } = useConnection();
   const { publicKey, signTransaction, wallet } = useWallet();
 
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
   const poolData = useGlobalStore((state) => state.poolData);
 
   const [payToken, setPayToken] = useState<TokenE>();
@@ -88,7 +90,7 @@ export function TradeSwap(props: Props) {
           f
       );
 
-      console.log("setting fee????", f);
+      // console.log("setting fee????", f);
       // .amountOut.sub(swapInfo.feeIn)
       setFee(f);
 
@@ -142,7 +144,14 @@ export function TradeSwap(props: Props) {
     return <LoadingDots />;
   }
 
-  console.log("swap stast", stats);
+  if (Object.values(stats).length === 0) {
+    return (
+      <div>
+        <p>no stats</p>
+        <LoadingDots />
+      </div>
+    );
+  }
 
   return (
     <div className={props.className}>

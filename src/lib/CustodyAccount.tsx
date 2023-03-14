@@ -1,4 +1,4 @@
-import { GeckoStats } from "@/hooks/useDailyPriceStats";
+import { GeckoStats } from "@/hooks/storeHelpers/fetchPrices";
 import { PublicKey } from "@solana/web3.js";
 import { tokenAddressToToken, TokenE } from "./Token";
 import {

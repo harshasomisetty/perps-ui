@@ -11,7 +11,6 @@ import Subtract from "@carbon/icons-react/lib/Subtract";
 import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
 import AirdropButton from "../AirdropButton";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
 import { getCustodyData } from "@/hooks/storeHelpers/fetchCustodies";
@@ -39,9 +38,8 @@ export default function LiquidityCard(props: Props) {
 
   const [payToken, setPayToken] = useState(props.pool.getTokenList()[0]);
 
-  const stats = useDailyPriceStats();
+  const stats = useGlobalStore((state) => state.priceStats);
 
-  // let poolData = useGlobalStore((state) => state.poolData);
   const setPoolData = useGlobalStore((state) => state.setPoolData);
   const setCustodyData = useGlobalStore((state) => state.setCustodyData);
 

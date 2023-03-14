@@ -1,3 +1,4 @@
+import { fetchAllStats } from "@/hooks/storeHelpers/fetchPrices";
 import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
 import { useGlobalStore } from "@/stores/store";
 import { publicKey } from "@coral-xyz/borsh";
@@ -16,6 +17,9 @@ export const useHydrateStore = () => {
 
   const userData = useGlobalStore((state) => state.userData);
   const setUserData = useGlobalStore((state) => state.setUserData);
+
+  const priceStats = useGlobalStore((state) => state.priceStats);
+  const setPriceStats = useGlobalStore((state) => state.setPriceStats);
 
   const { connection } = useConnection();
   const { publicKey } = useWallet();
@@ -44,4 +48,17 @@ export const useHydrateStore = () => {
       })();
     }
   }, [publicKey, poolData]);
+
+  useEffect(() => {
+    const fetchAndSetStats = async () => {
+      const priceStats = await fetchAllStats();
+      setPriceStats(priceStats);
+    };
+
+    fetchAndSetStats();
+
+    const interval = setInterval(fetchAndSetStats, 20000);
+
+    return () => clearInterval(interval);
+  }, []);
 };

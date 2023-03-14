@@ -1,3 +1,4 @@
+import { TokenE } from "@/lib/Token";
 import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 
@@ -193,3 +194,12 @@ export interface Position {
   lockedAmount: BN;
   collateralAmount: BN;
 }
+
+interface PriceStat {
+  change24hr: number;
+  currentPrice: number;
+  high24hr: number;
+  low24hr: number;
+}
+
+export type PriceStats = Record<TokenE, PriceStat>;

@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { cloneElement, useState } from "react";
+import { cloneElement } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
@@ -8,10 +8,10 @@ import NewTab from "@carbon/icons-react/lib/NewTab";
 
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { PositionColumn } from "./PositionColumn";
-import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { formatNumberCommas } from "@/utils/formatters";
 import { Side } from "@/lib/types";
 import { PositionAccount } from "@/lib/PositionAccount";
+import { useGlobalStore } from "@/stores/store";
 
 interface Props {
   className?: string;
@@ -24,7 +24,7 @@ interface Props {
 
 export default function PositionBasicInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
-  const stats = useDailyPriceStats(props.position.token);
+  const stats = useGlobalStore((state) => state.priceStats);
 
   function getNetValue(): number {
     // let netValue = 0
@@ -129,7 +129,10 @@ export default function PositionBasicInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={6}>
         <div className="text-sm text-white">
-          ${stats != undefined ? formatNumberCommas(stats.currentPrice) : 0}
+          $
+          {stats[props.position.token] != undefined
+            ? formatNumberCommas(stats[props.position.token].currentPrice)
+            : 0}
         </div>
       </PositionColumn>
       <PositionColumn num={7}>
