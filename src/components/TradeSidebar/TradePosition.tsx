@@ -34,8 +34,8 @@ enum Input {
 }
 
 export function TradePosition(props: Props) {
-  const [payToken, setPayToken] = useState(TokenE.SOL);
-  const [positionToken, setPositionToken] = useState(TokenE.SOL);
+  const [payToken, setPayToken] = useState<TokenE>();
+  const [positionToken, setPositionToken] = useState<TokenE>();
   const [payTokenBalance, setPayTokenBalance] = useState<number>();
 
   const [payAmount, setPayAmount] = useState(0.1);
@@ -92,7 +92,22 @@ export function TradePosition(props: Props) {
   useEffect(() => {
     // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
+    setPayToken(asToken(pair.split("-")[0]));
   }, [pair]);
+
+  useEffect(() => {
+    if (Object.values(poolData).length > 0) {
+      setPool(Object.values(poolData)[0]);
+    }
+  }, [poolData]);
+
+  useEffect(() => {
+    if (Object.values(userData.lpBalances).length > 0) {
+      setPayTokenBalance(
+        userData.tokenBalances[Object.values(poolData)[0].getTokenList()[0]]
+      );
+    }
+  }, [userData]);
 
   useEffect(() => {
     async function fetchData() {
@@ -128,21 +143,6 @@ export function TradePosition(props: Props) {
   }, [wallet, pool, payAmount, positionAmount, props.side]);
 
   // let payTokenBalance = 0;
-
-  useEffect(() => {
-    if (Object.values(poolData).length > 0) {
-      setPool(Object.values(poolData)[0]);
-    }
-  }, [poolData]);
-
-  useEffect(() => {
-    if (Object.values(userData.lpBalances).length > 0) {
-      setPayTokenBalance(
-        userData.tokenBalances[Object.values(poolData)[0].getTokenList()[0]]
-      );
-    }
-  }, [userData]);
-
   if (!pair || !pool) {
     return <LoadingDots />;
   }
