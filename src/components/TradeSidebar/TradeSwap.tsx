@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-
 import { useDailyPriceStats } from "@/hooks/useDailyPriceStats";
 import { TokenE } from "@/lib/Token";
-
-import { TokenSelector } from "../TokenSelector";
-import { SolidButton } from "../SolidButton";
-import { TradeSwapDetails } from "./TradeSwapDetails";
 import { swap } from "src/actions/swap";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
@@ -13,13 +8,15 @@ import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { twMerge } from "tailwind-merge";
-import { PoolSelector } from "../PoolSelector";
-import { LoadingDots } from "../LoadingDots";
-import { fetchTokenBalance } from "@/utils/retrieveData";
 import ArrowsVertical from "@carbon/icons-react/lib/ArrowsVertical";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { LoadingDots } from "@/components/LoadingDots";
+import { TokenSelector } from "@/components/TokenSelector";
+import { PoolSelector } from "@/components/PoolSelector";
+import { SolidButton } from "@/components/SolidButton";
+import { TradeSwapDetails } from "@/components/TradeSidebar/TradeSwapDetails";
 
 interface Props {
   className?: string;
@@ -36,7 +33,7 @@ export function TradeSwap(props: Props) {
   const [payAmount, setPayAmount] = useState<number>(1);
   const [receiveToken, setReceiveToken] = useState<TokenE>();
   const [receiveAmount, setReceiveAmount] = useState<number>(0);
-  const [fee, setFee] = useState<number>(9);
+  const [fee, setFee] = useState<number>(0);
 
   const userData = useGlobalStore((state) => state.userData);
   // convert to state
@@ -141,9 +138,11 @@ export function TradeSwap(props: Props) {
     router.reload(window.location.pathname);
   }
 
-  if (!pool || !payToken || !receiveToken) {
+  if (!pool || !payToken || !receiveToken || Object.values(stats).length == 0) {
     return <LoadingDots />;
   }
+
+  console.log("swap stast", stats);
 
   return (
     <div className={props.className}>
@@ -208,6 +207,7 @@ export function TradeSwap(props: Props) {
         onChangeAmount={setReceiveAmount}
         onSelectToken={setReceiveToken}
         tokenList={pool.getTokenList().filter((token) => token !== payToken)}
+        liqRatio={0}
       />
       <div className="mt-4 text-sm text-zinc-400">Pool</div>
       <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />

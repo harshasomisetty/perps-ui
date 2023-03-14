@@ -230,17 +230,17 @@ export function TradePosition(props: Props) {
           "pt-4",
           "px-4"
         )}
-        collateralToken={payToken}
-        positionToken={positionToken}
+        collateralToken={payToken!}
+        positionToken={positionToken!}
         entryPrice={entryPrice}
         liquidationPrice={liquidationPrice}
         fees={fee}
         availableLiquidity={pool
           .getCustodyAccount(positionToken!)
-          ?.getCustodyLiquidity()}
+          ?.getCustodyLiquidity(stats)}
         borrowRate={
           Number(
-            pool.getCustodyAccount(positionToken)?.borrowRateState.currentRate
+            pool.getCustodyAccount(positionToken!!)?.borrowRateState.currentRate
           ) /
           10 ** 9
         }

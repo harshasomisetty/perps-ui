@@ -73,6 +73,9 @@ export class CustodyAccount {
   }
 
   getCustodyLiquidity(stats: GeckoStats): number {
+    if (Object.values(stats).length === 0) {
+      throw new Error("stats not loaded");
+    }
     try {
       return (
         (stats[this.getTokenE()].currentPrice *
