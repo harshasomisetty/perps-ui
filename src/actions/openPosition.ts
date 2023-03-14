@@ -104,7 +104,6 @@ export async function openPosition(
         );
       }
 
-      // get balance of associated token account
       console.log("sol ata exists");
       const balance = await connection.getBalance(associatedTokenAccount);
       if (balance < payAmount.toNumber()) {
@@ -129,32 +128,6 @@ export async function openPosition(
       side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
     };
 
-    if (payCustody.getTokenE() != positionCustody.getTokenE()) {
-      let swapTx = await perpetual_program.methods
-        .swap(params)
-        .accounts({
-          owner: publicKey,
-          fundingAccount: fundingAccount,
-          receivingAccount: receivingAccount,
-          transferAuthority: TRANSFER_AUTHORITY,
-          perpetuals: PERPETUALS_ADDRESS,
-          pool: pool.address,
-
-          receivingCustody: receivingCustody.address,
-          receivingCustodyOracleAccount: receivingCustody.oracle.oracleAccount,
-          receivingCustodyTokenAccount: receivingCustody.tokenAccount,
-
-          dispensingCustody: dispensingCustody.address,
-          dispensingCustodyOracleAccount:
-            dispensingCustody.oracle.oracleAccount,
-          dispensingCustodyTokenAccount: dispensingCustody.tokenAccount,
-
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .transaction();
-      transaction = transaction.add(swapTx);
-    }
-
     let tx = await perpetual_program.methods
       .openPosition(params)
       .accounts({
@@ -172,16 +145,6 @@ export async function openPosition(
       })
       .transaction();
     transaction = transaction.add(tx);
-
-    console.log("open pos tx", transaction);
-    console.log("tx keys");
-    // for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-    //   console.log(
-    //     "key",
-    //     i,
-    //     transaction.instructions[0]!.keys[i]?.pubkey.toString()
-    //   );
-    // }
 
     await manualSendTransaction(
       transaction,

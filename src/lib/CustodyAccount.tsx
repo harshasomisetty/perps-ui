@@ -69,7 +69,7 @@ export class CustodyAccount {
   }
 
   getTokenE(): TokenE {
-    return tokenAddressToToken(this.mint.toString());
+    return tokenAddressToToken(this.mint.toString())!;
   }
 
   getCustodyLiquidity(stats: GeckoStats): number {

@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import { getSymbol, TokenE } from "@/lib/Token";
-import { ChartCurrency } from "./ChartCurrency";
-import { DailyStats } from "./DailyStats";
+import { ChartCurrency } from "@/components/Chart/ChartCurrency";
+import { DailyStats } from "@/components/Chart/DailyStats";
 
 // @ts-ignore
 const TradingViewWidget = dynamic<any>(import("react-tradingview-widget"), {

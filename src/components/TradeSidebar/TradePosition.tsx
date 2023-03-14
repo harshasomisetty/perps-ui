@@ -1,25 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-
 import { asToken, TokenE } from "@/lib/Token";
-
-import { TokenSelector } from "../TokenSelector";
-import { LeverageSlider } from "../LeverageSlider";
-import { TradeDetails } from "./TradeDetails";
-import { SolidButton } from "../SolidButton";
-import { PoolSelector } from "../PoolSelector";
 import { useRouter } from "next/router";
 import { openPosition } from "src/actions/openPosition";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { LoadingDots } from "../LoadingDots";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { Side } from "@/lib/types";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
 import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
+import { LoadingDots } from "@/components/LoadingDots";
+import { TokenSelector } from "@/components/TokenSelector";
+import { PoolSelector } from "@/components/PoolSelector";
+import { LeverageSlider } from "@/components/LeverageSlider";
+import { SolidButton } from "@/components/SolidButton";
+import { TradeDetails } from "@/components/TradeSidebar/TradeDetails";
 
 interface Props {
   className?: string;
@@ -222,9 +220,12 @@ export function TradePosition(props: Props) {
       <LeverageSlider
         className="mt-6"
         value={leverage}
-        // maxLeverage={50}
+        minLeverage={Number(
+          pool.getCustodyAccount(positionToken)?.pricing.minInitialLeverage /
+            10000
+        )}
         maxLeverage={Number(
-          pool.getCustodyAccount(positionToken)?.pricing.maxLeverage
+          pool.getCustodyAccount(positionToken)?.pricing.maxLeverage / 10000
         )}
         onChange={(e) => {
           if (lastChanged === Input.Pay) {
@@ -253,9 +254,9 @@ export function TradePosition(props: Props) {
         entryPrice={entryPrice}
         liquidationPrice={liquidationPrice}
         fees={fee}
-        availableLiquidity={pool
-          .getCustodyAccount(positionToken!)
-          ?.getCustodyLiquidity(stats!)}
+        availableLiquidity={
+          pool.getCustodyAccount(positionToken!)?.getCustodyLiquidity(stats!)!
+        }
         borrowRate={
           Number(
             pool.getCustodyAccount(positionToken!!)?.borrowRateState.currentRate

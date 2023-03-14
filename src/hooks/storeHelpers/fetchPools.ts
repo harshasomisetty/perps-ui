@@ -1,5 +1,3 @@
-// function getCustodyInfos(fetchedCustodies, custodyAccounts, pool) {
-//   let custodyInfos: Record<string, Custody> = {};
 import { PoolAccount } from "@/lib/PoolAccount";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { Pool } from "@/lib/types";

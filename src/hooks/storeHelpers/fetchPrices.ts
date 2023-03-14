@@ -28,7 +28,7 @@ export function fetchAllStats(): PriceStats {
   )
     .then((resp) => resp.json())
     .then((data: FetchedData) => {
-      console.log("fetching once");
+      // console.log("fetching once");
       const allStats = TOKEN_LIST.reduce((acc, token) => {
         const tokenData = data[getTokenId(token)];
 

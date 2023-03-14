@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-
 import { TokenE } from "@/lib/Token";
 import { swap } from "src/actions/swap";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -8,8 +7,6 @@ import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { twMerge } from "tailwind-merge";
-import { PoolSelector } from "../PoolSelector";
-import { LoadingDots } from "../LoadingDots";
 import ArrowsVertical from "@carbon/icons-react/lib/ArrowsVertical";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";

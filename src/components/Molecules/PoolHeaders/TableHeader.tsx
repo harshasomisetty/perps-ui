@@ -1,6 +1,5 @@
 import { PoolTokens } from "@/components/PoolTokens";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { tokenAddressToToken } from "@/lib/Token";
 import { twMerge } from "tailwind-merge";
 
 interface Props {

@@ -1,10 +1,9 @@
 import { twMerge } from "tailwind-merge";
 import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
 import { cloneElement, useState } from "react";
-
 import { TokenE, getTokenIcon } from "@/lib/Token";
-import { TokenSelectorList } from "./TokenSelectorList";
 import { useGlobalStore } from "@/stores/store";
+import { TokenSelectorList } from "@/components/TokenSelectorList";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {

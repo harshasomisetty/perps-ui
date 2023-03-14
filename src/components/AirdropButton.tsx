@@ -1,5 +1,5 @@
 import { CustodyAccount } from "@/lib/CustodyAccount";
-import { getTokenLabel, tokenAddressToToken, TokenE } from "@/lib/Token";
+import { getTokenLabel, TokenE } from "@/lib/Token";
 import { DEFAULT_PERPS_USER } from "@/utils/constants";
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
@@ -9,7 +9,7 @@ import {
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import { Transaction } from "@solana/web3.js";
 import { useRouter } from "next/router";
 import { SolidButton } from "./SolidButton";
 

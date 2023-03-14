@@ -7,11 +7,11 @@ import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
-import { PositionColumn } from "./PositionColumn";
 import { formatNumberCommas } from "@/utils/formatters";
 import { Side } from "@/lib/types";
 import { PositionAccount } from "@/lib/PositionAccount";
 import { useGlobalStore } from "@/stores/store";
+import { PositionColumn } from "@/components/Positions/PositionColumn";
 
 interface Props {
   className?: string;

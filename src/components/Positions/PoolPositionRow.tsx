@@ -1,6 +1,5 @@
 import { twMerge } from "tailwind-merge";
 import { useEffect, useState } from "react";
-
 import { PositionAccount } from "@/lib/PositionAccount";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useGlobalStore } from "@/stores/store";
@@ -17,10 +16,9 @@ interface Props {
 
 export default function PoolPositionRow(props: Props) {
   const { connection } = useConnection();
-  const { publicKey, signTransaction, wallet } = useWallet();
+  const { wallet } = useWallet();
 
   const poolData = useGlobalStore((state) => state.poolData);
-  const custodyData = useGlobalStore((state) => state.custodyData);
 
   const [expanded, setExpanded] = useState(false);
 

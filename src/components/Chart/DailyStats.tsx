@@ -11,8 +11,6 @@ interface DailyStatsProps {
 export function DailyStats(props: DailyStatsProps) {
   const stats = useGlobalStore((state) => state.priceStats);
 
-  console.log("daily sats", stats);
-
   if (Object.values(stats).length === 0) return <p>sdf</p>;
 
   return (

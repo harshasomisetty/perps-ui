@@ -6,7 +6,7 @@ import NewTab from "@carbon/icons-react/lib/NewTab";
 import { formatNumberCommas } from "@/utils/formatters";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
-import { LoadingSpinner } from "../Icons/LoadingSpinner";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 
 interface Props {
   className?: string;

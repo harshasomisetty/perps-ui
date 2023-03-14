@@ -1,10 +1,9 @@
-import { LoadingDots } from "../LoadingDots";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { ExistingPositions } from "./ExistingPositions";
-import { NoPositions } from "./NoPositions";
 import { useGlobalStore } from "@/stores/store";
-import { countDictList, getPoolSortedPositions } from "@/utils/organizers";
-import { LoadingSpinner } from "../Icons/LoadingSpinner";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
+import { NoPositions } from "@/components/Positions/NoPositions";
+import { LoadingDots } from "@/components/LoadingDots";
+import { ExistingPositions } from "@/components/Positions/ExistingPositions";
 
 interface Props {
   className?: string;

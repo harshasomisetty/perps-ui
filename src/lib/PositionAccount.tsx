@@ -1,8 +1,8 @@
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { TokenE } from "@/lib/Token";
+import { Position, Side } from "@/lib/types";
 import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { CustodyAccount } from "./CustodyAccount";
-import { TokenE } from "./Token";
-import { Position, Side } from "./types";
 
 export class PositionAccount {
   public owner: PublicKey;
@@ -58,7 +58,7 @@ export class PositionAccount {
   }
 
   getLeverage(): number {
-    return (this.sizeUsd.toNumber() / this.collateralUsd.toNumber()).toFixed(3);
+    return this.sizeUsd.toNumber() / this.collateralUsd.toNumber();
   }
 
   // TODO fix getTimestamp to proper date

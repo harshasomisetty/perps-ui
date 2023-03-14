@@ -3,10 +3,10 @@ import { useState } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import ArrowsHorizontalIcon from "@carbon/icons-react/lib/ArrowsHorizontal";
 
-import { SidebarTab } from "../SidebarTab";
 import { TradeSwap } from "@/components/TradeSidebar/TradeSwap";
-import { TradePosition } from "./TradePosition";
 import { Side } from "@/lib/types";
+import { SidebarTab } from "@/components/SidebarTab";
+import { TradePosition } from "@/components/TradeSidebar/TradePosition";
 
 interface Props {
   className?: string;

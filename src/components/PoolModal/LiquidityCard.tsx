@@ -2,19 +2,17 @@ import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
 import { TokenSelector } from "@/components/TokenSelector";
-
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { SidebarTab } from "../SidebarTab";
-
 import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
-import { LpSelector } from "./LpSelector";
 import { changeLiquidity } from "src/actions/changeLiquidity";
-import AirdropButton from "../AirdropButton";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
 import { getCustodyData } from "@/hooks/storeHelpers/fetchCustodies";
 import { getPoolData } from "@/hooks/storeHelpers/fetchPools";
+import { SidebarTab } from "@/components/SidebarTab";
+import AirdropButton from "@/components/AirdropButton";
+import { LpSelector } from "@/components/PoolModal/LpSelector";
 
 interface Props {
   className?: string;
@@ -150,8 +148,6 @@ export default function LiquidityCard(props: Props) {
               token={payToken!}
               onChangeAmount={setTokenAmount}
               onSelectToken={setPayToken}
-              liqRatio={liqRatio}
-              setLiquidity={setLiqAmount}
               tokenList={props.pool.getTokenList()}
               maxBalance={payTokenBalance}
             />
