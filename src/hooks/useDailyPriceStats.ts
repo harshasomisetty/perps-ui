@@ -59,6 +59,7 @@ const fetchAllStats = (() => {
 
         inFlight = null;
 
+        console.log("all stats", allStats);
         return allStats;
       })
       .catch(() => {
