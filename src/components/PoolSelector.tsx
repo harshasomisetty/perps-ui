@@ -41,7 +41,7 @@ export function PoolSelector(props: Props) {
           props.className
         )}
       >
-        <PoolTokens tokens={props.pool.getTokenList()} />
+        <PoolTokens tokens={props.pool.getTokenList()} className="h-5 w-5" />
         <div className="truncate text-sm font-medium text-white">
           {props.pool.name}
         </div>

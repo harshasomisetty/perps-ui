@@ -25,6 +25,7 @@ interface Props {
   onSelectToken?(token: TokenE): void;
   tokenList?: TokenE[];
   maxBalance?: number;
+  pendingRateConversion?: boolean;
 }
 
 export function TokenSelector(props: Props) {
@@ -95,39 +96,35 @@ export function TokenSelector(props: Props) {
           )}
         </div>
         <div>
-          <input
-            className={twMerge(
-              "bg-transparent",
-              "h-full",
-              "text-2xl",
-              "text-right",
-              "text-white",
-              "top-0",
-              "w-full",
-              "focus:outline-none",
-              typeof props.onChangeAmount === "function"
-                ? "cursor-pointer"
-                : "cursor-none",
-              typeof props.onChangeAmount === "function"
-                ? "pointer-events-auto"
-                : "pointer-events-none"
-            )}
-            placeholder="0"
-            type="number"
-            value={decimalTrim(props.amount) || ""}
-            onChange={(e) => {
-              const text = e.currentTarget.value;
-
-              console.log("text", text, parseFloat(text));
-              if (text === "0" || isNaN(parseFloat(text))) {
-                props.onChangeAmount?.(0);
-                console.log("set 0");
-              } else {
-                props.onChangeAmount?.(parseFloat(text));
-              }
-            }}
-          />
-          {/* <p>test</p> */}
+          {props.pendingRateConversion ? (
+            <div className="text-right text-xs text-zinc-500">Loading...</div>
+          ) : (
+            <input
+              className={twMerge(
+                "bg-transparent",
+                "h-full",
+                "text-2xl",
+                "text-right",
+                "text-white",
+                "top-0",
+                "w-full",
+                "focus:outline-none",
+                typeof props.onChangeAmount === "function"
+                  ? "cursor-pointer"
+                  : "cursor-none",
+                typeof props.onChangeAmount === "function"
+                  ? "pointer-events-auto"
+                  : "pointer-events-none"
+              )}
+              placeholder="0"
+              type="number"
+              value={props.amount.toString()}
+              onChange={(e) => {
+                const value = e.currentTarget.valueAsNumber;
+                props.onChangeAmount?.(isNaN(value) ? 0 : value);
+              }}
+            />
+          )}
           {!!stats[props.token]?.currentPrice && (
             <div className="mt-0.5 text-right text-xs text-zinc-500">
               {formatNumber(props.amount * stats[props.token].currentPrice)}

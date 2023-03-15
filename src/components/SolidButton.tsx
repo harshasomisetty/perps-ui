@@ -12,13 +12,8 @@ export const SolidButton = forwardRef<HTMLButtonElement, Props>(
   function SolidButton(props, ref) {
     const { ...rest } = props;
     const [loading, setLoading] = useState(false);
-    const { publicKey } = useWallet();
 
     const handleClick = async (e: any) => {
-      if (!publicKey) {
-        notify("Connect Wallet", "warn");
-        return;
-      }
       setLoading(true);
       try {
         await rest.onClick?.(e);
@@ -54,9 +49,9 @@ export const SolidButton = forwardRef<HTMLButtonElement, Props>(
         )}
         onClick={(e) => {
           handleClick(e);
-          // if (!loading && !rest.disabled) {
-          //   rest.onClick?.(e);
-          // }
+          if (!loading && !rest.disabled) {
+            rest.onClick?.(e);
+          }
         }}
       >
         <div

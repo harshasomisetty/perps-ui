@@ -20,7 +20,8 @@ export function PoolTokens(props: Props) {
             "border-black",
             "border",
             "rounded-full",
-            "relative"
+            "relative",
+            "shrink-0"
           ),
           style: { zIndex: 3 - i },
           key: i,

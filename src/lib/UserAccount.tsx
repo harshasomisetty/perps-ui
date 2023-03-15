@@ -1,5 +1,4 @@
 import { TokenE } from "@/lib/Token";
-import { BN } from "@project-serum/anchor";
 
 export class UserAccount {
   public lpBalances: Record<string, number>;

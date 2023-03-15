@@ -123,7 +123,6 @@ export default function LiquidityCard(props: Props) {
           <div className="flex items-center justify-between">
             {tab === Tab.Add ? (
               <>
-                {" "}
                 <div className="text-sm font-medium text-white">You Add</div>
                 {publicKey && (
                   <div>
@@ -133,7 +132,6 @@ export default function LiquidityCard(props: Props) {
               </>
             ) : (
               <>
-                {" "}
                 <div className="text-sm font-medium text-white">You Remove</div>
                 {publicKey && (
                   <div>Balance: {liqBalance && liqBalance.toFixed(2)}</div>
@@ -162,8 +160,20 @@ export default function LiquidityCard(props: Props) {
         <div>
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Receive</div>
-            {publicKey && (
-              <div>Balance: {liqBalance && liqBalance.toFixed(2)}</div>
+            {tab === Tab.Add ? (
+              <>
+                {publicKey && (
+                  <div>Balance: {liqBalance && liqBalance.toFixed(2)}</div>
+                )}
+              </>
+            ) : (
+              <>
+                {publicKey && (
+                  <div>
+                    Balance: {payTokenBalance && payTokenBalance.toFixed(2)}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -181,9 +191,30 @@ export default function LiquidityCard(props: Props) {
           )}
         </div>
 
-        <SolidButton className="mt-6 w-full" onClick={changeLiq}>
-          Confirm
+        <SolidButton
+          className="mt-6 w-full"
+          onClick={changeLiq}
+          disabled={!publicKey || !tokenAmount}
+        >
+          Add Liquidity
         </SolidButton>
+        {!publicKey && (
+          <p
+            className="mt-2 text-center text-xs text-orange-500
+      "
+          >
+            Please connect wallet to add liquidity
+          </p>
+        )}
+        {!tokenAmount && (
+          <p
+            className="mt-2 text-center text-xs text-orange-500
+      "
+          >
+            Please enter a valid amount of tokens to{" "}
+            {tab === Tab.Add ? "add" : "remove"} liquidity
+          </p>
+        )}
       </div>
     </div>
   );

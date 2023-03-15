@@ -24,6 +24,19 @@ export function formatNumber(num: number) {
   return formatter.format(num);
 }
 
+export function formatNumberLessThan(num: number) {
+  const formatter = Intl.NumberFormat("en", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
+
+  if (num < 0.01) {
+    return "<$0.01";
+  } else {
+    return "$" + formatter.format(num);
+  }
+}
+
 export function formatPrice(num: number) {
   const formatter = Intl.NumberFormat("en", {
     maximumFractionDigits: 2,

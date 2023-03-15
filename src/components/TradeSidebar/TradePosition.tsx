@@ -236,9 +236,30 @@ export function TradePosition(props: Props) {
           setLeverage(e);
         }}
       />
-      <SolidButton className="mt-6 w-full" onClick={handleTrade}>
+      <SolidButton
+        className="mt-6 w-full"
+        onClick={handleTrade}
+        disabled={!publicKey || payAmount === 0}
+      >
         Place Order
       </SolidButton>
+      {!publicKey && (
+        <p
+          className="mt-2 text-center text-xs text-orange-500
+      "
+        >
+          Please connect wallet to execute order
+        </p>
+      )}
+      {!payAmount && (
+        <p
+          className="mt-2 text-center text-xs text-orange-500
+      "
+        >
+          Please specify a valid nonzero amount to pay
+        </p>
+      )}
+
       <TradeDetails
         className={twMerge(
           "-mb-4",

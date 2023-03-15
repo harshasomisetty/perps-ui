@@ -11,6 +11,7 @@ import { PositionAccount } from "@/lib/PositionAccount";
 import { formatPrice } from "@/utils/formatters";
 import { SolidButton } from "@/components/SolidButton";
 import { PositionValueDelta } from "@/components/Positions/PositionValueDelta";
+import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
 
 interface Props {
   className?: string;
@@ -26,6 +27,8 @@ export function PositionAdditionalInfo(props: Props) {
 
   const poolData = useGlobalStore((state) => state.poolData);
   const custodyData = useGlobalStore((state) => state.custodyData);
+
+  const setPositionData = useGlobalStore((state) => state.setPositionData);
 
   const positionPool = poolData[props.position.pool.toString()]!;
   const positionCustody = custodyData[props.position.custody.toString()]!;
@@ -43,6 +46,9 @@ export function PositionAdditionalInfo(props: Props) {
       positionCustody,
       new BN(stats[props.position.token].currentPrice * 10 ** 6)
     );
+
+    const positionInfos = await getPositionData(custodyData);
+    setPositionData(positionInfos);
 
     // fetchPositions();
   }

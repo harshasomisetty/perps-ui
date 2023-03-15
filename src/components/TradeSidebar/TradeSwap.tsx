@@ -42,6 +42,8 @@ export function TradeSwap(props: Props) {
 
   const [pool, setPool] = useState<PoolAccount | null>(null);
 
+  const [pendingRateConversion, setPendingRateConversion] = useState(false);
+
   const timeoutRef = useRef(null);
   const router = useRouter();
 
@@ -67,6 +69,7 @@ export function TradeSwap(props: Props) {
         setFee(0);
         return;
       }
+      setPendingRateConversion(true);
       let { provider } = await getPerpetualProgramAndProvider(wallet as any);
 
       const View = new ViewHelper(connection, provider);
@@ -86,6 +89,7 @@ export function TradeSwap(props: Props) {
           10 ** pool!.getCustodyAccount(receiveToken)!.decimals -
           f
       );
+      setPendingRateConversion(false);
 
       // console.log("setting fee????", f);
       // .amountOut.sub(swapInfo.feeIn)
@@ -214,6 +218,7 @@ export function TradeSwap(props: Props) {
         onSelectToken={setReceiveToken}
         tokenList={pool.getTokenList().filter((token) => token !== payToken)}
         liqRatio={0}
+        pendingRateConversion={pendingRateConversion}
       />
       <div className="mt-4 text-sm text-zinc-400">Pool</div>
       <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
@@ -232,9 +237,30 @@ export function TradeSwap(props: Props) {
           )}
         </div>
       </div>
-      <SolidButton className="mt-6 w-full" onClick={handleSwap}>
+      <SolidButton
+        className="mt-6 w-full"
+        onClick={handleSwap}
+        disabled={!publicKey || !payAmount}
+      >
         Swap
       </SolidButton>
+      {!publicKey && (
+        <p
+          className="mt-2 text-center text-xs text-orange-500
+      "
+        >
+          Please connect wallet to execute order
+        </p>
+      )}
+      {!payAmount && (
+        <p
+          className="mt-2 text-center text-xs text-orange-500
+      "
+        >
+          Please specify a valid nonzero amount to swap
+        </p>
+      )}
+
       <TradeSwapDetails
         className={twMerge(
           "-mb-4",

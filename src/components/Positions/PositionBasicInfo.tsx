@@ -71,7 +71,7 @@ export default function PositionBasicInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={2}>
         <div className="text-sm text-white">
-          {props.position.getLeverage()}x
+          {props.position.getLeverage().toFixed(3)}x
         </div>
         <div
           className={twMerge(

@@ -1,7 +1,12 @@
 import { twMerge } from "tailwind-merge";
 import { getTokenIcon, TokenE } from "@/lib/Token";
 import { cloneElement } from "react";
-import { formatFees, formatNumber, formatPrice } from "@/utils/formatters";
+import {
+  formatFees,
+  formatNumber,
+  formatNumberLessThan,
+  formatPrice,
+} from "@/utils/formatters";
 import { Side } from "@/lib/types";
 
 interface Props {
@@ -47,7 +52,7 @@ export function TradeDetails(props: Props) {
           },
           {
             label: "Fees",
-            value: `$${formatNumber(props.fees)}`,
+            value: `${formatNumberLessThan(props.fees)}`,
           },
           {
             label: "Borrow Rate",
