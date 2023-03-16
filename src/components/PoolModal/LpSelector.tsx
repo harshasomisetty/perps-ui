@@ -4,6 +4,7 @@ interface Props {
   className?: string;
   amount: number;
   onChangeAmount?(amount: number): void;
+  maxBalance?: number;
 }
 
 export const LpSelector = (props: Props) => {
@@ -22,7 +23,25 @@ export const LpSelector = (props: Props) => {
           props.className
         )}
       >
-        LP Tokens
+        <div className="flex items-center space-x-2">
+          <p>LP Tokens</p>
+          {props.maxBalance && (
+            <button
+              className={twMerge(
+                "h-min",
+                "w-min",
+                "bg-purple-500",
+                "rounded",
+                "py-1",
+                "px-2",
+                "text-white"
+              )}
+              onClick={() => props.onChangeAmount?.(props.maxBalance!)}
+            >
+              Max
+            </button>
+          )}
+        </div>
         <div>
           <input
             className={twMerge(
@@ -43,11 +62,10 @@ export const LpSelector = (props: Props) => {
             )}
             placeholder="0"
             type="number"
-            value={props.amount || ""}
+            value={props.amount.toFixed(3)}
             onChange={(e) => {
-              const text = e.currentTarget.value;
-              console.log("lp text", text);
-              props.onChangeAmount?.(text ? Number(text) : 0);
+              const value = e.currentTarget.valueAsNumber;
+              props.onChangeAmount?.(isNaN(value) ? 0 : value);
             }}
           />
         </div>

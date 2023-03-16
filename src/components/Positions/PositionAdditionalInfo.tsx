@@ -12,6 +12,7 @@ import { formatPrice } from "@/utils/formatters";
 import { SolidButton } from "@/components/SolidButton";
 import { PositionValueDelta } from "@/components/Positions/PositionValueDelta";
 import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
+import { CollateralModal } from "@/components/Positions/CollateralModal";
 
 interface Props {
   className?: string;
@@ -103,17 +104,19 @@ export function PositionAdditionalInfo(props: Props) {
             <div className="text-sm text-white">
               ${formatPrice(props.position.getSizeUsd())}
             </div>
-            <button className="group ml-2">
-              <EditIcon
-                className={twMerge(
-                  "fill-zinc-500",
-                  "h-4",
-                  "transition-colors",
-                  "w-4",
-                  "group-hover:fill-white"
-                )}
-              />
-            </button>
+            <CollateralModal position={props.position}>
+              <button className="group ml-2">
+                <EditIcon
+                  className={twMerge(
+                    "fill-zinc-500",
+                    "h-4",
+                    "transition-colors",
+                    "w-4",
+                    "group-hover:fill-white"
+                  )}
+                />
+              </button>
+            </CollateralModal>
           </div>
         </div>
         <div>

@@ -35,6 +35,7 @@ export class PositionAccount {
     // console.log("printing entier new consturcture", position.openTime);
     this.owner = position.owner;
     this.pool = position.pool;
+    console.log("added pool", this.pool.toString());
     this.custody = position.custody;
     this.lockCustody = position.lockCustody;
 

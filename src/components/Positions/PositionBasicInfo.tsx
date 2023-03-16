@@ -12,6 +12,7 @@ import { Side } from "@/lib/types";
 import { PositionAccount } from "@/lib/PositionAccount";
 import { useGlobalStore } from "@/stores/store";
 import { PositionColumn } from "@/components/Positions/PositionColumn";
+import { CollateralModal } from "@/components/Positions/CollateralModal";
 
 interface Props {
   className?: string;
@@ -109,17 +110,19 @@ export default function PositionBasicInfo(props: Props) {
           <div className="text-sm text-white">
             ${formatNumberCommas(props.position.getCollateralUsd())}
           </div>
-          <button className="group ml-2">
-            <EditIcon
-              className={twMerge(
-                "fill-zinc-500",
-                "h-4",
-                "transition-colors",
-                "w-4",
-                "group-hover:fill-white"
-              )}
-            />
-          </button>
+          <CollateralModal position={props.position}>
+            <button className="group ml-2">
+              <EditIcon
+                className={twMerge(
+                  "fill-zinc-500",
+                  "h-4",
+                  "transition-colors",
+                  "w-4",
+                  "group-hover:fill-white"
+                )}
+              />
+            </button>
+          </CollateralModal>
         </div>
       </PositionColumn>
       <PositionColumn num={5}>
