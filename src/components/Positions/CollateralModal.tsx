@@ -1,5 +1,6 @@
 import { SidebarTab } from "@/components/SidebarTab";
-import { Close } from "@carbon/icons-react";
+import ArrowRight from "@carbon/icons-react/lib/ArrowRight";
+import Close from "@carbon/icons-react/lib/Close";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
@@ -12,11 +13,13 @@ import { TokenSelector } from "@/components/TokenSelector";
 import { LpSelector } from "@/components/PoolModal/LpSelector";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
+import { formatNumberCommas } from "@/utils/formatters";
 
 interface Props {
   className?: string;
   children?: React.ReactNode;
   position: PositionAccount;
+  pnl: number;
 }
 
 enum Tab {
@@ -29,8 +32,6 @@ export function CollateralModal(props: Props) {
   const { wallet, publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
 
-  // const [payToken, setPayToken] = useState(props.pool.getTokenList()[0]);
-
   const poolData = useGlobalStore((state) => state.poolData);
   const setCustodyData = useGlobalStore((state) => state.setCustodyData);
 
@@ -40,20 +41,44 @@ export function CollateralModal(props: Props) {
 
   let pool = poolData[props.position.pool.toString()]!;
 
-  const [payToken, setPayToken] = useState(pool.getTokenList()[0]);
+  let payToken = props.position.token;
 
   let payTokenBalance = userData.tokenBalances[pool.getTokenList()[0]!];
   let liqBalance = userData.lpBalances[pool.address.toString()];
 
-  const [liqAmount, setLiqAmount] = useState(0);
-  const [tokenAmount, setTokenAmount] = useState(1);
+  const [withdrawAmount, setWithdrawAmount] = useState(1);
+  const [depositAmount, setDepositAmount] = useState(1);
+
+  const stats = useGlobalStore((state) => state.priceStats);
+
+  function getNewLeverage() {
+    let changeCollateral =
+      tab === Tab.Add
+        ? depositAmount * stats[props.position.token].currentPrice
+        : -1 * withdrawAmount;
+
+    return (
+      props.position.getSizeUsd() /
+      (props.position.getCollateralUsd() + changeCollateral)
+    );
+  }
+
+  function getNewCollateral() {
+    return (
+      props.position.getCollateralUsd() +
+      depositAmount * stats[props.position.token].currentPrice
+    );
+  }
+
+  // TODO incorporate proper fetched new liq price into collateral modal
+  function getNewLiqPrice() {}
 
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>{props.children}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed top-0 bottom-0 left-0 right-0 grid place-items-center bg-black/80 text-white">
-          <Dialog.Content className="mt-6 max-w-sm rounded bg-zinc-800 p-4">
+          <Dialog.Content className="max-w-s mt-6 rounded bg-zinc-800 p-4">
             {/* <Dialog.Title className="DialogTitle">Modify Position</Dialog.Title> */}
             {/* <Dialog.Description className="DialogDescription">
               Modify your position by adding or removing collateral.
@@ -62,8 +87,8 @@ export function CollateralModal(props: Props) {
               <SidebarTab
                 selected={tab === Tab.Add}
                 onClick={() => {
-                  // setLiqAmount(0);
-                  // setTokenAmount(0);
+                  // setLiqAmount(1);
+                  // setDepositAmount(0);
                   setTab(Tab.Add);
                 }}
               >
@@ -73,8 +98,8 @@ export function CollateralModal(props: Props) {
               <SidebarTab
                 selected={tab === Tab.Remove}
                 onClick={() => {
-                  // setLiqAmount(0);
-                  // setTokenAmount(0);
+                  // setLiqAmount(1);
+                  // setDepositAmount(0);
                   setTab(Tab.Remove);
                 }}
               >
@@ -109,18 +134,17 @@ export function CollateralModal(props: Props) {
               {tab === Tab.Add ? (
                 <TokenSelector
                   className="mt-2"
-                  amount={tokenAmount}
+                  amount={depositAmount}
                   token={payToken!}
-                  onChangeAmount={setTokenAmount}
-                  onSelectToken={setPayToken}
+                  onChangeAmount={setDepositAmount}
                   tokenList={[props.position.token]}
                   maxBalance={payTokenBalance}
                 />
               ) : (
                 <LpSelector
                   className="mt-2"
-                  amount={liqAmount}
-                  onChangeAmount={setLiqAmount}
+                  amount={withdrawAmount}
+                  onChangeAmount={setWithdrawAmount}
                   maxBalance={liqBalance}
                 />
               )}
@@ -128,14 +152,46 @@ export function CollateralModal(props: Props) {
 
             <div className={twMerge("grid", "grid-cols-2", "gap-4", "pt-2")}>
               {[
-                { label: "Size", value: "0.00" },
-                { label: "Mark Price", value: "0.00" },
-                { label: "Leverage", value: "0.00" },
-                { label: "Borrow Fee", value: "0.00" },
-                { label: "Collateral", value: "0.00" },
-                { label: "Liq Price", value: "0.00" },
-                { label: "Execution Fee", value: "0.00" },
-              ].map(({ label, value }, i) => (
+                {
+                  label: "Collateral",
+                  value: `$${formatNumberCommas(
+                    props.position.getCollateralUsd()
+                  )}`,
+                  newValue: `$${formatNumberCommas(getNewCollateral())}`,
+                },
+                {
+                  label: "Mark Price",
+                  value: `$${
+                    stats[props.position.token] != undefined
+                      ? formatNumberCommas(
+                          stats[props.position.token].currentPrice
+                        )
+                      : 0
+                  }`,
+                },
+                {
+                  label: "Leverage",
+                  value: `${props.position.getLeverage().toFixed(2)}`,
+                  newValue: `${getNewLeverage().toFixed(2)}`,
+                },
+                {
+                  label: "Size",
+                  value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
+                },
+                // {
+                //   label: "Borrow Fee",
+                //   value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
+                // },
+                {
+                  label: "Liq Price",
+                  value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
+                  newValue: `sdf`,
+                },
+                // {
+                //   label: "Execution Fee",
+                //   value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
+                // },
+              ].map(({ label, value, newValue }, i) => (
                 <div
                   className={twMerge(
                     "border-zinc-700",
@@ -146,7 +202,19 @@ export function CollateralModal(props: Props) {
                   key={i}
                 >
                   <div className="text-xs text-zinc-400">{label}</div>
-                  <div className="text-sm text-white">{value}</div>
+                  <div className="space flex flex-row items-center space-x-1">
+                    <div className="text-sm text-white">{value}</div>
+
+                    {newValue && (
+                      <>
+                        <p className="text-sm text-white">
+                          <ArrowRight />
+                        </p>
+
+                        <div className="text-sm text-white">{newValue}</div>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -155,7 +223,7 @@ export function CollateralModal(props: Props) {
               <Dialog.Close asChild>
                 <SolidButton
                   className="w-full"
-                  disabled={!publicKey || !tokenAmount}
+                  disabled={!publicKey || !depositAmount}
                 >
                   {tab === Tab.Add ? "Add Collateral" : "Remove Collateral"}
                 </SolidButton>

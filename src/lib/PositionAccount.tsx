@@ -35,7 +35,6 @@ export class PositionAccount {
     // console.log("printing entier new consturcture", position.openTime);
     this.owner = position.owner;
     this.pool = position.pool;
-    console.log("added pool", this.pool.toString());
     this.custody = position.custody;
     this.lockCustody = position.lockCustody;
 
@@ -58,6 +57,7 @@ export class PositionAccount {
       custodies[this.custody.toString()]?.oracle.oracleAccount!;
   }
 
+  // TODO update leverage with pnl?
   getLeverage(): number {
     return this.sizeUsd.toNumber() / this.collateralUsd.toNumber();
   }
@@ -78,6 +78,11 @@ export class PositionAccount {
 
   getSizeUsd(): number {
     return Number(this.sizeUsd) / 10 ** 6;
+  }
+
+  getNetValue(pnl: number): number {
+    // return this.getSizeUsd() - this.getCollateralUsd();
+    return Number(this.getCollateralUsd()) + pnl;
   }
 
   // getLiquidationPrice(): number {

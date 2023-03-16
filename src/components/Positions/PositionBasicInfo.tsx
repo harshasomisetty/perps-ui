@@ -27,19 +27,11 @@ export default function PositionBasicInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
   const stats = useGlobalStore((state) => state.priceStats);
 
-  function getNetValue(): number {
-    // let netValue = 0
-    let collateral = props.position.getCollateralUsd();
-
-    // if (props.position.side === Side.Buy) {
-    //   netValue = props.position.size * props.position.entryPrice;
-    // } else {
-    //   netValue = props.position.size * props.position.entryPrice * -1;
-    // }
-
-    // console.log("net value", collateral, pnl, collateral + pnl);
-    return Number(props.position.getCollateralUsd()) + props.pnl;
-  }
+  // function getNetValue(): number {
+  //   // let netValue = 0
+  //   // let collateral = props.position.getCollateralUsd();
+  //   return Number(props.position.getCollateralUsd()) + props.pnl;
+  // }
 
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
@@ -97,7 +89,7 @@ export default function PositionBasicInfo(props: Props) {
       </PositionColumn>
       <PositionColumn num={3}>
         <div className="text-sm text-white">
-          ${formatNumberCommas(getNetValue())}
+          ${formatNumberCommas(props.position.getNetValue(props.pnl))}
         </div>
         {/* <PositionValueDelta
           className="mt-0.5"
@@ -110,7 +102,7 @@ export default function PositionBasicInfo(props: Props) {
           <div className="text-sm text-white">
             ${formatNumberCommas(props.position.getCollateralUsd())}
           </div>
-          <CollateralModal position={props.position}>
+          <CollateralModal position={props.position} pnl={props.pnl}>
             <button className="group ml-2">
               <EditIcon
                 className={twMerge(
