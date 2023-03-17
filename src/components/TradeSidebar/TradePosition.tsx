@@ -41,7 +41,9 @@ export function TradePosition(props: Props) {
 
   const [leverage, setLeverage] = useState(1);
 
-  const { publicKey, signTransaction, wallet } = useWallet();
+  const { publicKey, signTransaction, wallet, signAllTransactions } =
+    useWallet();
+
   const { connection } = useConnection();
 
   const poolData = useGlobalStore((state) => state.poolData);
@@ -72,6 +74,7 @@ export function TradePosition(props: Props) {
       wallet,
       publicKey,
       signTransaction,
+      signAllTransactions,
       connection,
       pool,
       payCustody,

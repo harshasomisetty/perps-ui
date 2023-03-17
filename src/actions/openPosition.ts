@@ -7,6 +7,7 @@ import {
 import { manualSendTransaction } from "@/utils/manualTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import { BN, Wallet } from "@project-serum/anchor";
+import { Wallet as SolanaWalletReact } from "@solana/wallet-adapter-react";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import {
   createAssociatedTokenAccountInstruction,
@@ -21,6 +22,7 @@ import {
   PublicKey,
   SystemProgram,
   Transaction,
+  TransactionInstruction,
 } from "@solana/web3.js";
 import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
@@ -28,9 +30,10 @@ import { PoolAccount } from "@/lib/PoolAccount";
 import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 
 export async function openPosition(
-  wallet: Wallet,
+  wallet: SolanaWalletReact,
   publicKey: PublicKey,
-  signTransaction: SignerWalletAdapterProps["signAllTransactions"],
+  signTransaction: SignerWalletAdapterProps["signTransaction"],
+  signAllTransactions: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
   pool: PoolAccount,
   payCustody: CustodyAccount,
@@ -40,7 +43,11 @@ export async function openPosition(
   price: BN,
   side: Side
 ) {
-  let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
+  let { perpetual_program } = await getPerpetualProgramAndProvider(
+    wallet,
+    signTransaction,
+    signAllTransactions
+  );
 
   // TODO: need to take slippage as param , this is now for testing
   const newPrice =
@@ -66,8 +73,12 @@ export async function openPosition(
     perpetual_program.programId
   )[0];
 
-  let transaction = new Transaction();
+  // let transaction = new Transaction();
   // TODO SWAP IF PAY != POSITION TOKEN
+
+  let assoTx;
+  let transferTx;
+  let syncTx;
 
   try {
     // wrap sol if needed
@@ -82,13 +93,11 @@ export async function openPosition(
       if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
         console.log("sol ata does not exist", NATIVE_MINT.toString());
 
-        transaction = transaction.add(
-          createAssociatedTokenAccountInstruction(
-            publicKey,
-            associatedTokenAccount,
-            publicKey,
-            NATIVE_MINT
-          )
+        assoTx = createAssociatedTokenAccountInstruction(
+          publicKey,
+          associatedTokenAccount,
+          publicKey,
+          NATIVE_MINT
         );
       }
 
@@ -96,14 +105,20 @@ export async function openPosition(
       const balance = await connection.getBalance(associatedTokenAccount);
       if (balance < payAmount.toNumber()) {
         console.log("balance insufficient");
-        transaction = transaction.add(
-          SystemProgram.transfer({
-            fromPubkey: publicKey,
-            toPubkey: associatedTokenAccount,
-            lamports: LAMPORTS_PER_SOL,
-          }),
-          createSyncNativeInstruction(associatedTokenAccount)
-        );
+
+        transferTx = SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: associatedTokenAccount,
+          lamports: LAMPORTS_PER_SOL,
+        });
+        // transaction = transaction.add(
+        // SystemProgram.transfer({
+        //   fromPubkey: publicKey,
+        //   toPubkey: associatedTokenAccount,
+        //   lamports: LAMPORTS_PER_SOL,
+        // }),
+        syncTx = createSyncNativeInstruction(associatedTokenAccount);
+        // );
       }
     }
 
@@ -116,6 +131,18 @@ export async function openPosition(
       side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
     };
 
+    let preInstructions: TransactionInstruction[] = [];
+    if (assoTx) preInstructions.push(assoTx);
+    if (transferTx) preInstructions.push(transferTx);
+    if (syncTx) preInstructions.push(syncTx);
+
+    console.log("about to rpc transaction");
+
+    console.log(
+      "wallet data",
+      perpetual_program.provider,
+      perpetual_program.provider.publicKey?.toString()
+    );
     let tx = await perpetual_program.methods
       .openPosition(params)
       .accounts({
@@ -131,15 +158,17 @@ export async function openPosition(
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .transaction();
-    transaction = transaction.add(tx);
+      .preInstructions(preInstructions)
+      .rpc();
+    // .transaction();
+    // transaction = transaction.add(tx);
 
-    await manualSendTransaction(
-      transaction,
-      publicKey,
-      connection,
-      signTransaction
-    );
+    // await manualSendTransaction(
+    //   transaction,
+    //   publicKey,
+    //   connection,
+    //   signTransaction
+    // );
   } catch (err) {
     console.log(err);
     throw err;
