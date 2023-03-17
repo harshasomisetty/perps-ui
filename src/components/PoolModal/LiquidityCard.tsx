@@ -214,7 +214,7 @@ export default function LiquidityCard(props: Props) {
             />
           )}
         </div>
-        <div>
+        <div className="mt-2">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-white">You Receive</div>
             {tab === Tab.Add ? (
@@ -253,8 +253,12 @@ export default function LiquidityCard(props: Props) {
           )}
         </div>
 
+        <div className="mt-2 flex flex-row space-x-2">
+          <p className="text-sm text-white">${fee.toFixed(4)}</p>
+          <p className="text-sm text-zinc-500">Fee</p>
+        </div>
         <SolidButton
-          className="mt-6 w-full"
+          className="mt-4 w-full"
           onClick={changeLiq}
           disabled={!publicKey || !tokenAmount}
         >
