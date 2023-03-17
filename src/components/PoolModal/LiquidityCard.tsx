@@ -74,32 +74,8 @@ export default function LiquidityCard(props: Props) {
     setPoolData(poolData);
   }
 
-  useEffect(() => {
-    async function fetchData() {
-      setPendingRateConversion(true);
-      const { provider } = await getPerpetualProgramAndProvider(wallet as any);
-      const View = new ViewHelper(connection, provider);
-      let liqInfo;
-
-      liqInfo = await View.getAddLiquidityAmountAndFees(
-        new BN(tokenAmount * LAMPORTS_PER_SOL),
-        props.pool!,
-        props.pool!.getCustodyAccount(payToken!)!
-      );
-      setLiqAmount(Number(liqInfo.amount) / 10 ** props.pool.lpData.decimals);
-
-      setFee(Number(liqInfo.fee) / 10 ** 6);
-
-      setPendingRateConversion(false);
-    }
-
-    if (tab === Tab.Add && tokenAmount !== 0) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(fetchData, 1000);
-    }
-
-    return () => clearTimeout(timeoutRef.current);
-  }, [tokenAmount]);
+  const [prevTokenAmount, setPrevTokenAmount] = useState(0);
+  const [prevLiqAmount, setPrevLiqAmount] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -108,28 +84,65 @@ export default function LiquidityCard(props: Props) {
       const View = new ViewHelper(connection, provider);
       let liqInfo;
 
-      liqInfo = await View.getRemoveLiquidityAmountAndFees(
-        new BN(liqAmount * 10 ** props.pool.lpData.decimals),
-        props.pool!,
-        props.pool!.getCustodyAccount(payToken!)!
-      );
-      setTokenAmount(
-        Number(liqInfo.amount) /
-          10 ** props.pool.getCustodyAccount(payToken!)!.decimals
-      );
+      if (
+        tab === Tab.Add &&
+        tokenAmount !== 0 &&
+        tokenAmount !== prevTokenAmount
+      ) {
+        liqInfo = await View.getAddLiquidityAmountAndFees(
+          new BN(tokenAmount * LAMPORTS_PER_SOL),
+          props.pool!,
+          props.pool!.getCustodyAccount(payToken!)!
+        );
+        setLiqAmount(Number(liqInfo.amount) / 10 ** props.pool.lpData.decimals);
+        setPrevTokenAmount(tokenAmount);
+      }
 
-      setFee(Number(liqInfo.fee) / 10 ** 6);
+      if (
+        tab === Tab.Remove &&
+        liqAmount !== 0 &&
+        liqAmount !== prevLiqAmount
+      ) {
+        liqInfo = await View.getRemoveLiquidityAmountAndFees(
+          new BN(liqAmount * 10 ** props.pool.lpData.decimals),
+          props.pool!,
+          props.pool!.getCustodyAccount(payToken!)!
+        );
+        setTokenAmount(
+          Number(liqInfo.amount) /
+            10 ** props.pool.getCustodyAccount(payToken!)!.decimals
+        );
+        setPrevLiqAmount(liqAmount);
+      }
+
+      if (liqInfo) {
+        setFee(Number(liqInfo.fee) / 10 ** 6);
+      }
 
       setPendingRateConversion(false);
     }
 
-    if (tab === Tab.Remove && liqAmount !== 0) {
+    if (
+      (tab === Tab.Add && tokenAmount == 0) ||
+      (tab === Tab.Remove && liqAmount == 0)
+    ) {
+      setTokenAmount(0);
+      setLiqAmount(0);
+      setFee(0);
+    }
+
+    if (
+      (tab === Tab.Add &&
+        tokenAmount !== 0 &&
+        tokenAmount !== prevTokenAmount) ||
+      (tab === Tab.Remove && liqAmount !== 0 && liqAmount !== prevLiqAmount)
+    ) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(fetchData, 1000);
     }
 
     return () => clearTimeout(timeoutRef.current);
-  }, [liqAmount]);
+  }, [tokenAmount, liqAmount]);
 
   const handleSelectToken = (token: TokenE) => {
     setTokenAmount(0);
@@ -253,7 +266,7 @@ export default function LiquidityCard(props: Props) {
           )}
         </div>
 
-        <div className="mt-2 flex flex-row space-x-2">
+        <div className="mt-2 flex flex-row justify-end space-x-2">
           <p className="text-sm text-white">${fee.toFixed(4)}</p>
           <p className="text-sm text-zinc-500">Fee</p>
         </div>

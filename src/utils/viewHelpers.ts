@@ -310,7 +310,6 @@ export class ViewHelper {
       .remainingAccounts(pool.getCustodyMetas())
       .transaction();
     const result = await this.simulateTransaction(transaction);
-    console.log("add liq result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAddLiquidityAmountAndFee"
     );
@@ -341,7 +340,6 @@ export class ViewHelper {
       .remainingAccounts(pool.getCustodyMetas())
       .transaction();
     const result = await this.simulateTransaction(transaction);
-    console.log("result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getRemoveLiquidityAmountAndFee"
     );
