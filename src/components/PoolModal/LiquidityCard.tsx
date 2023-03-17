@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
 import { TokenSelector } from "@/components/TokenSelector";
@@ -14,6 +14,10 @@ import { SidebarTab } from "@/components/SidebarTab";
 import AirdropButton from "@/components/AirdropButton";
 import { LpSelector } from "@/components/PoolModal/LpSelector";
 import { Tab } from "@/lib/types";
+import { BN } from "@project-serum/anchor";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 interface Props {
   className?: string;
@@ -31,6 +35,7 @@ export default function LiquidityCard(props: Props) {
   const { connection } = useConnection();
 
   const [payToken, setPayToken] = useState(props.pool.getTokenList()[0]);
+  const [fee, setFee] = useState<number>(0);
 
   const stats = useGlobalStore((state) => state.priceStats);
 
@@ -42,6 +47,10 @@ export default function LiquidityCard(props: Props) {
   // @ts-ignore
   let payTokenBalance = userData.tokenBalances[props.pool.getTokenList()[0]];
   let liqBalance = userData.lpBalances[props.pool.address.toString()];
+
+  const [pendingRateConversion, setPendingRateConversion] = useState(false);
+
+  const timeoutRef = useRef(null);
 
   async function changeLiq() {
     await changeLiquidity(
@@ -62,6 +71,63 @@ export default function LiquidityCard(props: Props) {
     setCustodyData(custodyData);
     setPoolData(poolData);
   }
+
+  useEffect(() => {
+    async function fetchData() {
+      setPendingRateConversion(true);
+      const { provider } = await getPerpetualProgramAndProvider(wallet as any);
+      const View = new ViewHelper(connection, provider);
+      let liqInfo;
+
+      liqInfo = await View.getAddLiquidityAmountAndFees(
+        new BN(tokenAmount * LAMPORTS_PER_SOL),
+        props.pool!,
+        props.pool!.getCustodyAccount(payToken!)!
+      );
+      setLiqAmount(Number(liqInfo.amount) / 10 ** props.pool.lpData.decimals);
+
+      setFee(Number(liqInfo.fee) / 10 ** 6);
+
+      setPendingRateConversion(false);
+    }
+
+    if (tab === Tab.Add && tokenAmount !== 0) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(fetchData, 1000);
+    }
+
+    return () => clearTimeout(timeoutRef.current);
+  }, [tokenAmount]);
+
+  useEffect(() => {
+    async function fetchData() {
+      setPendingRateConversion(true);
+      const { provider } = await getPerpetualProgramAndProvider(wallet as any);
+      const View = new ViewHelper(connection, provider);
+      let liqInfo;
+
+      liqInfo = await View.getRemoveLiquidityAmountAndFees(
+        new BN(liqAmount * 10 ** props.pool.lpData.decimals),
+        props.pool!,
+        props.pool!.getCustodyAccount(payToken!)!
+      );
+      setTokenAmount(
+        Number(liqInfo.amount) /
+          10 ** props.pool.getCustodyAccount(payToken!)!.decimals
+      );
+
+      setFee(Number(liqInfo.fee) / 10 ** 6);
+
+      setPendingRateConversion(false);
+    }
+
+    if (tab === Tab.Remove && liqAmount !== 0) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(fetchData, 1000);
+    }
+
+    return () => clearTimeout(timeoutRef.current);
+  }, [liqAmount]);
 
   return (
     <div className={props.className}>
@@ -162,7 +228,11 @@ export default function LiquidityCard(props: Props) {
           </div>
 
           {tab === Tab.Add ? (
-            <LpSelector className="mt-2" amount={liqAmount} />
+            <LpSelector
+              className="mt-2"
+              amount={liqAmount}
+              pendingRateConversion={pendingRateConversion}
+            />
           ) : (
             // @ts-ignore
             <TokenSelector
@@ -171,6 +241,7 @@ export default function LiquidityCard(props: Props) {
               token={payToken!}
               onSelectToken={setPayToken}
               tokenList={props.pool.getTokenList()}
+              pendingRateConversion={pendingRateConversion}
             />
           )}
         </div>

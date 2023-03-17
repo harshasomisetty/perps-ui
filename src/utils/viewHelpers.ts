@@ -39,6 +39,16 @@ export interface SwapAmountAndFees {
   feeOut: BN;
 }
 
+export interface AddLiquidityAmountAndFees {
+  amount: BN;
+  fee: BN;
+}
+
+export interface RemoveLiquidityAmountAndFees {
+  amount: BN;
+  fee: BN;
+}
+
 export class ViewHelper {
   program: Program<Perpetuals>;
   connection: Connection;
@@ -119,8 +129,6 @@ export class ViewHelper {
     custody: CustodyAccount
   ): Promise<PriceAndFee> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
-    // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
-    // console.log("side", side);
 
     let transaction: Transaction = await program.methods
       // @ts-ignore
@@ -224,33 +232,6 @@ export class ViewHelper {
     return this.decodeLogs(result, index);
   };
 
-  // getAddLiquidity = async (pool:
-
-  //   getOraclePrice = async (
-  //     poolKey: PublicKey,
-  //     ema: boolean,
-  //     custodyKey: PublicKey
-  //   ): Promise<BN> => {
-  //     const transaction = await this.program.methods
-  //       .getOraclePrice({
-  //         ema,
-  //       })
-  //       .accounts({
-  //         perpetuals: this.poolConfig.perpetuals,
-  //         pool: poolKey,
-  //         custody: custodyKey,
-  //         custodyOracleAccount:
-  //           PoolConfig.getCustodyConfig(custodyKey)?.oracleAddress,
-  //       })
-  //       .transaction();
-
-  //     const result = await this.simulateTransaction(transaction);
-  //     const index = IDL.instructions.findIndex(
-  //       (f) => f.name === "getOraclePrice"
-  //     );
-  //     return this.decodeLogs<BN>(result, index);
-  //   };
-
   getPnl = async (position: PositionAccount): Promise<ProfitAndLoss> => {
     let { perpetual_program } = await getPerpetualProgramAndProvider();
     const transaction = await perpetual_program.methods
@@ -306,6 +287,66 @@ export class ViewHelper {
       amountOut: res.amountOut,
       feeIn: res.feeIn,
       feeOut: res.feeOut,
+    };
+  };
+
+  getAddLiquidityAmountAndFees = async (
+    amountIn: BN,
+    pool: PoolAccount,
+    custody: CustodyAccount
+  ): Promise<AddLiquidityAmountAndFees> => {
+    let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+    let transaction = await program.methods
+      .getAddLiquidityAmountAndFee({
+        amountIn,
+      })
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
+        custody: custody.address,
+        custodyOracleAccount: custody.oracle.oracleAccount,
+        lpTokenMint: pool.getLpTokenMint(),
+      })
+      .remainingAccounts(pool.getCustodyMetas())
+      .transaction();
+    const result = await this.simulateTransaction(transaction);
+    console.log("add liq result", result);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getAddLiquidityAmountAndFee"
+    );
+    const res: any = this.decodeLogs(result, index);
+    return {
+      amount: res.amount,
+      fee: res.fee,
+    };
+  };
+
+  getRemoveLiquidityAmountAndFees = async (
+    lpAmountIn: BN,
+    pool: PoolAccount,
+    custody: CustodyAccount
+  ): Promise<RemoveLiquidityAmountAndFees> => {
+    let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+    let transaction = await program.methods
+      .getRemoveLiquidityAmountAndFee({
+        lpAmountIn,
+      })
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
+        custody: custody.address,
+        custodyOracleAccount: custody.oracle.oracleAccount,
+        lpTokenMint: pool.getLpTokenMint(),
+      })
+      .transaction();
+    const result = await this.simulateTransaction(transaction);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getRemoveLiquidityAmountAndFee"
+    );
+    const res: any = this.decodeLogs(result, index);
+    return {
+      amount: res.amount,
+      fee: res.fee,
     };
   };
 }
