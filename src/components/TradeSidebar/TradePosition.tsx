@@ -44,6 +44,8 @@ export function TradePosition(props: Props) {
   const { publicKey, signTransaction, wallet, signAllTransactions } =
     useWallet();
 
+  const walletContextState = useWallet();
+
   const { connection } = useConnection();
 
   const poolData = useGlobalStore((state) => state.poolData);
@@ -70,11 +72,7 @@ export function TradePosition(props: Props) {
     const payCustody = pool?.getCustodyAccount(payToken);
     const positionCustody = pool?.getCustodyAccount(positionToken);
     await openPosition(
-      // @ts-ignore
-      wallet,
-      publicKey,
-      signTransaction,
-      signAllTransactions,
+      walletContextState,
       connection,
       pool,
       payCustody,

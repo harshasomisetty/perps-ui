@@ -1,7 +1,10 @@
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { Program, Wallet } from "@project-serum/anchor";
 
-import { Wallet as SolanaWalletReact } from "@solana/wallet-adapter-react";
+import {
+  Wallet as SolanaWalletReact,
+  WalletContextState,
+} from "@solana/wallet-adapter-react";
 import { IDL as PERPETUALS_IDL } from "@/target/types/perpetuals";
 import * as PerpetualsJson from "@/target/idl/perpetuals.json";
 import { getProvider } from "@/utils/provider";
@@ -33,21 +36,23 @@ class DefaultWallet implements Wallet {
 }
 
 export async function getPerpetualProgramAndProvider(
-  solanaWallet?: SolanaWalletReact,
-  signTransaction?: any,
-  signAllTransactions?: any
+  walletContextState: WalletContextState
 ) {
   let provider;
 
   let perpetual_program;
 
-  if (signTransaction) {
+  if (walletContextState) {
     let wallet: Wallet = {
-      signTransaction: signTransaction,
-      signAllTransactions: signAllTransactions,
-      publicKey: solanaWallet?.adapter.publicKey,
+      // @ts-ignore
+      signTransaction: walletContextState.signTransaction,
+      // @ts-ignore
+      signAllTransactions: walletContextState.signAllTransactions,
+      // @ts-ignore
+      publicKey: walletContextState.publicKey,
     };
 
+    // console.log("wallet context state", walletContextState.wallet?.adapter.url);
     provider = await getProvider(wallet);
   } else {
     provider = await getProvider(new DefaultWallet(DEFAULT_PERPS_USER));
