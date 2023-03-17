@@ -17,8 +17,6 @@ export default function PoolTokenStats(props: Props) {
   const stats = useGlobalStore((state) => state.priceStats);
   let poolData = useGlobalStore((state) => state.poolData);
 
-  console.log("stats", stats);
-
   if (Object.keys(stats).length === 0) {
     return <LoadingSpinner className="absolute text-4xl" />;
   } else {
