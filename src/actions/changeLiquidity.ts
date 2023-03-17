@@ -109,13 +109,14 @@ export async function changeLiquidity(
       console.log("in add liq", tokenAmount);
       let amountIn;
       let minLpAmountOut = new BN(
-        liquidityAmount * 10 ** pool.lpData.decimals * 0.9
+        liquidityAmount * 10 ** pool.lpData.decimals * 0.8
       );
       if (custody.getTokenE() === TokenE.SOL) {
         amountIn = new BN(tokenAmount * LAMPORTS_PER_SOL);
       } else {
         amountIn = new BN(tokenAmount * 10 ** custody.decimals);
       }
+      console.log("min lp out", Number(minLpAmountOut));
       let addLiquidityTx = await perpetual_program.methods
         .addLiquidity({ amountIn, minLpAmountOut })
         .accounts({

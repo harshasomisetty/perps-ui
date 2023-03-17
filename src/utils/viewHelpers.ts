@@ -291,11 +291,12 @@ export class ViewHelper {
   };
 
   getAddLiquidityAmountAndFees = async (
-    amountIn: BN,
+    amtIn: number,
     pool: PoolAccount,
     custody: CustodyAccount
   ): Promise<AddLiquidityAmountAndFees> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+    let amountIn = new BN(amtIn * 10 ** custody.decimals);
     let transaction = await program.methods
       .getAddLiquidityAmountAndFee({
         amountIn,
@@ -310,6 +311,8 @@ export class ViewHelper {
       .remainingAccounts(pool.getCustodyMetas())
       .transaction();
     const result = await this.simulateTransaction(transaction);
+
+    console.log("result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAddLiquidityAmountAndFee"
     );
@@ -321,11 +324,14 @@ export class ViewHelper {
   };
 
   getRemoveLiquidityAmountAndFees = async (
-    lpAmountIn: BN,
+    lpIn: number,
     pool: PoolAccount,
     custody: CustodyAccount
   ): Promise<RemoveLiquidityAmountAndFees> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+
+    let lpAmountIn = new BN(lpIn * 10 ** pool.lpData.decimals);
+
     let transaction = await program.methods
       .getRemoveLiquidityAmountAndFee({
         lpAmountIn,
@@ -348,5 +354,30 @@ export class ViewHelper {
       amount: res.amount,
       fee: res.fee,
     };
+  };
+
+  getOraclePrice = async (
+    pool: PoolAccount,
+    ema: boolean,
+    custody: CustodyAccount
+  ): Promise<BN> => {
+    const transaction = await this.program.methods
+      .getOraclePrice({
+        ema,
+      })
+      .accounts({
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
+        custody: custody.address,
+        custodyOracleAccount: custody.oracle.oracleAccount,
+      })
+      .transaction();
+
+    const result = await this.simulateTransaction(transaction);
+    console.log("oracle result", result);
+    const index = IDL.instructions.findIndex(
+      (f) => f.name === "getOraclePrice"
+    );
+    return this.decodeLogs<BN>(result, index);
   };
 }

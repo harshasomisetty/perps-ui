@@ -17,7 +17,6 @@ import { Tab } from "@/lib/types";
 import { BN } from "@project-serum/anchor";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { TokenE } from "@/lib/Token";
 
 interface Props {
@@ -90,10 +89,11 @@ export default function LiquidityCard(props: Props) {
         tokenAmount !== prevTokenAmount
       ) {
         liqInfo = await View.getAddLiquidityAmountAndFees(
-          new BN(tokenAmount * LAMPORTS_PER_SOL),
+          tokenAmount,
           props.pool!,
           props.pool!.getCustodyAccount(payToken!)!
         );
+
         setLiqAmount(Number(liqInfo.amount) / 10 ** props.pool.lpData.decimals);
         setPrevTokenAmount(tokenAmount);
       }
@@ -104,7 +104,7 @@ export default function LiquidityCard(props: Props) {
         liqAmount !== prevLiqAmount
       ) {
         liqInfo = await View.getRemoveLiquidityAmountAndFees(
-          new BN(liqAmount * 10 ** props.pool.lpData.decimals),
+          liqAmount,
           props.pool!,
           props.pool!.getCustodyAccount(payToken!)!
         );
@@ -146,6 +146,8 @@ export default function LiquidityCard(props: Props) {
 
   const handleSelectToken = (token: TokenE) => {
     setTokenAmount(0);
+    setPrevTokenAmount(0);
+    setPrevLiqAmount(0);
     setPayToken(token);
   };
 
