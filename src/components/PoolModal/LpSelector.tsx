@@ -2,6 +2,7 @@ import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;
+  label?: string;
   amount: number;
   onChangeAmount?(amount: number): void;
   maxBalance?: number;
@@ -24,7 +25,7 @@ export const LpSelector = (props: Props) => {
         )}
       >
         <div className="flex items-center space-x-2">
-          <p>LP Tokens</p>
+          <p>{props.label ? props.label : "LP Tokens"}</p>
           {props.maxBalance && (
             <button
               className={twMerge(
@@ -62,7 +63,7 @@ export const LpSelector = (props: Props) => {
             )}
             placeholder="0"
             type="number"
-            value={props.amount.toFixed(3)}
+            value={props.amount.toString()}
             onChange={(e) => {
               const value = e.currentTarget.valueAsNumber;
               props.onChangeAmount?.(isNaN(value) ? 0 : value);

@@ -14,17 +14,16 @@ import { LpSelector } from "@/components/PoolModal/LpSelector";
 import { twMerge } from "tailwind-merge";
 import { SolidButton } from "@/components/SolidButton";
 import { formatNumberCommas } from "@/utils/formatters";
+import { changeCollateral } from "src/actions/changeCollateral";
+import { Tab } from "@/lib/types";
+import { ta } from "date-fns/locale";
+import { BN } from "@project-serum/anchor";
 
 interface Props {
   className?: string;
   children?: React.ReactNode;
   position: PositionAccount;
   pnl: number;
-}
-
-enum Tab {
-  Add,
-  Remove,
 }
 
 export function CollateralModal(props: Props) {
@@ -73,6 +72,28 @@ export function CollateralModal(props: Props) {
   // TODO incorporate proper fetched new liq price into collateral modal
   function getNewLiqPrice() {}
 
+  async function handleChangeCollateral() {
+    let changeAmount;
+    if (tab === Tab.Add) {
+      changeAmount =
+        depositAmount *
+        10 ** pool.getCustodyAccount(props.position.token)!.decimals;
+    } else {
+      changeAmount = withdrawAmount * 10 ** 6;
+    }
+    console.log("in change coll", formatNumberCommas(changeAmount));
+    await changeCollateral(
+      publicKey!,
+      wallet!,
+      connection,
+      signTransaction,
+      pool,
+      props.position,
+      new BN(changeAmount),
+      tab
+    );
+  }
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>{props.children}</Dialog.Trigger>
@@ -116,7 +137,7 @@ export function CollateralModal(props: Props) {
                     </div>
                     {publicKey && (
                       <div>
-                        Balance: {payTokenBalance && payTokenBalance.toFixed(3)}
+                        Max: {payTokenBalance && payTokenBalance.toFixed(3)}
                       </div>
                     )}
                   </>
@@ -126,7 +147,9 @@ export function CollateralModal(props: Props) {
                       You Remove
                     </div>
                     {publicKey && (
-                      <div>Balance: {liqBalance && liqBalance.toFixed(3)}</div>
+                      <div>
+                        Max: {props.position.getCollateralUsd().toFixed(3)}
+                      </div>
                     )}
                   </>
                 )}
@@ -145,7 +168,8 @@ export function CollateralModal(props: Props) {
                   className="mt-2"
                   amount={withdrawAmount}
                   onChangeAmount={setWithdrawAmount}
-                  maxBalance={liqBalance}
+                  maxBalance={props.position.getCollateralUsd()}
+                  label={"USD"}
                 />
               )}
             </div>
@@ -211,7 +235,9 @@ export function CollateralModal(props: Props) {
                           <ArrowRight />
                         </p>
 
-                        <div className="text-sm text-white">{newValue}</div>
+                        <div className="text-sm font-semibold text-white">
+                          {newValue}
+                        </div>
                       </>
                     )}
                   </div>
@@ -224,6 +250,7 @@ export function CollateralModal(props: Props) {
                 <SolidButton
                   className="w-full"
                   disabled={!publicKey || !depositAmount}
+                  onClick={handleChangeCollateral}
                 >
                   {tab === Tab.Add ? "Add Collateral" : "Remove Collateral"}
                 </SolidButton>
