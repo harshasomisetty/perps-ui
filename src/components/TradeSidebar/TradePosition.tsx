@@ -41,8 +41,7 @@ export function TradePosition(props: Props) {
 
   const [leverage, setLeverage] = useState(1);
 
-  const { publicKey, signTransaction, wallet, signAllTransactions } =
-    useWallet();
+  const { publicKey, wallet } = useWallet();
 
   const walletContextState = useWallet();
 
@@ -165,6 +164,8 @@ export function TradePosition(props: Props) {
       </div>
     );
   }
+
+  // TODO redo leverage calculation by seeing how much payToken * price / positionToken * price is
 
   return (
     <div className={props.className}>

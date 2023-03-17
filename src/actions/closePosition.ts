@@ -6,7 +6,7 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { manualSendTransaction } from "@/utils/manualTransaction";
+import { manualSendTransaction } from "@/utils/dispatchTransaction";
 import { BN, Wallet } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";

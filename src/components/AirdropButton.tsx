@@ -1,7 +1,7 @@
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { getTokenLabel, TokenE } from "@/lib/Token";
 import { DEFAULT_PERPS_USER } from "@/utils/constants";
-import { manualSendTransaction } from "@/utils/manualTransaction";
+import { manualSendTransaction } from "@/utils/dispatchTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import {
   createAssociatedTokenAccountInstruction,

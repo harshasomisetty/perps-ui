@@ -25,6 +25,7 @@ interface Props {
 export function TradeSwap(props: Props) {
   const { connection } = useConnection();
   const { publicKey, signTransaction, wallet } = useWallet();
+  const walletContextState = useWallet();
 
   const stats = useGlobalStore((state) => state.priceStats);
   const poolData = useGlobalStore((state) => state.poolData);
@@ -125,9 +126,7 @@ export function TradeSwap(props: Props) {
       .div(new BN(100));
 
     await swap(
-      wallet,
-      publicKey,
-      signTransaction,
+      walletContextState,
       connection,
       pool,
       payToken,

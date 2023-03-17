@@ -25,6 +25,7 @@ import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import { automaticSendTransaction } from "@/utils/dispatchTransaction";
 
 export async function openPosition(
   walletContextState: WalletContextState,
@@ -68,11 +69,25 @@ export async function openPosition(
 
   // TODO SWAP IF PAY != POSITION TOKEN
 
-  let wrapInstructions;
+  // if (payCustody.getTokenE() != positionCustody.getTokenE()) {
+  // }
+
+  /*
+
+  swap pay token to position token
+
+  calculate how much position token value is new payAmount
+
+  open position using new payAmount
+
+
+  */
+
+  let preInstructions;
   if (positionCustody.getTokenE() == TokenE.SOL) {
     console.log("pay token name is sol");
 
-    wrapInstructions = await wrapSolIfNeeded(
+    preInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
       connection,
@@ -101,12 +116,12 @@ export async function openPosition(
     tokenProgram: TOKEN_PROGRAM_ID,
   });
 
-  if (wrapInstructions) {
-    methodBuilder = methodBuilder.preInstructions(wrapInstructions);
+  if (preInstructions) {
+    methodBuilder = methodBuilder.preInstructions(preInstructions);
   }
 
   try {
-    await methodBuilder.rpc();
+    await automaticSendTransaction(methodBuilder);
   } catch (err) {
     console.log(err);
     throw err;

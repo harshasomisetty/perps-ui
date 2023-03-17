@@ -14,6 +14,30 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 
+export async function createAtaIfNeeded(
+  publicKey: PublicKey,
+  payer: PublicKey,
+  mint: PublicKey,
+  connection: Connection
+): Promise<TransactionInstruction | null> {
+  const associatedTokenAccount = await getAssociatedTokenAddress(
+    mint,
+    publicKey
+  );
+
+  if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
+    console.log("ata doesn't exist");
+    return createAssociatedTokenAccountInstruction(
+      payer,
+      associatedTokenAccount,
+      publicKey,
+      NATIVE_MINT
+    );
+  }
+
+  return null;
+}
+
 export async function wrapSolIfNeeded(
   publicKey: PublicKey,
   payer: PublicKey,
@@ -28,17 +52,13 @@ export async function wrapSolIfNeeded(
     publicKey
   );
 
-  if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
-    console.log("ata doesn't exist");
-    preInstructions.push(
-      createAssociatedTokenAccountInstruction(
-        payer,
-        associatedTokenAccount,
-        publicKey,
-        NATIVE_MINT
-      )
-    );
-  }
+  let ataIx = await createAtaIfNeeded(
+    publicKey,
+    payer,
+    NATIVE_MINT,
+    connection
+  );
+  if (ataIx) preInstructions.push(ataIx);
 
   const balance = await connection.getBalance(associatedTokenAccount);
 

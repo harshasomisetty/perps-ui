@@ -5,7 +5,7 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { manualSendTransaction } from "@/utils/manualTransaction";
+import { manualSendTransaction } from "@/utils/dispatchTransaction";
 import { BN, Wallet } from "@project-serum/anchor";
 import {
   createAssociatedTokenAccountInstruction,
