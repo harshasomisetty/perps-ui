@@ -178,9 +178,9 @@ export default function LiquidityCard(props: Props) {
         <SolidButton
           className="mt-6 w-full"
           onClick={changeLiq}
-          disabled={!publicKey || !tokenAmount}
+          // disabled={!publicKey || !tokenAmount}
         >
-          Add Liquidity
+          {tab == Tab.Add ? "Add" : "Remove"} Liquidity
         </SolidButton>
         {!publicKey && (
           <p
@@ -190,7 +190,7 @@ export default function LiquidityCard(props: Props) {
             Please connect wallet to add liquidity
           </p>
         )}
-        {!tokenAmount && (
+        {/* {!tokenAmount && (
           <p
             className="mt-2 text-center text-xs text-orange-500
       "
@@ -198,7 +198,7 @@ export default function LiquidityCard(props: Props) {
             Please enter a valid amount of tokens to{" "}
             {tab === Tab.Add ? "add" : "remove"} liquidity
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );

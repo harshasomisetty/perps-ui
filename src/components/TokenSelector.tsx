@@ -120,7 +120,7 @@ export function TokenSelector(props: Props) {
               )}
               placeholder="0"
               type="number"
-              value={props.amount.toFixed(3)}
+              value={props.amount.toString()}
               onChange={(e) => {
                 const value = e.currentTarget.valueAsNumber;
                 props.onChangeAmount?.(isNaN(value) ? 0 : value);
