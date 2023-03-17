@@ -77,9 +77,9 @@ export function TradePosition(props: Props) {
       pool,
       payCustody,
       positionCustody,
-      new BN(payAmount * LAMPORTS_PER_SOL),
-      new BN(positionAmount * LAMPORTS_PER_SOL),
-      new BN(stats[payToken]?.currentPrice * 10 ** 6),
+      payAmount,
+      positionAmount,
+      stats[payToken]?.currentPrice,
       props.side
     );
     const positionInfos = await getPositionData(custodyData);

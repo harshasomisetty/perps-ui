@@ -24,6 +24,7 @@ import {
 import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
+import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
 
 export async function openPosition(
   walletContextState: WalletContextState,
@@ -31,9 +32,9 @@ export async function openPosition(
   pool: PoolAccount,
   payCustody: CustodyAccount,
   positionCustody: CustodyAccount,
-  payAmount: BN,
-  positionAmount: BN,
-  price: BN,
+  payAmount: number,
+  positionAmount: number,
+  price: number,
   side: Side
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(
@@ -45,15 +46,14 @@ export async function openPosition(
   // TODO: need to take slippage as param , this is now for testing
   const newPrice =
     side.toString() == "Long"
-      ? price.mul(new BN(115)).div(new BN(100))
-      : price.mul(new BN(90)).div(new BN(100));
+      ? new BN((price * 10 ** 6 * 115) / 100)
+      : new BN((price * 10 ** 6 * 90) / 100);
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
     positionCustody.mint,
     publicKey
   );
 
-  // console.log("tokens", payToken, positionToken);
   let positionAccount = findProgramAddressSync(
     [
       Buffer.from("position"),
@@ -68,72 +68,45 @@ export async function openPosition(
 
   // TODO SWAP IF PAY != POSITION TOKEN
 
-  let preInstructions: TransactionInstruction[] = [];
+  let wrapInstructions;
+  if (positionCustody.getTokenE() == TokenE.SOL) {
+    console.log("pay token name is sol");
+
+    wrapInstructions = await wrapSolIfNeeded(
+      publicKey,
+      publicKey,
+      connection,
+      payAmount
+    );
+  }
+
+  const params: any = {
+    price: newPrice,
+    collateral: new BN(payAmount * LAMPORTS_PER_SOL),
+    size: new BN(positionAmount * LAMPORTS_PER_SOL),
+    side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
+  };
+
+  let methodBuilder = perpetual_program.methods.openPosition(params).accounts({
+    owner: publicKey,
+    fundingAccount: userCustodyTokenAccount,
+    transferAuthority: TRANSFER_AUTHORITY,
+    perpetuals: PERPETUALS_ADDRESS,
+    pool: pool.address,
+    position: positionAccount,
+    custody: positionCustody.address,
+    custodyOracleAccount: positionCustody.oracle.oracleAccount,
+    custodyTokenAccount: positionCustody.tokenAccount,
+    systemProgram: SystemProgram.programId,
+    tokenProgram: TOKEN_PROGRAM_ID,
+  });
+
+  if (wrapInstructions) {
+    methodBuilder = methodBuilder.preInstructions(wrapInstructions);
+  }
+
   try {
-    // wrap sol if needed
-    if (positionCustody.getTokenE() == TokenE.SOL) {
-      console.log("pay token name is sol");
-
-      const associatedTokenAccount = await getAssociatedTokenAddress(
-        NATIVE_MINT,
-        publicKey
-      );
-
-      if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
-        console.log("sol ata does not exist", NATIVE_MINT.toString());
-
-        preInstructions.push(
-          createAssociatedTokenAccountInstruction(
-            publicKey,
-            associatedTokenAccount,
-            publicKey,
-            NATIVE_MINT
-          )
-        );
-      }
-
-      console.log("sol ata exists");
-      const balance = await connection.getBalance(associatedTokenAccount);
-      if (balance < payAmount.toNumber()) {
-        console.log("balance insufficient");
-
-        preInstructions.push(
-          SystemProgram.transfer({
-            fromPubkey: publicKey,
-            toPubkey: associatedTokenAccount,
-            lamports: LAMPORTS_PER_SOL,
-          })
-        );
-        preInstructions.push(
-          createSyncNativeInstruction(associatedTokenAccount)
-        );
-      }
-    }
-
-    const params: any = {
-      price: newPrice,
-      collateral: payAmount,
-      size: positionAmount,
-      side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
-    };
-
-    await perpetual_program.methods
-      .openPosition(params)
-      .accounts({
-        owner: publicKey,
-        fundingAccount: userCustodyTokenAccount,
-        transferAuthority: TRANSFER_AUTHORITY,
-        perpetuals: PERPETUALS_ADDRESS,
-        pool: pool.address,
-        position: positionAccount,
-        custody: positionCustody.address,
-        custodyOracleAccount: positionCustody.oracle.oracleAccount,
-        custodyTokenAccount: positionCustody.tokenAccount,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .preInstructions(preInstructions)
-      .rpc();
+    await methodBuilder.rpc();
   } catch (err) {
     console.log(err);
     throw err;
