@@ -16,6 +16,7 @@ import { TokenSelector } from "@/components/TokenSelector";
 import { PoolSelector } from "@/components/PoolSelector";
 import { SolidButton } from "@/components/SolidButton";
 import { TradeSwapDetails } from "@/components/TradeSidebar/TradeSwapDetails";
+import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
 
 interface Props {
   className?: string;
@@ -41,6 +42,8 @@ export function TradeSwap(props: Props) {
   const [receiveTokenBalance, setReceiveTokenBalance] = useState(0);
 
   const [pool, setPool] = useState<PoolAccount | null>(null);
+
+  const setUserData = useGlobalStore((state) => state.setUserData);
 
   const [pendingRateConversion, setPendingRateConversion] = useState(false);
 
@@ -91,11 +94,7 @@ export function TradeSwap(props: Props) {
       );
       setPendingRateConversion(false);
 
-      // console.log("setting fee????", f);
-      // .amountOut.sub(swapInfo.feeIn)
       setFee(f);
-
-      // console.log("getting fee percentage", getFeePercentage());
     }
 
     if (pool) {
@@ -121,7 +120,6 @@ export function TradeSwap(props: Props) {
 
   async function handleSwap() {
     // TODO: need to take slippage as param , this is now for testing
-    // console.log("in handle swap");
     const newPrice = new BN(receiveAmount * 10 ** 6)
       .mul(new BN(90))
       .div(new BN(100));
@@ -138,7 +136,8 @@ export function TradeSwap(props: Props) {
       newPrice
     );
 
-    router.reload(window.location.pathname);
+    const userData = await getAllUserData(connection, publicKey!, poolData);
+    setUserData(userData);
   }
 
   if (!pool || !payToken || !receiveToken || Object.values(stats).length == 0) {

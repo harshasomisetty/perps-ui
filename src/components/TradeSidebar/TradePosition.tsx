@@ -63,10 +63,8 @@ export function TradePosition(props: Props) {
 
   const timeoutRef = useRef(null);
 
-  async function handleTrade(e) {
-    e.preventDefault();
-
-    console.log("in handle trade");
+  async function handleTrade() {
+    // console.log("in handle trade");
     const payCustody = pool?.getCustodyAccount(payToken);
     const positionCustody = pool?.getCustodyAccount(positionToken);
     await openPosition(
@@ -85,7 +83,6 @@ export function TradePosition(props: Props) {
     );
     const positionInfos = await getPositionData(custodyData);
     setPositionData(positionInfos);
-    // fetchPositions();
   }
 
   useEffect(() => {
@@ -247,18 +244,12 @@ export function TradePosition(props: Props) {
         Place Order
       </SolidButton>
       {!publicKey && (
-        <p
-          className="mt-2 text-center text-xs text-orange-500
-      "
-        >
+        <p className="mt-2 text-center text-xs text-orange-500">
           Please connect wallet to execute order
         </p>
       )}
       {!payAmount && (
-        <p
-          className="mt-2 text-center text-xs text-orange-500
-      "
-        >
+        <p className="mt-2 text-center text-xs text-orange-500 ">
           Please specify a valid nonzero amount to pay
         </p>
       )}

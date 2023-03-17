@@ -1,6 +1,4 @@
 import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
-import { notify } from "@/components/Notify";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { forwardRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
@@ -49,9 +47,6 @@ export const SolidButton = forwardRef<HTMLButtonElement, Props>(
         )}
         onClick={(e) => {
           handleClick(e);
-          if (!loading && !rest.disabled) {
-            rest.onClick?.(e);
-          }
         }}
       >
         <div

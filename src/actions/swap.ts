@@ -36,18 +36,6 @@ export async function swap(
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
-  // sol is one i'm sending out, from pool perspective its the receiving custody
-
-  // sol: pay token, receiving cusoty
-
-  // from: funding_account; should be sol
-  // to: receiving_custody_token_account;
-  // constraint = funding_account.mint == receiving_custody.mint,
-
-  // from: dispensing_custody_token_account; should be usdc
-  // to: receiving_account;
-  // constraint = receiving_account.mint == dispensing_custody.mint,
-
   const receivingCustody = pool.getCustodyAccount(topToken)!;
   let fundingAccount = await getAssociatedTokenAddress(
     receivingCustody.mint,
@@ -59,17 +47,6 @@ export async function swap(
   let receivingAccount = await getAssociatedTokenAddress(
     dispensingCustody.mint,
     publicKey
-  );
-
-  console.log(
-    "token swap details",
-    receivingCustody.getTokenE(),
-    dispensingCustody.getTokenE()
-  );
-  console.log(
-    "receiving and funding accounts",
-    receivingAccount.toString(),
-    fundingAccount.toString()
   );
 
   let transaction = new Transaction();
@@ -163,16 +140,6 @@ export async function swap(
       })
       .transaction();
     transaction = transaction.add(swapTx);
-
-    console.log("swap tx", transaction);
-    console.log("tx keys");
-    // for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-    //   console.log(
-    //     "key",
-    //     i,
-    //     transaction.instructions[0]!.keys[i]?.pubkey.toString()
-    //   );
-    // }
 
     await manualSendTransaction(
       transaction,

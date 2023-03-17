@@ -48,20 +48,10 @@ export async function openPosition(
       ? price.mul(new BN(115)).div(new BN(100))
       : price.mul(new BN(90)).div(new BN(100));
 
-  console.log("pool", pool);
-
-  console.log("position custo", positionCustody.getTokenE());
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
     positionCustody.mint,
     publicKey
   );
-
-  console.log("user custody token account", userCustodyTokenAccount.toString());
-
-  // check if usercustodytoken account exists
-  if (!(await checkIfAccountExists(userCustodyTokenAccount, connection))) {
-    console.log("user custody token account does not exist");
-  }
 
   // console.log("tokens", payToken, positionToken);
   let positionAccount = findProgramAddressSync(
@@ -75,8 +65,6 @@ export async function openPosition(
     ],
     perpetual_program.programId
   )[0];
-
-  console.log("pos accoutn", positionAccount.toString());
 
   let transaction = new Transaction();
   // TODO SWAP IF PAY != POSITION TOKEN

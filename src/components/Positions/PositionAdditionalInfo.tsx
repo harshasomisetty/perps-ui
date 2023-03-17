@@ -35,7 +35,6 @@ export function PositionAdditionalInfo(props: Props) {
   const positionCustody = custodyData[props.position.custody.toString()]!;
 
   async function handleCloseTrade() {
-    console.log("in close trade");
     await closePosition(
       positionPool,
       //@ts-ignore
@@ -50,8 +49,6 @@ export function PositionAdditionalInfo(props: Props) {
 
     const positionInfos = await getPositionData(custodyData);
     setPositionData(positionInfos);
-
-    // fetchPositions();
   }
 
   if (Object.values(stats).length === 0) return <p>sdf</p>;

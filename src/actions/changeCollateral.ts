@@ -16,7 +16,6 @@ import {
 } from "@solana/spl-token";
 import {
   Connection,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
   Transaction,
@@ -128,7 +127,6 @@ export async function changeCollateral(
         .transaction();
       transaction = transaction.add(removeCollateralTx);
     }
-    console.log("col tx", transaction);
 
     await manualSendTransaction(
       transaction,

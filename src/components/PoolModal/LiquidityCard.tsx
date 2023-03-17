@@ -13,15 +13,11 @@ import { getPoolData } from "@/hooks/storeHelpers/fetchPools";
 import { SidebarTab } from "@/components/SidebarTab";
 import AirdropButton from "@/components/AirdropButton";
 import { LpSelector } from "@/components/PoolModal/LpSelector";
+import { Tab } from "@/lib/types";
 
 interface Props {
   className?: string;
   pool: PoolAccount;
-}
-
-enum Tab {
-  Add,
-  Remove,
 }
 
 export default function LiquidityCard(props: Props) {
@@ -48,7 +44,6 @@ export default function LiquidityCard(props: Props) {
   let liqBalance = userData.lpBalances[props.pool.address.toString()];
 
   async function changeLiq() {
-    console.log("before change", tab === Tab.Remove, liqAmount);
     await changeLiquidity(
       props.pool,
       wallet!,

@@ -22,23 +22,13 @@ export async function closePosition(
   custody: CustodyAccount,
   price: BN
 ) {
-  console.log("in close postion");
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
 
-  console.log("pool", pool);
-  console.log("side:", position.side);
-
   // TODO: need to take slippage as param , this is now for testing
-  console.log("side", position.side.toString());
   const adjustedPrice =
     position.side.toString() == "Long"
       ? price.mul(new BN(50)).div(new BN(100))
       : price.mul(new BN(150)).div(new BN(100));
-  console.log(
-    "price, adjustedPrice, apiPrice:",
-    price.toString(),
-    adjustedPrice.toString()
-  );
 
   let userCustodyTokenAccount = await getAssociatedTokenAddress(
     custody.mint,
@@ -48,8 +38,6 @@ export async function closePosition(
   let transaction = new Transaction();
 
   try {
-    // console.log("position account", positionAccount.toString());
-
     let tx = await perpetual_program.methods
       .closePosition({
         price: adjustedPrice,
@@ -68,16 +56,6 @@ export async function closePosition(
       })
       .transaction();
     transaction = transaction.add(tx);
-
-    console.log("close position tx", transaction);
-    console.log("tx keys");
-    // for (let i = 0; i < transaction.instructions[0]!.keys.length; i++) {
-    //   console.log(
-    //     "key",
-    //     i,
-    //     transaction.instructions[0]!.keys[i]?.pubkey.toString()
-    //   );
-    // }
 
     await manualSendTransaction(
       transaction,

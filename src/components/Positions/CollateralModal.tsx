@@ -1,13 +1,11 @@
 import { SidebarTab } from "@/components/SidebarTab";
 import ArrowRight from "@carbon/icons-react/lib/ArrowRight";
-import Close from "@carbon/icons-react/lib/Close";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
 import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
 import { useGlobalStore } from "@/stores/store";
-import { PoolAccount } from "@/lib/PoolAccount";
 import { PositionAccount } from "@/lib/PositionAccount";
 import { TokenSelector } from "@/components/TokenSelector";
 import { LpSelector } from "@/components/PoolModal/LpSelector";
@@ -16,8 +14,8 @@ import { SolidButton } from "@/components/SolidButton";
 import { formatNumberCommas } from "@/utils/formatters";
 import { changeCollateral } from "src/actions/changeCollateral";
 import { Tab } from "@/lib/types";
-import { ta } from "date-fns/locale";
 import { BN } from "@project-serum/anchor";
+import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
 
 interface Props {
   className?: string;
@@ -32,7 +30,6 @@ export function CollateralModal(props: Props) {
   const { connection } = useConnection();
 
   const poolData = useGlobalStore((state) => state.poolData);
-  const setCustodyData = useGlobalStore((state) => state.setCustodyData);
 
   const userData = useGlobalStore((state) => state.userData);
 
@@ -44,6 +41,10 @@ export function CollateralModal(props: Props) {
 
   let payTokenBalance = userData.tokenBalances[pool.getTokenList()[0]!];
   let liqBalance = userData.lpBalances[pool.address.toString()];
+
+  const custodyData = useGlobalStore((state) => state.custodyData);
+
+  const setPositionData = useGlobalStore((state) => state.setPositionData);
 
   const [withdrawAmount, setWithdrawAmount] = useState(1);
   const [depositAmount, setDepositAmount] = useState(1);
@@ -81,7 +82,7 @@ export function CollateralModal(props: Props) {
     } else {
       changeAmount = withdrawAmount * 10 ** 6;
     }
-    console.log("in change coll", formatNumberCommas(changeAmount));
+
     await changeCollateral(
       publicKey!,
       wallet!,
@@ -92,6 +93,9 @@ export function CollateralModal(props: Props) {
       new BN(changeAmount),
       tab
     );
+
+    const positionInfos = await getPositionData(custodyData);
+    setPositionData(positionInfos);
   }
 
   return (
