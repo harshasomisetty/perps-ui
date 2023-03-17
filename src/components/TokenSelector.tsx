@@ -75,8 +75,10 @@ export function TokenSelector(props: Props) {
             {cloneElement(getTokenIcon(props.token), {
               className: "h-6 rounded-full w-6",
             })}
-            <div className="ml-1 text-2xl text-white">{props.token}</div>
-            <ChevronRightIcon className="ml-2 fill-gray-500 transition-colors group-hover:fill-white" />
+            <div className="ml-1 mr-2 text-xl text-white">{props.token}</div>
+            {props.tokenList.length > 1 && (
+              <ChevronRightIcon className="fill-gray-500 transition-colors group-hover:fill-white" />
+            )}
           </button>
           {props.maxBalance && (
             <button
@@ -118,7 +120,7 @@ export function TokenSelector(props: Props) {
               )}
               placeholder="0"
               type="number"
-              value={props.amount.toString()}
+              value={props.amount.toFixed(3)}
               onChange={(e) => {
                 const value = e.currentTarget.valueAsNumber;
                 props.onChangeAmount?.(isNaN(value) ? 0 : value);
@@ -132,7 +134,7 @@ export function TokenSelector(props: Props) {
           )}
         </div>
       </div>
-      {selectorOpen && (
+      {selectorOpen && props.tokenList.length > 1 && (
         <TokenSelectorList
           onClose={() => setSelectorOpen(false)}
           onSelectToken={props.onSelectToken}

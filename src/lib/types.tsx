@@ -164,6 +164,11 @@ export enum Side {
   Swap = "Swap",
 }
 
+export enum Tab {
+  Add,
+  Remove,
+}
+
 export interface AccountMeta {
   pubkey: PublicKey;
   isSigner: boolean;

@@ -63,7 +63,10 @@ export function TradePosition(props: Props) {
 
   const timeoutRef = useRef(null);
 
-  async function handleTrade() {
+  async function handleTrade(e) {
+    e.preventDefault();
+
+    console.log("in handle trade");
     const payCustody = pool?.getCustodyAccount(payToken);
     const positionCustody = pool?.getCustodyAccount(positionToken);
     await openPosition(

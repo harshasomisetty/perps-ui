@@ -47,11 +47,6 @@ export default function LiquidityCard(props: Props) {
   let payTokenBalance = userData.tokenBalances[props.pool.getTokenList()[0]];
   let liqBalance = userData.lpBalances[props.pool.address.toString()];
 
-  let liqRatio =
-    Number(props.pool.lpData.supply) /
-    10 ** props.pool.lpData.decimals /
-    props.pool.getLiquidities(stats)!;
-
   async function changeLiq() {
     console.log("before change", tab === Tab.Remove, liqAmount);
     await changeLiquidity(
@@ -71,13 +66,7 @@ export default function LiquidityCard(props: Props) {
 
     setCustodyData(custodyData);
     setPoolData(poolData);
-
-    // router.reload(window.location.pathname);
   }
-
-  // async function onChangeAmtLiq(tokenAmtUsd: number) {
-  //   setLiqAmount(tokenAmtUsd * liqRatio);
-  // }
 
   return (
     <div className={props.className}>

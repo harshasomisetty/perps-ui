@@ -57,6 +57,7 @@ export class PositionAccount {
       custodies[this.custody.toString()]?.oracle.oracleAccount!;
   }
 
+  // TODO update leverage with pnl?
   getLeverage(): number {
     return this.sizeUsd.toNumber() / this.collateralUsd.toNumber();
   }
@@ -77,6 +78,11 @@ export class PositionAccount {
 
   getSizeUsd(): number {
     return Number(this.sizeUsd) / 10 ** 6;
+  }
+
+  getNetValue(pnl: number): number {
+    // return this.getSizeUsd() - this.getCollateralUsd();
+    return Number(this.getCollateralUsd()) + pnl;
   }
 
   // getLiquidationPrice(): number {
