@@ -1171,6 +1171,88 @@
       ]
     },
     {
+      "name": "getAddLiquidityAmountAndFee",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetAddLiquidityAmountAndFeeParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "AmountAndFee"
+      }
+    },
+    {
+      "name": "getRemoveLiquidityAmountAndFee",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetRemoveLiquidityAmountAndFeeParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "AmountAndFee"
+      }
+    },
+    {
       "name": "getEntryPriceAndFee",
       "accounts": [
         {
@@ -1631,11 +1713,9 @@
           },
           {
             "name": "borrowRate",
-            "type": "u64"
-          },
-          {
-            "name": "borrowRateSum",
-            "type": "u64"
+            "type": {
+              "defined": "BorrowRateParams"
+            }
           },
           {
             "name": "assets",
@@ -1659,6 +1739,24 @@
             "name": "tradeStats",
             "type": {
               "defined": "TradeStats"
+            }
+          },
+          {
+            "name": "longPositions",
+            "type": {
+              "defined": "PositionStats"
+            }
+          },
+          {
+            "name": "shortPositions",
+            "type": {
+              "defined": "PositionStats"
+            }
+          },
+          {
+            "name": "borrowRateState",
+            "type": {
+              "defined": "BorrowRateState"
             }
           },
           {
@@ -1962,7 +2060,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "amount",
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minLpAmountOut",
             "type": "u64"
           }
         ]
@@ -1987,6 +2089,18 @@
         "fields": [
           {
             "name": "price",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetAddLiquidityAmountAndFeeParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
             "type": "u64"
           }
         ]
@@ -2032,7 +2146,16 @@
       "name": "GetLiquidationPriceParams",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "addCollateral",
+            "type": "u64"
+          },
+          {
+            "name": "removeCollateral",
+            "type": "u64"
+          }
+        ]
       }
     },
     {
@@ -2059,6 +2182,18 @@
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "GetRemoveLiquidityAmountAndFeeParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lpAmountIn",
+            "type": "u64"
+          }
+        ]
       }
     },
     {
@@ -2175,7 +2310,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "lpAmount",
+            "name": "lpAmountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minAmountOut",
             "type": "u64"
           }
         ]
@@ -2394,14 +2533,7 @@
       "name": "UpgradeCustodyParams",
       "type": {
         "kind": "struct",
-        "fields": [
-          {
-            "name": "borrowRate",
-            "type": {
-              "defined": "BorrowRateParams"
-            }
-          }
-        ]
+        "fields": []
       }
     },
     {
@@ -2646,11 +2778,27 @@
             "type": "u64"
           },
           {
+            "name": "maxInitialLeverage",
+            "type": "u64"
+          },
+          {
             "name": "maxLeverage",
             "type": "u64"
           },
           {
             "name": "maxPayoffMult",
+            "type": "u64"
+          },
+          {
+            "name": "maxUtilization",
+            "type": "u64"
+          },
+          {
+            "name": "maxPositionLockedUsd",
+            "type": "u64"
+          },
+          {
+            "name": "maxTotalLockedUsd",
             "type": "u64"
           }
         ]
@@ -2750,6 +2898,10 @@
             "type": "bool"
           },
           {
+            "name": "useUnrealizedPnlInAum",
+            "type": "bool"
+          },
+          {
             "name": "tradeSpreadLong",
             "type": "u64"
           },
@@ -2799,6 +2951,22 @@
         "fields": [
           {
             "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AmountAndFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
             "type": "u64"
           },
           {
@@ -3007,6 +3175,26 @@
       }
     },
     {
+      "name": "AumCalcMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Min"
+          },
+          {
+            "name": "Max"
+          },
+          {
+            "name": "Last"
+          },
+          {
+            "name": "EMA"
+          }
+        ]
+      }
+    },
+    {
       "name": "Side",
       "type": {
         "kind": "enum",
@@ -3134,26 +3322,36 @@
     },
     {
       "code": 6018,
-      "name": "PoolAmountLimit",
-      "msg": "Pool amount limit exceeded"
+      "name": "CustodyAmountLimit",
+      "msg": "Custody amount limit exceeded"
     },
     {
       "code": 6019,
+      "name": "PositionAmountLimit",
+      "msg": "Position amount limit exceeded"
+    },
+    {
+      "code": 6020,
       "name": "TokenRatioOutOfRange",
       "msg": "Token ratio out of range"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "UnsupportedToken",
       "msg": "Token is not supported"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "InstructionNotAllowed",
       "msg": "Instruction is not allowed at this time"
+    },
+    {
+      "code": 6023,
+      "name": "MaxUtilization",
+      "msg": "Token utilization limit exceeded"
     }
   ],
   "metadata": {
-    "address": "6mL61P7WnYn96PHSCnLemKuUQUQGDzaK5Jeh3pnyKLV8"
+    "address": "e83ema4pazXAr3xDB3hTdv6HV6ZYeR7HwsJNpKeAj7M"
   }
 }
