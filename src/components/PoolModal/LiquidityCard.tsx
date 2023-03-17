@@ -18,6 +18,7 @@ import { BN } from "@project-serum/anchor";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { TokenE } from "@/lib/Token";
 
 interface Props {
   className?: string;
@@ -61,8 +62,9 @@ export default function LiquidityCard(props: Props) {
       signTransaction!,
       connection,
       props.pool.getCustodyAccount(payToken!),
-      tab === Tab.Add ? tokenAmount : 0,
-      tab === Tab.Remove ? liqAmount : 0
+      tokenAmount,
+      liqAmount,
+      tab
     );
 
     const custodyData = await getCustodyData();
@@ -128,6 +130,11 @@ export default function LiquidityCard(props: Props) {
 
     return () => clearTimeout(timeoutRef.current);
   }, [liqAmount]);
+
+  const handleSelectToken = (token: TokenE) => {
+    setTokenAmount(0);
+    setPayToken(token);
+  };
 
   return (
     <div className={props.className}>
@@ -195,7 +202,7 @@ export default function LiquidityCard(props: Props) {
               amount={tokenAmount}
               token={payToken!}
               onChangeAmount={setTokenAmount}
-              onSelectToken={setPayToken}
+              onSelectToken={handleSelectToken}
               tokenList={props.pool.getTokenList()}
               maxBalance={payTokenBalance}
             />
@@ -239,7 +246,7 @@ export default function LiquidityCard(props: Props) {
               className="mt-2"
               amount={tokenAmount}
               token={payToken!}
-              onSelectToken={setPayToken}
+              onSelectToken={handleSelectToken}
               tokenList={props.pool.getTokenList()}
               pendingRateConversion={pendingRateConversion}
             />
@@ -249,7 +256,7 @@ export default function LiquidityCard(props: Props) {
         <SolidButton
           className="mt-6 w-full"
           onClick={changeLiq}
-          // disabled={!publicKey || !tokenAmount}
+          disabled={!publicKey || !tokenAmount}
         >
           {tab == Tab.Add ? "Add" : "Remove"} Liquidity
         </SolidButton>
@@ -261,7 +268,7 @@ export default function LiquidityCard(props: Props) {
             Please connect wallet to add liquidity
           </p>
         )}
-        {/* {!tokenAmount && (
+        {!tokenAmount && (
           <p
             className="mt-2 text-center text-xs text-orange-500
       "
@@ -269,7 +276,7 @@ export default function LiquidityCard(props: Props) {
             Please enter a valid amount of tokens to{" "}
             {tab === Tab.Add ? "add" : "remove"} liquidity
           </p>
-        )} */}
+        )}
       </div>
     </div>
   );

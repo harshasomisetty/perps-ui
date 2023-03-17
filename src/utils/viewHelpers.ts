@@ -338,8 +338,10 @@ export class ViewHelper {
         custodyOracleAccount: custody.oracle.oracleAccount,
         lpTokenMint: pool.getLpTokenMint(),
       })
+      .remainingAccounts(pool.getCustodyMetas())
       .transaction();
     const result = await this.simulateTransaction(transaction);
+    console.log("result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getRemoveLiquidityAmountAndFee"
     );

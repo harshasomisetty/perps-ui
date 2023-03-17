@@ -1,6 +1,7 @@
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { TokenE } from "@/lib/Token";
+import { Tab } from "@/lib/types";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
@@ -33,8 +34,9 @@ export async function changeLiquidity(
   signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   connection: Connection,
   custody: CustodyAccount,
-  tokenAmount?: number,
-  liquidityAmount?: number
+  tokenAmount: number,
+  liquidityAmount: number,
+  tab: Tab
 ) {
   // @ts-ignore
   let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
@@ -103,16 +105,19 @@ export async function changeLiquidity(
     }
 
     console.log("custodies", pool.getCustodyMetas());
-    if (tokenAmount) {
+    if (tab == Tab.Add) {
       console.log("in add liq", tokenAmount);
-      let amount;
+      let amountIn;
+      let minLpAmountOut = new BN(
+        liquidityAmount * 10 ** pool.lpData.decimals * 0.9
+      );
       if (custody.getTokenE() === TokenE.SOL) {
-        amount = new BN(tokenAmount * LAMPORTS_PER_SOL);
+        amountIn = new BN(tokenAmount * LAMPORTS_PER_SOL);
       } else {
-        amount = new BN(tokenAmount * 10 ** custody.decimals);
+        amountIn = new BN(tokenAmount * 10 ** custody.decimals);
       }
       let addLiquidityTx = await perpetual_program.methods
-        .addLiquidity({ amount })
+        .addLiquidity({ amountIn, minLpAmountOut })
         .accounts({
           owner: publicKey,
           fundingAccount: userCustodyTokenAccount, // user token account for custody token account
@@ -129,10 +134,17 @@ export async function changeLiquidity(
         .remainingAccounts(pool.getCustodyMetas())
         .transaction();
       transaction = transaction.add(addLiquidityTx);
-    } else if (liquidityAmount) {
-      let lpAmount = new BN(liquidityAmount * 10 ** pool.lpData.decimals);
+    } else if (tab == Tab.Remove) {
+      console.log("in liq remove");
+      let lpAmountIn = new BN(liquidityAmount * 10 ** pool.lpData.decimals);
+      let minAmountOut;
+      if (custody.getTokenE() === TokenE.SOL) {
+        minAmountOut = new BN(tokenAmount * LAMPORTS_PER_SOL * 0.9);
+      } else {
+        minAmountOut = new BN(tokenAmount * 10 ** custody.decimals * 0.9);
+      }
       let removeLiquidityTx = await perpetual_program.methods
-        .removeLiquidity({ lpAmount })
+        .removeLiquidity({ lpAmountIn, minAmountOut })
         .accounts({
           owner: publicKey,
           receivingAccount: userCustodyTokenAccount, // user token account for custody token account
