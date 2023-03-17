@@ -30,6 +30,9 @@ export function CandlestickChart(props: Props) {
           symbol={getSymbol(props.token)}
           theme="Dark"
         />
+        <p className="text-center text-xs text-white">
+          {props.token} stock chart by TradingView
+        </p>
       </div>
     </div>
   );

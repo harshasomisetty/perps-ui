@@ -216,7 +216,6 @@ export function TradeSwap(props: Props) {
         onChangeAmount={setReceiveAmount}
         onSelectToken={setReceiveToken}
         tokenList={pool.getTokenList().filter((token) => token !== payToken)}
-        liqRatio={0}
         pendingRateConversion={pendingRateConversion}
       />
       <div className="mt-4 text-sm text-zinc-400">Pool</div>
