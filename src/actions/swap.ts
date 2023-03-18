@@ -40,8 +40,6 @@ export async function buildSwapTransaction(
     publicKey
   );
 
-  // let transaction = new Transaction();
-
   let preInstructions: TransactionInstruction[] = [];
 
   let ataIx = await createAtaIfNeeded(

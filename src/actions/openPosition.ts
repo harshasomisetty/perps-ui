@@ -19,6 +19,7 @@ import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
 import { automaticSendTransaction } from "@/utils/dispatchTransaction";
+import { buildSwapTransaction } from "src/actions/swap";
 
 export async function openPosition(
   walletContextState: WalletContextState,
@@ -35,6 +36,7 @@ export async function openPosition(
     walletContextState
   );
 
+  console.log("in open pos");
   let publicKey = walletContextState.publicKey!;
 
   // TODO: need to take slippage as param , this is now for testing
@@ -61,22 +63,31 @@ export async function openPosition(
   )[0];
 
   // TODO SWAP IF PAY != POSITION TOKEN
+  let swapBuilder;
+  let ix;
 
-  // if (payCustody.getTokenE() != positionCustody.getTokenE()) {
-  // }
-
-  /*
-
-  swap pay token to position token
-
-  calculate how much position token value is new payAmount
-
-  open position using new payAmount
-
-
-  */
+  console.log("pre if");
 
   let preInstructions: TransactionInstruction[] = [];
+
+  if (payCustody.getTokenE() != positionCustody.getTokenE()) {
+    console.log("in swap needed");
+    swapBuilder = await buildSwapTransaction(
+      walletContextState,
+      connection,
+      pool,
+      payCustody.getTokenE(),
+      positionCustody.getTokenE(),
+      new BN(payAmount * 10 ** payCustody.decimals),
+      new BN(positionAmount * 10 ** positionCustody.decimals)
+    );
+    // calculate how much position token value is new payAmount
+    // open position using new payAmount
+
+    ix = await swapBuilder.instruction();
+    preInstructions.push(ix);
+  }
+
   if (positionCustody.getTokenE() == TokenE.SOL) {
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
@@ -91,8 +102,8 @@ export async function openPosition(
 
   const params: any = {
     price: newPrice,
-    collateral: new BN(payAmount * LAMPORTS_PER_SOL),
-    size: new BN(positionAmount * LAMPORTS_PER_SOL),
+    collateral: new BN(payAmount * 10 ** payCustody.decimals),
+    size: new BN(positionAmount * 10 ** positionCustody.decimals),
     side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
   };
 
