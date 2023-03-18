@@ -14,7 +14,6 @@ import { SidebarTab } from "@/components/SidebarTab";
 import AirdropButton from "@/components/AirdropButton";
 import { LpSelector } from "@/components/PoolModal/LpSelector";
 import { Tab } from "@/lib/types";
-import { BN } from "@project-serum/anchor";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
 import { TokenE } from "@/lib/Token";
@@ -47,7 +46,7 @@ export default function LiquidityCard(props: Props) {
   const userData = useGlobalStore((state) => state.userData);
 
   // @ts-ignore
-  let payTokenBalance = userData.tokenBalances[props.pool.getTokenList()[0]];
+  // let payTokenBalance = userData.tokenBalances[props.pool.getTokenList()[0]];
   let liqBalance = userData.lpBalances[props.pool.address.toString()];
 
   const [pendingRateConversion, setPendingRateConversion] = useState(false);
@@ -197,7 +196,7 @@ export default function LiquidityCard(props: Props) {
                 <div className="text-sm font-medium text-white">You Add</div>
                 {publicKey && (
                   <div>
-                    Balance: {payTokenBalance && payTokenBalance.toFixed(2)}
+                    Balance: {userData.tokenBalances[payToken].toFixed(2)}
                   </div>
                 )}
               </>
@@ -218,7 +217,7 @@ export default function LiquidityCard(props: Props) {
               onChangeAmount={setTokenAmount}
               onSelectToken={handleSelectToken}
               tokenList={props.pool.getTokenList()}
-              maxBalance={payTokenBalance}
+              maxBalance={userData.tokenBalances[payToken]}
             />
           ) : (
             <LpSelector
@@ -241,7 +240,7 @@ export default function LiquidityCard(props: Props) {
               <>
                 {publicKey && (
                   <div>
-                    Balance: {payTokenBalance && payTokenBalance.toFixed(2)}
+                    Balance: {userData.tokenBalances[payToken].toFixed(2)}
                   </div>
                 )}
               </>

@@ -1,7 +1,8 @@
+import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { getTokenLabel, TokenE } from "@/lib/Token";
+import { useGlobalStore } from "@/stores/store";
 import { DEFAULT_PERPS_USER } from "@/utils/constants";
-import { manualSendTransaction } from "@/utils/dispatchTransaction";
 import { checkIfAccountExists } from "@/utils/retrieveData";
 import {
   createAssociatedTokenAccountInstruction,
@@ -10,7 +11,6 @@ import {
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Transaction } from "@solana/web3.js";
-import { useRouter } from "next/router";
 import { SolidButton } from "./SolidButton";
 
 interface Props {
@@ -21,8 +21,10 @@ export default function AirdropButton(props: Props) {
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
 
-  const router = useRouter();
   let mint = props.custody.mint;
+
+  const poolData = useGlobalStore((state) => state.poolData);
+  const setUserData = useGlobalStore((state) => state.setUserData);
 
   async function handleAirdrop() {
     if (!publicKey) return;
@@ -54,16 +56,29 @@ export default function AirdropButton(props: Props) {
         )
       );
 
-      await manualSendTransaction(
-        transaction,
-        publicKey,
-        connection,
-        signTransaction,
-        DEFAULT_PERPS_USER
+      transaction.feePayer = publicKey;
+      transaction.recentBlockhash = (
+        await connection.getRecentBlockhash("finalized")
+      ).blockhash;
+
+      transaction.sign(DEFAULT_PERPS_USER);
+
+      transaction = await signTransaction(transaction);
+      const rawTransaction = transaction.serialize();
+      let signature = await connection.sendRawTransaction(rawTransaction, {
+        skipPreflight: false,
+      });
+      console.log(
+        `sent raw, waiting : https://explorer.solana.com/tx/${signature}?cluster=devnet`
+      );
+      await connection.confirmTransaction(signature, "confirmed");
+      console.log(
+        `sent tx!!! :https://explorer.solana.com/tx/${signature}?cluster=devnet`
       );
     }
-    // @ts-ignore
-    router.reload(window.location.pathname);
+
+    const userData = await getAllUserData(connection, publicKey!, poolData);
+    setUserData(userData);
   }
 
   if (props.custody.getTokenE() === TokenE.USDC) {

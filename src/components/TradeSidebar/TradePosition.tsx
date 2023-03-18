@@ -32,7 +32,6 @@ enum Input {
 export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState<TokenE>();
   const [positionToken, setPositionToken] = useState<TokenE>();
-  const [payTokenBalance, setPayTokenBalance] = useState<number>();
 
   const [payAmount, setPayAmount] = useState(0.1);
   const [positionAmount, setPositionAmount] = useState(0.2);
@@ -96,13 +95,13 @@ export function TradePosition(props: Props) {
     }
   }, [poolData]);
 
-  useEffect(() => {
-    if (Object.values(userData.lpBalances).length > 0) {
-      setPayTokenBalance(
-        userData.tokenBalances[Object.values(poolData)[0].getTokenList()[0]]
-      );
-    }
-  }, [userData]);
+  // useEffect(() => {
+  //   if (Object.values(userData.lpBalances).length > 0) {
+  //     setPayTokenBalance(
+  //       userData.tokenBalances[Object.values(poolData)[0].getTokenList()[0]]
+  //     );
+  //   }
+  // }, [userData]);
 
   useEffect(() => {
     async function fetchData() {
@@ -172,9 +171,9 @@ export function TradePosition(props: Props) {
         <div className="font-medium text-white">You Pay</div>
         {publicKey && (
           <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer">
-            {payTokenBalance ? (
+            {userData.tokenBalances[payToken].toFixed(2) ? (
               <>
-                <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
+                <p>{userData.tokenBalances[payToken].toFixed(2)}</p>
                 <p className="font-normal">{payToken}</p>
                 <p className="text-zinc-400"> Balance</p>
               </>
@@ -196,7 +195,7 @@ export function TradePosition(props: Props) {
         }}
         onSelectToken={setPayToken}
         tokenList={pool.getTokenList()}
-        maxBalance={payTokenBalance}
+        maxBalance={userData.tokenBalances[payToken].toFixed(2)}
       />
       <div className="mt-4 text-sm font-medium text-white">
         Your {props.side}
