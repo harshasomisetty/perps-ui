@@ -4,17 +4,10 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { checkIfAccountExists } from "@/utils/retrieveData";
 import { BN } from "@project-serum/anchor";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
-import {
-  createAssociatedTokenAccountInstruction,
-  createSyncNativeInstruction,
-  getAssociatedTokenAddress,
-  NATIVE_MINT,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
   Connection,
   LAMPORTS_PER_SOL,
@@ -24,7 +17,7 @@ import {
 import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
 import { automaticSendTransaction } from "@/utils/dispatchTransaction";
 
 export async function openPosition(
@@ -83,16 +76,17 @@ export async function openPosition(
 
   */
 
-  let preInstructions;
+  let preInstructions: TransactionInstruction[] = [];
   if (positionCustody.getTokenE() == TokenE.SOL) {
-    console.log("pay token name is sol");
-
-    preInstructions = await wrapSolIfNeeded(
+    let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
       connection,
       payAmount
     );
+    if (wrapInstructions) {
+      preInstructions.push(...wrapInstructions);
+    }
   }
 
   const params: any = {

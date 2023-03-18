@@ -4,29 +4,14 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import {
-  automaticSendTransaction,
-  manualSendTransaction,
-} from "@/utils/dispatchTransaction";
-import { checkIfAccountExists } from "@/utils/retrieveData";
-import { BN, Wallet } from "@project-serum/anchor";
-import {
-  createAssociatedTokenAccountInstruction,
-  createSyncNativeInstruction,
-  getAssociatedTokenAddress,
-  NATIVE_MINT,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import {
-  Connection,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-} from "@solana/web3.js";
-import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
+import { automaticSendTransaction } from "@/utils/dispatchTransaction";
+import { BN } from "@project-serum/anchor";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { Connection, TransactionInstruction } from "@solana/web3.js";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { WalletContextState } from "@solana/wallet-adapter-react";
-import { createAtaIfNeeded } from "@/utils/transactionHelpers";
+import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import { MethodsBuilder } from "@project-serum/anchor/dist/cjs/program/namespace/methods";
 
 export async function buildSwapTransaction(
   walletContextState: WalletContextState,
@@ -36,7 +21,7 @@ export async function buildSwapTransaction(
   bottomToken: TokenE,
   amountIn: BN,
   minAmountOut: BN
-): Promise<Transaction> {
+): Promise<MethodsBuilder> {
   let { perpetual_program } = await getPerpetualProgramAndProvider(
     walletContextState
   );
@@ -55,7 +40,9 @@ export async function buildSwapTransaction(
     publicKey
   );
 
-  let transaction = new Transaction();
+  // let transaction = new Transaction();
+
+  let preInstructions: TransactionInstruction[] = [];
 
   let ataIx = await createAtaIfNeeded(
     publicKey,
@@ -64,7 +51,7 @@ export async function buildSwapTransaction(
     connection
   );
 
-  if (ataIx) transaction = transaction.add(ataIx);
+  if (ataIx) preInstructions.push(ataIx);
 
   let ataIx1 = await createAtaIfNeeded(
     publicKey,
@@ -73,66 +60,17 @@ export async function buildSwapTransaction(
     connection
   );
 
-  if (ataIx1) transaction = transaction.add(ataIx1);
-
-  // if (!(await checkIfAccountExists(receivingAccount, connection))) {
-  //   transaction = transaction.add(
-  //     createAssociatedTokenAccountInstruction(
-  //       publicKey,
-  //       receivingAccount,
-  //       publicKey,
-  //       dispensingCustody.mint
-  //     )
-  //   );
-  // }
-
-  // if (!(await checkIfAccountExists(fundingAccount, connection))) {
-  //   transaction = transaction.add(
-  //     createAssociatedTokenAccountInstruction(
-  //       publicKey,
-  //       fundingAccount,
-  //       publicKey,
-  //       receivingCustody.mint
-  //     )
-  //   );
-  // }
+  if (ataIx1) preInstructions.push(ataIx1);
 
   if (receivingCustody.getTokenE() == TokenE.SOL) {
-    // assert tokenAmount is not 0
-
-    console.log("pay token name is sol", receivingCustody.getTokenE());
-
-    const associatedTokenAccount = await getAssociatedTokenAddress(
-      NATIVE_MINT,
-      publicKey
+    let wrapInstructions = await wrapSolIfNeeded(
+      publicKey,
+      publicKey,
+      connection,
+      Number(amountIn)
     );
-
-    if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
-      console.log("sol ata does not exist", NATIVE_MINT.toString());
-
-      transaction = transaction.add(
-        createAssociatedTokenAccountInstruction(
-          publicKey,
-          associatedTokenAccount,
-          publicKey,
-          NATIVE_MINT
-        )
-      );
-    }
-
-    // get balance of associated token account
-    console.log("sol ata exists");
-    const balance = await connection.getBalance(associatedTokenAccount);
-    if (balance < Number(amountIn)!) {
-      console.log("balance insufficient");
-      transaction = transaction.add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: associatedTokenAccount,
-          lamports: Number(amountIn)!,
-        }),
-        createSyncNativeInstruction(associatedTokenAccount)
-      );
+    if (wrapInstructions) {
+      preInstructions.push(...wrapInstructions);
     }
   }
 
@@ -141,30 +79,30 @@ export async function buildSwapTransaction(
     minAmountOut,
   };
 
-  let swapTx = await perpetual_program.methods
-    .swap(params)
-    .accounts({
-      owner: publicKey,
-      fundingAccount: fundingAccount,
-      receivingAccount: receivingAccount,
-      transferAuthority: TRANSFER_AUTHORITY,
-      perpetuals: PERPETUALS_ADDRESS,
-      pool: pool.address,
+  let methodBuilder = perpetual_program.methods.swap(params).accounts({
+    owner: publicKey,
+    fundingAccount: fundingAccount,
+    receivingAccount: receivingAccount,
+    transferAuthority: TRANSFER_AUTHORITY,
+    perpetuals: PERPETUALS_ADDRESS,
+    pool: pool.address,
 
-      receivingCustody: receivingCustody.address,
-      receivingCustodyOracleAccount: receivingCustody.oracle.oracleAccount,
-      receivingCustodyTokenAccount: receivingCustody.tokenAccount,
+    receivingCustody: receivingCustody.address,
+    receivingCustodyOracleAccount: receivingCustody.oracle.oracleAccount,
+    receivingCustodyTokenAccount: receivingCustody.tokenAccount,
 
-      dispensingCustody: dispensingCustody.address,
-      dispensingCustodyOracleAccount: dispensingCustody.oracle.oracleAccount,
-      dispensingCustodyTokenAccount: dispensingCustody.tokenAccount,
+    dispensingCustody: dispensingCustody.address,
+    dispensingCustodyOracleAccount: dispensingCustody.oracle.oracleAccount,
+    dispensingCustodyTokenAccount: dispensingCustody.tokenAccount,
 
-      tokenProgram: TOKEN_PROGRAM_ID,
-    })
-    .transaction();
-  transaction = transaction.add(swapTx);
+    tokenProgram: TOKEN_PROGRAM_ID,
+  });
 
-  return transaction;
+  if (preInstructions) {
+    methodBuilder = methodBuilder.preInstructions(preInstructions);
+  }
+
+  return methodBuilder;
 }
 
 export async function swap(
