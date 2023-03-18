@@ -5,135 +5,93 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { manualSendTransaction } from "@/utils/dispatchTransaction";
-import { BN, Wallet } from "@project-serum/anchor";
-import {
-  createAssociatedTokenAccountInstruction,
-  createSyncNativeInstruction,
-  getAssociatedTokenAddress,
-  NATIVE_MINT,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import {
-  Connection,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-} from "@solana/web3.js";
-import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
+import { automaticSendTransaction } from "@/utils/dispatchTransaction";
+import { BN } from "@project-serum/anchor";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { Connection, TransactionInstruction } from "@solana/web3.js";
 import { Tab } from "@/lib/types";
 import { TokenE } from "@/lib/Token";
-import { checkIfAccountExists } from "@/utils/retrieveData";
+import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import { WalletContextState } from "@solana/wallet-adapter-react";
 
 export async function changeCollateral(
-  publicKey: PublicKey,
-  wallet: Wallet,
+  walletContextState: WalletContextState,
   connection: Connection,
-  signTransaction: SignerWalletAdapterProps["signAllTransactions"],
   pool: PoolAccount,
   position: PositionAccount,
   collateral: BN,
   tab: Tab
 ) {
-  try {
-    let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
+  let { perpetual_program } = await getPerpetualProgramAndProvider(
+    walletContextState
+  );
 
-    let custody = pool.getCustodyAccount(position.token)!;
+  let publicKey = walletContextState.publicKey!;
 
-    let userCustodyTokenAccount = await getAssociatedTokenAddress(
-      custody.mint,
-      publicKey
-    );
+  let custody = pool.getCustodyAccount(position.token)!;
 
-    let transaction = new Transaction();
+  let userCustodyTokenAccount = await getAssociatedTokenAddress(
+    custody.mint,
+    publicKey
+  );
 
-    if (tab == Tab.Add) {
-      if (position.token == TokenE.SOL) {
-        // assert tokenAmount is not 0
+  let preInstructions: TransactionInstruction[] = [];
 
-        console.log("pay token name is sol", custody.getTokenE());
-
-        const associatedTokenAccount = await getAssociatedTokenAddress(
-          NATIVE_MINT,
-          publicKey
-        );
-
-        if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
-          console.log("sol ata does not exist", NATIVE_MINT.toString());
-
-          transaction = transaction.add(
-            createAssociatedTokenAccountInstruction(
-              publicKey,
-              associatedTokenAccount,
-              publicKey,
-              NATIVE_MINT
-            )
-          );
-        }
-
-        // get balance of associated token account
-        console.log("sol ata exists");
-        const balance = await connection.getBalance(associatedTokenAccount);
-        if (balance < Number(collateral)) {
-          console.log("balance insufficient");
-          transaction = transaction.add(
-            SystemProgram.transfer({
-              fromPubkey: publicKey,
-              toPubkey: associatedTokenAccount,
-              lamports: Number(collateral)!,
-            }),
-            createSyncNativeInstruction(associatedTokenAccount)
-          );
-        }
+  let methodBuilder;
+  if (tab == Tab.Add) {
+    if (position.token == TokenE.SOL) {
+      let wrapInstructions = await wrapSolIfNeeded(
+        publicKey,
+        publicKey,
+        connection,
+        Number(collateral)
+      );
+      if (wrapInstructions) {
+        preInstructions.push(...wrapInstructions);
       }
-
-      let addCollateralTx = await perpetual_program.methods
-        .addCollateral({
-          collateral,
-        })
-        .accounts({
-          owner: publicKey,
-          fundingAccount: userCustodyTokenAccount, // user token account for custody token account
-          transferAuthority: TRANSFER_AUTHORITY,
-          perpetuals: PERPETUALS_ADDRESS,
-          pool: pool.address,
-          position: position.address,
-          custody: custody.address,
-          custodyOracleAccount: custody.oracle.oracleAccount,
-          custodyTokenAccount: custody.tokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .transaction();
-
-      transaction = transaction.add(addCollateralTx);
-    } else {
-      let collateralUsd = collateral;
-      let removeCollateralTx = await perpetual_program.methods
-        .removeCollateral({
-          collateralUsd,
-        })
-        .accounts({
-          owner: publicKey,
-          receivingAccount: userCustodyTokenAccount,
-          transferAuthority: TRANSFER_AUTHORITY,
-          perpetuals: PERPETUALS_ADDRESS,
-          pool: pool.address,
-          position: position.address,
-          custody: custody.address,
-          custodyOracleAccount: custody.oracle.oracleAccount,
-          custodyTokenAccount: custody.tokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .transaction();
-      transaction = transaction.add(removeCollateralTx);
     }
 
-    await manualSendTransaction(
-      transaction,
-      publicKey,
-      connection,
-      signTransaction
-    );
+    methodBuilder = perpetual_program.methods
+      .addCollateral({
+        collateral,
+      })
+      .accounts({
+        owner: publicKey,
+        fundingAccount: userCustodyTokenAccount, // user token account for custody token account
+        transferAuthority: TRANSFER_AUTHORITY,
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
+        position: position.address,
+        custody: custody.address,
+        custodyOracleAccount: custody.oracle.oracleAccount,
+        custodyTokenAccount: custody.tokenAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      });
+  } else {
+    let collateralUsd = collateral;
+    methodBuilder = perpetual_program.methods
+      .removeCollateral({
+        collateralUsd,
+      })
+      .accounts({
+        owner: publicKey,
+        receivingAccount: userCustodyTokenAccount,
+        transferAuthority: TRANSFER_AUTHORITY,
+        perpetuals: PERPETUALS_ADDRESS,
+        pool: pool.address,
+        position: position.address,
+        custody: custody.address,
+        custodyOracleAccount: custody.oracle.oracleAccount,
+        custodyTokenAccount: custody.tokenAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      });
+  }
+
+  if (preInstructions)
+    methodBuilder = methodBuilder.preInstructions(preInstructions);
+
+  try {
+    await automaticSendTransaction(methodBuilder);
   } catch (err) {
     console.log(err);
     throw err;

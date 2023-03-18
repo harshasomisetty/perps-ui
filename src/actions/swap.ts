@@ -21,6 +21,7 @@ export async function buildSwapTransaction(
   bottomToken: TokenE,
   amountIn: BN,
   minAmountOut: BN
+  // @ts-ignore
 ): Promise<MethodsBuilder> {
   let { perpetual_program } = await getPerpetualProgramAndProvider(
     walletContextState

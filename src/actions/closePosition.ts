@@ -6,23 +6,24 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { manualSendTransaction } from "@/utils/dispatchTransaction";
-import { BN, Wallet } from "@project-serum/anchor";
+import { automaticSendTransaction } from "@/utils/dispatchTransaction";
+import { BN } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+import { WalletContextState } from "@solana/wallet-adapter-react";
+import { Connection } from "@solana/web3.js";
 
 export async function closePosition(
-  pool: PoolAccount,
-  wallet: Wallet,
-  publicKey: PublicKey,
-  signTransaction: SignerWalletAdapterProps["signAllTransactions"],
+  walletContextState: WalletContextState,
   connection: Connection,
+  pool: PoolAccount,
   position: PositionAccount,
   custody: CustodyAccount,
   price: BN
 ) {
-  let { perpetual_program } = await getPerpetualProgramAndProvider(wallet);
+  let { perpetual_program } = await getPerpetualProgramAndProvider(
+    walletContextState
+  );
+  let publicKey = walletContextState.publicKey!;
 
   // TODO: need to take slippage as param , this is now for testing
   const adjustedPrice =
@@ -35,34 +36,25 @@ export async function closePosition(
     publicKey
   );
 
-  let transaction = new Transaction();
+  let methodBuilder = await perpetual_program.methods
+    .closePosition({
+      price: adjustedPrice,
+    })
+    .accounts({
+      owner: publicKey,
+      receivingAccount: userCustodyTokenAccount,
+      transferAuthority: TRANSFER_AUTHORITY,
+      perpetuals: PERPETUALS_ADDRESS,
+      pool: pool.address,
+      position: position.address,
+      custody: custody.address,
+      custodyOracleAccount: custody.oracle.oracleAccount,
+      custodyTokenAccount: custody.tokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    });
 
   try {
-    let tx = await perpetual_program.methods
-      .closePosition({
-        price: adjustedPrice,
-      })
-      .accounts({
-        owner: publicKey,
-        receivingAccount: userCustodyTokenAccount,
-        transferAuthority: TRANSFER_AUTHORITY,
-        perpetuals: PERPETUALS_ADDRESS,
-        pool: pool.address,
-        position: position.address,
-        custody: custody.address,
-        custodyOracleAccount: custody.oracle.oracleAccount,
-        custodyTokenAccount: custody.tokenAccount,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .transaction();
-    transaction = transaction.add(tx);
-
-    await manualSendTransaction(
-      transaction,
-      publicKey,
-      connection,
-      signTransaction
-    );
+    await automaticSendTransaction(methodBuilder);
   } catch (err) {
     console.log(err);
     throw err;

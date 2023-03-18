@@ -26,14 +26,12 @@ interface Props {
 
 export function CollateralModal(props: Props) {
   const [tab, setTab] = useState(Tab.Add);
-  const { wallet, publicKey, signTransaction } = useWallet();
+  const { publicKey } = useWallet();
+  const walletContextState = useWallet();
   const { connection } = useConnection();
 
   const poolData = useGlobalStore((state) => state.poolData);
-
   const userData = useGlobalStore((state) => state.userData);
-
-  // console.log("props.", props.position);
 
   let pool = poolData[props.position.pool.toString()]!;
 
@@ -84,10 +82,8 @@ export function CollateralModal(props: Props) {
     }
 
     await changeCollateral(
-      publicKey!,
-      wallet!,
+      walletContextState,
       connection,
-      signTransaction,
       pool,
       props.position,
       new BN(changeAmount),

@@ -10,7 +10,6 @@ import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pub
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
   Connection,
-  LAMPORTS_PER_SOL,
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
@@ -35,8 +34,6 @@ export async function openPosition(
   let { perpetual_program } = await getPerpetualProgramAndProvider(
     walletContextState
   );
-
-  console.log("in open pos");
   let publicKey = walletContextState.publicKey!;
 
   // TODO: need to take slippage as param , this is now for testing
@@ -62,16 +59,12 @@ export async function openPosition(
     perpetual_program.programId
   )[0];
 
-  // TODO SWAP IF PAY != POSITION TOKEN
   let swapBuilder;
   let ix;
-
-  console.log("pre if");
 
   let preInstructions: TransactionInstruction[] = [];
 
   if (payCustody.getTokenE() != positionCustody.getTokenE()) {
-    console.log("in swap needed");
     swapBuilder = await buildSwapTransaction(
       walletContextState,
       connection,
@@ -81,8 +74,8 @@ export async function openPosition(
       new BN(payAmount * 10 ** payCustody.decimals),
       new BN(positionAmount * 10 ** positionCustody.decimals)
     );
-    // calculate how much position token value is new payAmount
-    // open position using new payAmount
+    // TODO calculate how much position token value is new payAmount
+    // TODO open position using new payAmount
 
     ix = await swapBuilder.instruction();
     preInstructions.push(ix);

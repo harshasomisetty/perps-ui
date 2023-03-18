@@ -31,7 +31,9 @@ export default function LiquidityCard(props: Props) {
 
   const [liqAmount, setLiqAmount] = useState(0);
 
-  const { wallet, publicKey, signTransaction } = useWallet();
+  const { publicKey, wallet } = useWallet();
+  const walletContextState = useWallet();
+
   const { connection } = useConnection();
 
   const [payToken, setPayToken] = useState(props.pool.getTokenList()[0]);
@@ -54,12 +56,9 @@ export default function LiquidityCard(props: Props) {
 
   async function changeLiq() {
     await changeLiquidity(
-      props.pool,
-      wallet!,
-      publicKey!,
-      // @ts-ignore
-      signTransaction!,
+      walletContextState,
       connection,
+      props.pool,
       props.pool.getCustodyAccount(payToken!),
       tokenAmount,
       liqAmount,

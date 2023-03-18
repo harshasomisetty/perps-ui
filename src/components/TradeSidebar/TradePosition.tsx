@@ -42,7 +42,6 @@ export function TradePosition(props: Props) {
   const [leverage, setLeverage] = useState(1);
 
   const { publicKey, wallet } = useWallet();
-
   const walletContextState = useWallet();
 
   const { connection } = useConnection();
