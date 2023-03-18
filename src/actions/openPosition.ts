@@ -17,7 +17,7 @@ import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
-import { automaticSendTransaction } from "@/utils/dispatchTransaction";
+import { automaticSendTransaction } from "@/utils/TransactionHandlers";
 import { buildSwapTransaction } from "src/actions/swap";
 
 export async function openPosition(
@@ -119,7 +119,7 @@ export async function openPosition(
   }
 
   try {
-    await automaticSendTransaction(methodBuilder);
+    await automaticSendTransaction(methodBuilder, connection);
   } catch (err) {
     console.log(err);
     throw err;

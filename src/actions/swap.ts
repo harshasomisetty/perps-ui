@@ -4,7 +4,6 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { automaticSendTransaction } from "@/utils/dispatchTransaction";
 import { BN } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Connection, TransactionInstruction } from "@solana/web3.js";
@@ -12,6 +11,7 @@ import { PoolAccount } from "@/lib/PoolAccount";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
 import { MethodsBuilder } from "@project-serum/anchor/dist/cjs/program/namespace/methods";
+import { automaticSendTransaction } from "@/utils/TransactionHandlers";
 
 export async function buildSwapTransaction(
   walletContextState: WalletContextState,
@@ -124,7 +124,7 @@ export async function swap(
   );
 
   try {
-    await automaticSendTransaction(methodBuilder);
+    await automaticSendTransaction(methodBuilder, connection);
   } catch (err) {
     console.log(err);
     throw err;

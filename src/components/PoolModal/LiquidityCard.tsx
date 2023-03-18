@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [tokenAmount, setTokenAmount] = useState(0);
+  const [tokenAmount, setTokenAmount] = useState(1);
 
   const [tab, setTab] = useState(Tab.Add);
 
@@ -46,7 +46,6 @@ export default function LiquidityCard(props: Props) {
   const userData = useGlobalStore((state) => state.userData);
 
   // @ts-ignore
-  // let payTokenBalance = userData.tokenBalances[props.pool.getTokenList()[0]];
   let liqBalance = userData.lpBalances[props.pool.address.toString()];
 
   const [pendingRateConversion, setPendingRateConversion] = useState(false);

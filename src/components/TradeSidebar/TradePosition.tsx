@@ -171,7 +171,8 @@ export function TradePosition(props: Props) {
         <div className="font-medium text-white">You Pay</div>
         {publicKey && (
           <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer">
-            {userData.tokenBalances[payToken].toFixed(2) ? (
+            {userData.tokenBalances[payToken] &&
+            userData.tokenBalances[payToken].toFixed(2) ? (
               <>
                 <p>{userData.tokenBalances[payToken].toFixed(2)}</p>
                 <p className="font-normal">{payToken}</p>
@@ -195,7 +196,11 @@ export function TradePosition(props: Props) {
         }}
         onSelectToken={setPayToken}
         tokenList={pool.getTokenList()}
-        maxBalance={userData.tokenBalances[payToken].toFixed(2)}
+        maxBalance={
+          userData.tokenBalances[payToken]
+            ? userData.tokenBalances[payToken]
+            : 0
+        }
       />
       <div className="mt-4 text-sm font-medium text-white">
         Your {props.side}

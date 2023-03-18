@@ -6,7 +6,7 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { automaticSendTransaction } from "@/utils/dispatchTransaction";
+import { automaticSendTransaction } from "@/utils/TransactionHandlers";
 import { BN } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { WalletContextState } from "@solana/wallet-adapter-react";
@@ -54,7 +54,10 @@ export async function closePosition(
     });
 
   try {
-    await automaticSendTransaction(methodBuilder);
+    await automaticSendTransaction(
+      methodBuilder,
+      perpetual_program.provider.connection
+    );
   } catch (err) {
     console.log(err);
     throw err;

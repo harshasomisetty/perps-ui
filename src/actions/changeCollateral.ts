@@ -5,7 +5,7 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { automaticSendTransaction } from "@/utils/dispatchTransaction";
+import { automaticSendTransaction } from "@/utils/TransactionHandlers";
 import { BN } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Connection, TransactionInstruction } from "@solana/web3.js";
@@ -91,7 +91,10 @@ export async function changeCollateral(
     methodBuilder = methodBuilder.preInstructions(preInstructions);
 
   try {
-    await automaticSendTransaction(methodBuilder);
+    await automaticSendTransaction(
+      methodBuilder,
+      perpetual_program.provider.connection
+    );
   } catch (err) {
     console.log(err);
     throw err;
