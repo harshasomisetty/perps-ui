@@ -203,9 +203,15 @@ export function TradeSwap(props: Props) {
           className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
           onClick={() => setReceiveAmount(receiveTokenBalance)}
         >
-          <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
-          <p className="font-normal">{receiveToken}</p>
-          <p className="text-zinc-400"> Balance</p>
+          {receiveTokenBalance ? (
+            <>
+              <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
+              <p className="font-normal">{receiveToken}</p>
+              <p className="text-zinc-400"> Balance</p>
+            </>
+          ) : (
+            <LoadingDots />
+          )}
         </div>
       </div>
       <TokenSelector

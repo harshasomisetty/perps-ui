@@ -122,13 +122,16 @@ export class ViewHelper {
   };
 
   getEntryPriceAndFee = async (
-    collateral: BN,
-    size: BN,
+    payAmount: number,
+    positionAmount: number,
     side: Side,
     pool: PoolAccount,
     custody: CustodyAccount
   ): Promise<PriceAndFee> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+
+    let collateral = new BN(payAmount * 10 ** custody.decimals);
+    let size = new BN(positionAmount * 10 ** custody.decimals);
 
     let transaction: Transaction = await program.methods
       // @ts-ignore

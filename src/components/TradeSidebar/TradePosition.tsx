@@ -106,9 +106,29 @@ export function TradePosition(props: Props) {
         perpetual_program.provider
       );
 
+      let payAmt = payAmount;
+
+      if (payToken != positionToken) {
+        let swapInfo = await View.getSwapAmountAndFees(
+          new BN(payAmount * 10 ** pool!.getCustodyAccount(payToken)!.decimals),
+          pool!,
+          pool!.getCustodyAccount(payToken)!,
+          pool!.getCustodyAccount(positionToken)!
+        );
+
+        payAmt =
+          Number(swapInfo.amountOut) /
+          10 ** pool!.getCustodyAccount(positionToken)!.decimals;
+        console.log("payAmt", payAmt);
+      }
+
+      if (payAmt > positionAmount) {
+        setPositionAmount(payAmt);
+      }
+      console.log("payAmt and payAmount", payAmt, payAmount);
       let getEntryPrice = await View.getEntryPriceAndFee(
-        new BN(payAmount * LAMPORTS_PER_SOL),
-        new BN(positionAmount * LAMPORTS_PER_SOL),
+        payAmt,
+        positionAmount,
         props.side,
         pool!,
         pool!.getCustodyAccount(positionToken)!
@@ -133,7 +153,7 @@ export function TradePosition(props: Props) {
       clearTimeout(timeoutRef.current);
     };
     // @ts-ignore
-  }, [wallet, pool, payAmount, positionAmount, props.side]);
+  }, [wallet, pool, payAmount, props.side, payToken, positionToken]);
 
   if (!pair) {
     return (
