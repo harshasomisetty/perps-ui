@@ -95,19 +95,16 @@ export function TradePosition(props: Props) {
     }
   }, [poolData]);
 
-  // useEffect(() => {
-  //   if (Object.values(userData.lpBalances).length > 0) {
-  //     setPayTokenBalance(
-  //       userData.tokenBalances[Object.values(poolData)[0].getTokenList()[0]]
-  //     );
-  //   }
-  // }, [userData]);
-
   useEffect(() => {
     async function fetchData() {
-      let { provider } = await getPerpetualProgramAndProvider(wallet as any);
+      let { perpetual_program } = await getPerpetualProgramAndProvider(
+        walletContextState
+      );
 
-      const View = new ViewHelper(connection, provider);
+      const View = new ViewHelper(
+        perpetual_program.provider.connection,
+        perpetual_program.provider
+      );
 
       let getEntryPrice = await View.getEntryPriceAndFee(
         new BN(payAmount * LAMPORTS_PER_SOL),
@@ -116,6 +113,8 @@ export function TradePosition(props: Props) {
         pool!,
         pool!.getCustodyAccount(positionToken)!
       );
+
+      console.log("get entry values", getEntryPrice);
 
       setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
       setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);

@@ -195,7 +195,9 @@ export default function LiquidityCard(props: Props) {
                 <div className="text-sm font-medium text-white">You Add</div>
                 {publicKey && (
                   <div>
-                    Balance: {userData.tokenBalances[payToken].toFixed(2)}
+                    Balance:{" "}
+                    {userData.tokenBalances[payToken] &&
+                      userData.tokenBalances[payToken].toFixed(2)}
                   </div>
                 )}
               </>
@@ -216,7 +218,11 @@ export default function LiquidityCard(props: Props) {
               onChangeAmount={setTokenAmount}
               onSelectToken={handleSelectToken}
               tokenList={props.pool.getTokenList()}
-              maxBalance={userData.tokenBalances[payToken]}
+              maxBalance={
+                userData.tokenBalances[payToken]
+                  ? userData.tokenBalances[payToken]
+                  : 0
+              }
             />
           ) : (
             <LpSelector

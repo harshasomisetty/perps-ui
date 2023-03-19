@@ -10,7 +10,6 @@ import { twMerge } from "tailwind-merge";
 import ArrowsVertical from "@carbon/icons-react/lib/ArrowsVertical";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { LoadingDots } from "@/components/LoadingDots";
 import { TokenSelector } from "@/components/TokenSelector";
 import { PoolSelector } from "@/components/PoolSelector";
@@ -79,7 +78,7 @@ export function TradeSwap(props: Props) {
       const View = new ViewHelper(connection, provider);
 
       let swapInfo = await View.getSwapAmountAndFees(
-        new BN(payAmount * LAMPORTS_PER_SOL),
+        new BN(payAmount * 10 ** pool!.getCustodyAccount(payToken)!.decimals),
         pool!,
         pool!.getCustodyAccount(payToken)!,
         pool!.getCustodyAccount(receiveToken)!
@@ -87,12 +86,13 @@ export function TradeSwap(props: Props) {
 
       let f = Number(swapInfo.feeOut) / 10 ** 6;
 
-      // TODO check the fees here
-      setReceiveAmount(
+      let recAmt =
         Number(swapInfo.amountOut) /
-          10 ** pool!.getCustodyAccount(receiveToken)!.decimals -
-          f
-      );
+        10 ** pool!.getCustodyAccount(receiveToken)!.decimals;
+
+      console.log("f and rec", f, recAmt);
+      // TODO check the fees here
+      setReceiveAmount(recAmt);
       setPendingRateConversion(false);
 
       setFee(f);
@@ -131,7 +131,7 @@ export function TradeSwap(props: Props) {
       pool,
       payToken,
       receiveToken,
-      new BN(payAmount * 10 ** 9),
+      new BN(payAmount * 10 ** pool?.getCustodyAccount(payToken).decimals),
       newPrice
     );
 
