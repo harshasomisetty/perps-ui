@@ -60,7 +60,8 @@ export async function wrapSolIfNeeded(
   );
   if (ataIx) preInstructions.push(ataIx);
 
-  const balance = await connection.getBalance(associatedTokenAccount);
+  const balance =
+    (await connection.getBalance(associatedTokenAccount)) / LAMPORTS_PER_SOL;
 
   if (balance < payAmount) {
     console.log("balance insufficient");
@@ -69,7 +70,7 @@ export async function wrapSolIfNeeded(
       SystemProgram.transfer({
         fromPubkey: publicKey,
         toPubkey: associatedTokenAccount,
-        lamports: Math.floor((payAmount - balance) * LAMPORTS_PER_SOL * 1.05),
+        lamports: Math.floor((payAmount - balance) * LAMPORTS_PER_SOL * 1.1),
       })
     );
     preInstructions.push(createSyncNativeInstruction(associatedTokenAccount));

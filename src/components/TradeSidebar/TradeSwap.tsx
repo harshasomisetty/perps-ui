@@ -110,7 +110,7 @@ export function TradeSwap(props: Props) {
       clearTimeout(timeoutRef.current);
     };
     // @ts-ignore
-  }, [wallet, pool, payAmount]);
+  }, [wallet, pool, payAmount, payToken]);
 
   function getFeePercentage() {
     if (fee == 0) {
@@ -121,9 +121,6 @@ export function TradeSwap(props: Props) {
 
   async function handleSwap() {
     // TODO: need to take slippage as param , this is now for testing
-    const newPrice = new BN(receiveAmount * 10 ** 6)
-      .mul(new BN(90))
-      .div(new BN(100));
 
     await swap(
       walletContextState,
@@ -131,8 +128,8 @@ export function TradeSwap(props: Props) {
       pool,
       payToken,
       receiveToken,
-      new BN(payAmount * 10 ** pool?.getCustodyAccount(payToken).decimals),
-      newPrice
+      payAmount,
+      receiveAmount
     );
 
     const userData = await getAllUserData(connection, publicKey!, poolData);

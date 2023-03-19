@@ -11,7 +11,10 @@ import { PoolAccount } from "@/lib/PoolAccount";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
 import { MethodsBuilder } from "@project-serum/anchor/dist/cjs/program/namespace/methods";
-import { automaticSendTransaction } from "@/utils/TransactionHandlers";
+import {
+  automaticSendTransaction,
+  manualSendTransaction,
+} from "@/utils/TransactionHandlers";
 
 export async function buildSwapTransaction(
   walletContextState: WalletContextState,
@@ -19,14 +22,16 @@ export async function buildSwapTransaction(
   pool: PoolAccount,
   topToken: TokenE,
   bottomToken: TokenE,
-  amountIn: BN,
-  minAmountOut: BN
+  amtInNumber: number,
+  minAmtOutNumber?: number
   // @ts-ignore
 ): Promise<MethodsBuilder> {
   let { perpetual_program } = await getPerpetualProgramAndProvider(
     walletContextState
   );
   let publicKey = walletContextState.publicKey!;
+
+  console.log("build swap 1");
 
   const receivingCustody = pool.getCustodyAccount(topToken)!;
   let fundingAccount = await getAssociatedTokenAddress(
@@ -41,6 +46,7 @@ export async function buildSwapTransaction(
     publicKey
   );
 
+  console.log("build swap 2");
   let preInstructions: TransactionInstruction[] = [];
 
   let ataIx = await createAtaIfNeeded(
@@ -61,22 +67,46 @@ export async function buildSwapTransaction(
 
   if (ataIx1) preInstructions.push(ataIx1);
 
+  console.log("build swap 3");
   if (receivingCustody.getTokenE() == TokenE.SOL) {
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
       connection,
-      Number(amountIn)
+      amtInNumber
     );
     if (wrapInstructions) {
       preInstructions.push(...wrapInstructions);
     }
   }
+  console.log("build swap 4");
+
+  let minAmountOut;
+  if (minAmtOutNumber) {
+    minAmountOut = new BN(minAmtOutNumber * 10 ** dispensingCustody.decimals)
+      .mul(new BN(90))
+      .div(new BN(100));
+  } else {
+    minAmountOut = new BN(amtInNumber * 10 ** dispensingCustody.decimals)
+      .mul(new BN(90))
+      .div(new BN(100));
+  }
+
+  let amountIn = new BN(amtInNumber * 10 ** dispensingCustody.decimals);
+  console.log("min amoutn out", Number(minAmountOut));
 
   const params: any = {
     amountIn,
     minAmountOut,
   };
+
+  console.log(
+    "amout ins",
+    amtInNumber,
+    Number(amountIn),
+    dispensingCustody.decimals,
+    dispensingCustody.getTokenE()
+  );
 
   let methodBuilder = perpetual_program.methods.swap(params).accounts({
     owner: publicKey,
@@ -96,10 +126,12 @@ export async function buildSwapTransaction(
 
     tokenProgram: TOKEN_PROGRAM_ID,
   });
+  console.log("build swap 5");
 
   if (preInstructions) {
     methodBuilder = methodBuilder.preInstructions(preInstructions);
   }
+  console.log("build swap 6");
 
   return methodBuilder;
 }
@@ -110,8 +142,8 @@ export async function swap(
   pool: PoolAccount,
   topToken: TokenE,
   bottomToken: TokenE,
-  amountIn: BN,
-  minAmountOut: BN
+  amtInNumber: number,
+  minAmtOutNumber?: number
 ) {
   let methodBuilder = await buildSwapTransaction(
     walletContextState,
@@ -119,12 +151,22 @@ export async function swap(
     pool,
     topToken,
     bottomToken,
-    amountIn,
-    minAmountOut
+    amtInNumber,
+    minAmtOutNumber
   );
 
+  let publicKey = walletContextState.publicKey!;
+  console.log("made swap buidler in SWAP");
+
   try {
-    await automaticSendTransaction(methodBuilder, connection);
+    // await automaticSendTransaction(methodBuilder, connection);
+    let tx = await methodBuilder.transaction();
+    await manualSendTransaction(
+      tx,
+      publicKey,
+      connection,
+      walletContextState.signTransaction
+    );
   } catch (err) {
     console.log(err);
     throw err;

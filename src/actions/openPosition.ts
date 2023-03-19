@@ -17,7 +17,10 @@ import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
-import { automaticSendTransaction } from "@/utils/TransactionHandlers";
+import {
+  automaticSendTransaction,
+  manualSendTransaction,
+} from "@/utils/TransactionHandlers";
 import { buildSwapTransaction } from "src/actions/swap";
 
 export async function openPosition(
@@ -31,6 +34,7 @@ export async function openPosition(
   price: number,
   side: Side
 ) {
+  console.log("in open position");
   let { perpetual_program } = await getPerpetualProgramAndProvider(
     walletContextState
   );
@@ -64,6 +68,7 @@ export async function openPosition(
 
   let preInstructions: TransactionInstruction[] = [];
 
+  console.log("in tokens not equal open pos");
   if (payCustody.getTokenE() != positionCustody.getTokenE()) {
     swapBuilder = await buildSwapTransaction(
       walletContextState,
@@ -71,15 +76,17 @@ export async function openPosition(
       pool,
       payCustody.getTokenE(),
       positionCustody.getTokenE(),
-      new BN(payAmount * 10 ** payCustody.decimals),
-      new BN(positionAmount * 10 ** positionCustody.decimals)
+      payAmount
     );
     // TODO calculate how much position token value is new payAmount
     // TODO open position using new payAmount
+    console.log("make builder into instruction in openPos");
 
     ix = await swapBuilder.instruction();
     preInstructions.push(ix);
   }
+
+  console.log("after tokens not equal :)");
 
   if (positionCustody.getTokenE() == TokenE.SOL) {
     let wrapInstructions = await wrapSolIfNeeded(
@@ -118,8 +125,17 @@ export async function openPosition(
     methodBuilder = methodBuilder.preInstructions(preInstructions);
   }
 
+  console.log("about to send tx");
+
   try {
-    await automaticSendTransaction(methodBuilder, connection);
+    // await automaticSendTransaction(methodBuilder, connection);
+    let tx = await methodBuilder.transaction();
+    await manualSendTransaction(
+      tx,
+      publicKey,
+      connection,
+      walletContextState.signTransaction
+    );
   } catch (err) {
     console.log(err);
     throw err;

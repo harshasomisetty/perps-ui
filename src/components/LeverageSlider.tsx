@@ -81,12 +81,10 @@ export function LeverageSlider(props: Props) {
         <input
           className="w-full bg-transparent text-center text-sm text-white"
           type="number"
-          value={formatNumber(props.value)}
+          value={props.value}
           onChange={(e) => {
             const text = e.currentTarget.value;
             const number = parseFloat(text);
-            // in order to allow the user to input numbers between 1 and 10, we
-            // set the value to 0 instead of 1 when the user clears the input
             props.onChange?.(
               Number.isNaN(number) ? 0 : clamp(number, 1, props.maxLeverage)
             );
@@ -94,9 +92,6 @@ export function LeverageSlider(props: Props) {
           onBlur={(e) => {
             const text = e.currentTarget.value;
             const number = parseFloat(text);
-            // when the user blurs, in contrast to when the user is typing, we
-            // reset the value to 1 since we want to ensure this selector
-            // only produces valid values
             props.onChange?.(
               Number.isNaN(number) ? 1 : clamp(number, 1, props.maxLeverage)
             );

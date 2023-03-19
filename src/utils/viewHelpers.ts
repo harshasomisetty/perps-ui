@@ -115,6 +115,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
+    console.log("result in aum fetch", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAssetsUnderManagement"
     );

@@ -120,7 +120,7 @@ export function TokenSelector(props: Props) {
               )}
               placeholder="0"
               type="number"
-              value={props.amount.toString()}
+              value={Math.round(props.amount * 100) / 100}
               onChange={(e) => {
                 const value = e.currentTarget.valueAsNumber;
                 props.onChangeAmount?.(isNaN(value) ? 0 : value);
