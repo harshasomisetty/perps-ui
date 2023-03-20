@@ -49,8 +49,8 @@ export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState<TokenE>();
   const [positionToken, setPositionToken] = useState<TokenE>();
 
-  const [payAmount, setPayAmount] = useState(0.1);
-  const [positionAmount, setPositionAmount] = useState(0.2);
+  const [payAmount, setPayAmount] = useState(0);
+  const [positionAmount, setPositionAmount] = useState(0);
   const [conversionRatio, setConversionRatio] = useState(1);
   const [leverage, setLeverage] = useState(1);
   const [entryPrice, setEntryPrice] = useState(0);
@@ -228,7 +228,11 @@ export function TradePosition(props: Props) {
                 <p className="text-zinc-400"> Balance</p>
               </>
             ) : (
-              <LoadingDots />
+              <>
+                <p>0</p>
+                <p className="font-normal">{payToken}</p>
+                <p className="text-zinc-400"> Balance</p>
+              </>
             )}
           </div>
         )}
@@ -265,7 +269,7 @@ export function TradePosition(props: Props) {
         }}
         onSelectToken={(token) => {
           setPositionToken(token);
-          router.push("/trade/" + token + "-USD");
+          router.push("/trade/" + token + "-USD", undefined, { shallow: true });
         }}
         tokenList={pool.getTokenList()}
       />
