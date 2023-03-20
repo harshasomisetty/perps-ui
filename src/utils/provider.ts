@@ -1,7 +1,10 @@
 import { Connection } from "@solana/web3.js";
 import { AnchorProvider, Wallet } from "@project-serum/anchor";
 
-export async function getProvider(wallet: Wallet, network: string = "devnet") {
+export async function getProvider(
+  wallet: Wallet,
+  network: string = "devnet"
+): Promise<AnchorProvider> {
   let network_url;
   if (network === "devnet") {
     network_url = "https://api.devnet.solana.com";

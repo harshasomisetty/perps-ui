@@ -14,7 +14,6 @@ import { SidebarTab } from "@/components/SidebarTab";
 import AirdropButton from "@/components/AirdropButton";
 import { LpSelector } from "@/components/PoolModal/LpSelector";
 import { Tab } from "@/lib/types";
-import { BN } from "@project-serum/anchor";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
 import { TokenE } from "@/lib/Token";
@@ -25,13 +24,15 @@ interface Props {
 }
 
 export default function LiquidityCard(props: Props) {
-  const [tokenAmount, setTokenAmount] = useState(0);
+  const [tokenAmount, setTokenAmount] = useState(1);
 
   const [tab, setTab] = useState(Tab.Add);
 
   const [liqAmount, setLiqAmount] = useState(0);
 
-  const { wallet, publicKey, signTransaction } = useWallet();
+  const { publicKey, wallet } = useWallet();
+  const walletContextState = useWallet();
+
   const { connection } = useConnection();
 
   const [payToken, setPayToken] = useState(props.pool.getTokenList()[0]);
@@ -45,7 +46,6 @@ export default function LiquidityCard(props: Props) {
   const userData = useGlobalStore((state) => state.userData);
 
   // @ts-ignore
-  let payTokenBalance = userData.tokenBalances[props.pool.getTokenList()[0]];
   let liqBalance = userData.lpBalances[props.pool.address.toString()];
 
   const [pendingRateConversion, setPendingRateConversion] = useState(false);
@@ -54,12 +54,9 @@ export default function LiquidityCard(props: Props) {
 
   async function changeLiq() {
     await changeLiquidity(
-      props.pool,
-      wallet!,
-      publicKey!,
-      // @ts-ignore
-      signTransaction!,
+      walletContextState,
       connection,
+      props.pool,
       props.pool.getCustodyAccount(payToken!),
       tokenAmount,
       liqAmount,
@@ -198,7 +195,9 @@ export default function LiquidityCard(props: Props) {
                 <div className="text-sm font-medium text-white">You Add</div>
                 {publicKey && (
                   <div>
-                    Balance: {payTokenBalance && payTokenBalance.toFixed(2)}
+                    Balance:{" "}
+                    {userData.tokenBalances[payToken] &&
+                      userData.tokenBalances[payToken].toFixed(2)}
                   </div>
                 )}
               </>
@@ -219,7 +218,11 @@ export default function LiquidityCard(props: Props) {
               onChangeAmount={setTokenAmount}
               onSelectToken={handleSelectToken}
               tokenList={props.pool.getTokenList()}
-              maxBalance={payTokenBalance}
+              maxBalance={
+                userData.tokenBalances[payToken]
+                  ? userData.tokenBalances[payToken]
+                  : 0
+              }
             />
           ) : (
             <LpSelector
@@ -242,7 +245,7 @@ export default function LiquidityCard(props: Props) {
               <>
                 {publicKey && (
                   <div>
-                    Balance: {payTokenBalance && payTokenBalance.toFixed(2)}
+                    Balance: {userData.tokenBalances[payToken].toFixed(2)}
                   </div>
                 )}
               </>

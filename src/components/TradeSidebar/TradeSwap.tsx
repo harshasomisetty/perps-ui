@@ -10,7 +10,6 @@ import { twMerge } from "tailwind-merge";
 import ArrowsVertical from "@carbon/icons-react/lib/ArrowsVertical";
 import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { ViewHelper } from "@/utils/viewHelpers";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { LoadingDots } from "@/components/LoadingDots";
 import { TokenSelector } from "@/components/TokenSelector";
 import { PoolSelector } from "@/components/PoolSelector";
@@ -25,6 +24,7 @@ interface Props {
 export function TradeSwap(props: Props) {
   const { connection } = useConnection();
   const { publicKey, signTransaction, wallet } = useWallet();
+  const walletContextState = useWallet();
 
   const stats = useGlobalStore((state) => state.priceStats);
   const poolData = useGlobalStore((state) => state.poolData);
@@ -78,7 +78,7 @@ export function TradeSwap(props: Props) {
       const View = new ViewHelper(connection, provider);
 
       let swapInfo = await View.getSwapAmountAndFees(
-        new BN(payAmount * LAMPORTS_PER_SOL),
+        new BN(payAmount * 10 ** pool!.getCustodyAccount(payToken)!.decimals),
         pool!,
         pool!.getCustodyAccount(payToken)!,
         pool!.getCustodyAccount(receiveToken)!
@@ -86,12 +86,13 @@ export function TradeSwap(props: Props) {
 
       let f = Number(swapInfo.feeOut) / 10 ** 6;
 
-      // TODO check the fees here
-      setReceiveAmount(
+      let recAmt =
         Number(swapInfo.amountOut) /
-          10 ** pool!.getCustodyAccount(receiveToken)!.decimals -
-          f
-      );
+        10 ** pool!.getCustodyAccount(receiveToken)!.decimals;
+
+      console.log("f and rec", f, recAmt);
+      // TODO check the fees here
+      setReceiveAmount(recAmt);
       setPendingRateConversion(false);
 
       setFee(f);
@@ -109,7 +110,7 @@ export function TradeSwap(props: Props) {
       clearTimeout(timeoutRef.current);
     };
     // @ts-ignore
-  }, [wallet, pool, payAmount]);
+  }, [wallet, pool, payAmount, payToken]);
 
   function getFeePercentage() {
     if (fee == 0) {
@@ -120,20 +121,15 @@ export function TradeSwap(props: Props) {
 
   async function handleSwap() {
     // TODO: need to take slippage as param , this is now for testing
-    const newPrice = new BN(receiveAmount * 10 ** 6)
-      .mul(new BN(90))
-      .div(new BN(100));
 
     await swap(
-      wallet,
-      publicKey,
-      signTransaction,
+      walletContextState,
       connection,
       pool,
       payToken,
       receiveToken,
-      new BN(payAmount * 10 ** 9),
-      newPrice
+      payAmount,
+      receiveAmount
     );
 
     const userData = await getAllUserData(connection, publicKey!, poolData);
@@ -204,9 +200,15 @@ export function TradeSwap(props: Props) {
           className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
           onClick={() => setReceiveAmount(receiveTokenBalance)}
         >
-          <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
-          <p className="font-normal">{receiveToken}</p>
-          <p className="text-zinc-400"> Balance</p>
+          {receiveTokenBalance ? (
+            <>
+              <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
+              <p className="font-normal">{receiveToken}</p>
+              <p className="text-zinc-400"> Balance</p>
+            </>
+          ) : (
+            <LoadingDots />
+          )}
         </div>
       </div>
       <TokenSelector

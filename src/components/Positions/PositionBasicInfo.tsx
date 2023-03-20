@@ -3,7 +3,6 @@ import { cloneElement } from "react";
 import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
-import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
@@ -13,6 +12,7 @@ import { PositionAccount } from "@/lib/PositionAccount";
 import { useGlobalStore } from "@/stores/store";
 import { PositionColumn } from "@/components/Positions/PositionColumn";
 import { CollateralModal } from "@/components/Positions/CollateralModal";
+import { ACCOUNT_URL } from "@/utils/TransactionHandlers";
 
 interface Props {
   className?: string;

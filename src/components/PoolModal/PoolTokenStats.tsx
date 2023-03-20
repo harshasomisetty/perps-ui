@@ -1,12 +1,12 @@
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
-import { ACCOUNT_URL } from "@/lib/TransactionHandlers";
 import NewTab from "@carbon/icons-react/lib/NewTab";
 import { formatNumberCommas } from "@/utils/formatters";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
 import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
+import { ACCOUNT_URL } from "@/utils/TransactionHandlers";
 
 interface Props {
   className?: string;

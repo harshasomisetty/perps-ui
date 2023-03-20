@@ -22,7 +22,8 @@ interface Props {
 }
 
 export function PositionAdditionalInfo(props: Props) {
-  const { publicKey, signTransaction, wallet } = useWallet();
+  const walletContextState = useWallet();
+
   const { connection } = useConnection();
   const stats = useGlobalStore((state) => state.priceStats);
 
@@ -36,12 +37,9 @@ export function PositionAdditionalInfo(props: Props) {
 
   async function handleCloseTrade() {
     await closePosition(
-      positionPool,
-      //@ts-ignore
-      wallet!,
-      publicKey!,
-      signTransaction!,
+      walletContextState,
       connection,
+      positionPool,
       props.position,
       positionCustody,
       new BN(stats[props.position.token].currentPrice * 10 ** 6)

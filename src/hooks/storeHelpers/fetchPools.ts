@@ -50,10 +50,18 @@ export async function getPoolData(
           pool.publicKey,
           lpData
         );
+        let fetchedAum;
 
-        let fetchedAum = await View.getAssetsUnderManagement(
-          poolObjs[pool.publicKey.toString()]
-        );
+        try {
+          fetchedAum = await View.getAssetsUnderManagement(
+            poolObjs[pool.publicKey.toString()]
+          );
+        } catch (error) {
+          console.log("error");
+          fetchedAum = await View.getAssetsUnderManagement(
+            poolObjs[pool.publicKey.toString()]
+          );
+        }
 
         poolObjs[pool.publicKey.toString()].setAum(fetchedAum);
       })
