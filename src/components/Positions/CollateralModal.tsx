@@ -38,7 +38,7 @@ export function CollateralModal(props: Props) {
   let payToken = props.position.token;
 
   let payTokenBalance = userData.tokenBalances[pool.getTokenList()[0]!];
-  let liqBalance = userData.lpBalances[pool.address.toString()];
+  // let liqBalance = userData.lpBalances[pool.address.toString()];
 
   const custodyData = useGlobalStore((state) => state.custodyData);
 
@@ -62,10 +62,14 @@ export function CollateralModal(props: Props) {
   }
 
   function getNewCollateral() {
-    return (
-      props.position.getCollateralUsd() +
-      depositAmount * stats[props.position.token].currentPrice
-    );
+    if (tab === Tab.Add) {
+      return (
+        props.position.getCollateralUsd() +
+        depositAmount * stats[props.position.token].currentPrice
+      );
+    } else {
+      return props.position.getCollateralUsd() - withdrawAmount;
+    }
   }
 
   // TODO incorporate proper fetched new liq price into collateral modal
