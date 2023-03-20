@@ -259,12 +259,13 @@ export class ViewHelper {
   };
 
   getSwapAmountAndFees = async (
-    amountIn: BN,
+    amtIn: number,
     pool: PoolAccount,
     receivingCustody: CustodyAccount,
     dispensingCustody: CustodyAccount
   ): Promise<SwapAmountAndFees> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+    let amountIn = new BN(amtIn * 10 ** receivingCustody.decimals);
 
     let transaction = await program.methods
       // @ts-ignore
@@ -282,6 +283,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
+    console.log("result in swap  fetch", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getSwapAmountAndFees"
     );

@@ -31,8 +31,6 @@ export async function buildSwapTransaction(
   );
   let publicKey = walletContextState.publicKey!;
 
-  console.log("build swap 1");
-
   const receivingCustody = pool.getCustodyAccount(topToken)!;
   let fundingAccount = await getAssociatedTokenAddress(
     receivingCustody.mint,
@@ -46,28 +44,8 @@ export async function buildSwapTransaction(
     publicKey
   );
 
-  console.log("build swap 2");
   let preInstructions: TransactionInstruction[] = [];
 
-  let ataIx = await createAtaIfNeeded(
-    publicKey,
-    publicKey,
-    dispensingCustody.mint,
-    connection
-  );
-
-  if (ataIx) preInstructions.push(ataIx);
-
-  let ataIx1 = await createAtaIfNeeded(
-    publicKey,
-    publicKey,
-    receivingCustody.mint,
-    connection
-  );
-
-  if (ataIx1) preInstructions.push(ataIx1);
-
-  console.log("build swap 3");
   if (receivingCustody.getTokenE() == TokenE.SOL) {
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
@@ -78,10 +56,35 @@ export async function buildSwapTransaction(
     if (wrapInstructions) {
       preInstructions.push(...wrapInstructions);
     }
-  }
-  console.log("build swap 4");
+  } else {
+    let ataIx = await createAtaIfNeeded(
+      publicKey,
+      publicKey,
+      receivingCustody.mint,
+      connection
+    );
 
+    if (ataIx) preInstructions.push(ataIx);
+  }
+
+  console.log("dispensing custody", dispensingCustody.getTokenE());
+  const associatedTokenAccount = await getAssociatedTokenAddress(
+    dispensingCustody.mint,
+    publicKey
+  );
+  console.log("dispensing ata", associatedTokenAccount.toString());
+  let ataIx1 = await createAtaIfNeeded(
+    publicKey,
+    publicKey,
+    dispensingCustody.mint,
+    connection
+  );
+
+  if (ataIx1) preInstructions.push(ataIx1);
+
+  console.log("params", minAmtOutNumber);
   let minAmountOut;
+  // TODO explain why there is an if statement here
   if (minAmtOutNumber) {
     minAmountOut = new BN(minAmtOutNumber * 10 ** dispensingCustody.decimals)
       .mul(new BN(90))
@@ -92,7 +95,8 @@ export async function buildSwapTransaction(
       .div(new BN(100));
   }
 
-  let amountIn = new BN(amtInNumber * 10 ** dispensingCustody.decimals);
+  console.log("amt in values", amtInNumber, receivingCustody.decimals);
+  let amountIn = new BN(amtInNumber * 10 ** receivingCustody.decimals);
   console.log("min amoutn out", Number(minAmountOut));
 
   const params: any = {
@@ -126,12 +130,10 @@ export async function buildSwapTransaction(
 
     tokenProgram: TOKEN_PROGRAM_ID,
   });
-  console.log("build swap 5");
 
   if (preInstructions) {
     methodBuilder = methodBuilder.preInstructions(preInstructions);
   }
-  console.log("build swap 6");
 
   return methodBuilder;
 }

@@ -107,6 +107,9 @@ export function TradePosition(props: Props) {
 
   useEffect(() => {
     async function getConversionRatio() {
+      if (payAmount === 0) {
+        return;
+      }
       let { perpetual_program } = await getPerpetualProgramAndProvider(
         walletContextState
       );
@@ -116,9 +119,11 @@ export function TradePosition(props: Props) {
         perpetual_program.provider
       );
 
+      console.log("view swap");
       if (payToken != positionToken) {
+        console.log("tokens not same");
         let swapInfo = await View.getSwapAmountAndFees(
-          new BN(payAmount * 10 ** pool!.getCustodyAccount(payToken)!.decimals),
+          payAmount,
           pool!,
           pool!.getCustodyAccount(payToken)!,
           pool!.getCustodyAccount(positionToken)!
@@ -242,7 +247,6 @@ export function TradePosition(props: Props) {
         amount={payAmount}
         token={payToken}
         onChangeAmount={(e) => {
-          console.log("token selector wrp on change", e);
           setPayAmount(e);
           setPositionAmount(e * leverage);
           setLastChanged(Input.Pay);

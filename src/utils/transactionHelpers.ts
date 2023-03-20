@@ -31,7 +31,7 @@ export async function createAtaIfNeeded(
       payer,
       associatedTokenAccount,
       publicKey,
-      NATIVE_MINT
+      mint
     );
   }
 
@@ -75,7 +75,6 @@ export async function wrapSolIfNeeded(
     );
     preInstructions.push(createSyncNativeInstruction(associatedTokenAccount));
   }
-  console.log("all pre instructions", preInstructions);
 
   return preInstructions.length > 0 ? preInstructions : null;
 }

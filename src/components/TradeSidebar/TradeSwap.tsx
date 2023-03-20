@@ -54,15 +54,18 @@ export function TradeSwap(props: Props) {
     if (Object.values(poolData).length > 0) {
       setPool(Object.values(poolData)[0]);
 
-      let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
-      let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
+      // let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
+      // let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
+      let tokenA = TokenE.USDC;
+      let tokenB = TokenE.TEST;
+      console.log("userData", userData);
 
       setPayToken(tokenA);
       setPayTokenBalance(userData.tokenBalances[tokenA]);
       setReceiveToken(tokenB);
       setReceiveTokenBalance(userData.tokenBalances[tokenB]);
     }
-  }, [poolData]);
+  }, [poolData, userData]);
 
   useEffect(() => {
     async function fetchData() {
@@ -76,15 +79,23 @@ export function TradeSwap(props: Props) {
       let { provider } = await getPerpetualProgramAndProvider(wallet as any);
 
       const View = new ViewHelper(connection, provider);
+      console.log("trying to get swap amt", payToken, receiveToken, payAmount);
 
       let swapInfo = await View.getSwapAmountAndFees(
-        new BN(payAmount * 10 ** pool!.getCustodyAccount(payToken)!.decimals),
+        payAmount,
         pool!,
         pool!.getCustodyAccount(payToken)!,
         pool!.getCustodyAccount(receiveToken)!
       );
 
       let f = Number(swapInfo.feeOut) / 10 ** 6;
+
+      console.log(
+        "rec amt? ",
+        Number(swapInfo.amountOut),
+        pool!.getCustodyAccount(receiveToken)!.decimals,
+        pool!.getCustodyAccount(receiveToken)!.decimals
+      );
 
       let recAmt =
         Number(swapInfo.amountOut) /
@@ -148,6 +159,7 @@ export function TradeSwap(props: Props) {
       </div>
     );
   }
+  console.log("pay token balance", payTokenBalance, payToken);
 
   return (
     <div className={props.className}>
