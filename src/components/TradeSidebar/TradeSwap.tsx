@@ -15,6 +15,7 @@ import { PoolSelector } from "@/components/PoolSelector";
 import { SolidButton } from "@/components/SolidButton";
 import { TradeSwapDetails } from "@/components/TradeSidebar/TradeSwapDetails";
 import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
+import { UserBalance } from "@/components/Atoms/UserBalance";
 
 interface Props {
   className?: string;
@@ -29,9 +30,9 @@ export function TradeSwap(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
 
   const [payToken, setPayToken] = useState<TokenE>();
-  const [payAmount, setPayAmount] = useState<number>(1);
+  const [payAmount, setPayAmount] = useState<number>();
   const [receiveToken, setReceiveToken] = useState<TokenE>();
-  const [receiveAmount, setReceiveAmount] = useState<number>(0);
+  const [receiveAmount, setReceiveAmount] = useState<number>();
   const [fee, setFee] = useState<number>(0);
 
   const userData = useGlobalStore((state) => state.userData);
@@ -164,20 +165,10 @@ export function TradeSwap(props: Props) {
     <div className={props.className}>
       <div className="flex items-center justify-between text-sm">
         <div className="text-sm font-medium text-white">You Pay</div>
-        <div
-          className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
+        <UserBalance
+          token={payToken}
           onClick={() => setPayAmount(payTokenBalance)}
-        >
-          {payTokenBalance ? (
-            <>
-              <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
-              <p className="font-normal">{payToken}</p>
-              <p className="text-zinc-400"> Balance</p>
-            </>
-          ) : (
-            <LoadingDots />
-          )}
-        </div>
+        />
       </div>
       <TokenSelector
         className="mt-2"
@@ -207,20 +198,10 @@ export function TradeSwap(props: Props) {
       </div>
       <div className="flex items-center justify-between text-sm">
         <div className="text-sm font-medium text-white">You Receive</div>
-        <div
-          className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
+        <UserBalance
+          token={receiveToken}
           onClick={() => setReceiveAmount(receiveTokenBalance)}
-        >
-          {receiveTokenBalance ? (
-            <>
-              <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
-              <p className="font-normal">{receiveToken}</p>
-              <p className="text-zinc-400"> Balance</p>
-            </>
-          ) : (
-            <LoadingDots />
-          )}
-        </div>
+        />
       </div>
       <TokenSelector
         className="mt-2"

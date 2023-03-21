@@ -18,6 +18,7 @@ import { PoolSelector } from "@/components/PoolSelector";
 import { LeverageSlider } from "@/components/LeverageSlider";
 import { SolidButton } from "@/components/SolidButton";
 import { TradeDetails } from "@/components/TradeSidebar/TradeDetails";
+import { UserBalance } from "@/components/Atoms/UserBalance";
 
 interface Props {
   className?: string;
@@ -96,7 +97,9 @@ export function TradePosition(props: Props) {
   useEffect(() => {
     // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
-    // setPayToken(asToken(pair.split("-")[0]));
+    if (!payToken) {
+      setPayToken(asToken(pair.split("-")[0]));
+    }
   }, [pair]);
 
   useEffect(() => {
@@ -217,29 +220,18 @@ export function TradePosition(props: Props) {
     );
   }
 
+  console.log("user dataaaa", userData);
+
+  // function UserBalance() {
+  //   return <p className="text-white">bob</p>;
+  // }
   // TODO redo leverage calculation by seeing how much payToken * price / positionToken * price is
 
   return (
     <div className={props.className}>
       <div className="flex items-center justify-between text-sm ">
         <div className="font-medium text-white">You Pay</div>
-        {publicKey && (
-          <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer">
-            {userData.tokenBalances[payToken] ? (
-              <>
-                <p>{userData.tokenBalances[payToken].toFixed(2)}</p>
-                <p className="font-normal">{payToken}</p>
-                <p className="text-zinc-400"> Balance</p>
-              </>
-            ) : (
-              <>
-                <p>0</p>
-                <p className="font-normal">{payToken}</p>
-                <p className="text-zinc-400"> Balance</p>
-              </>
-            )}
-          </div>
-        )}
+        <UserBalance token={payToken} />
       </div>
       <TokenSelector
         className="mt-2"

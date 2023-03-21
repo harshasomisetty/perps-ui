@@ -80,7 +80,7 @@ export function TokenSelector(props: Props) {
               <ChevronRightIcon className="fill-gray-500 transition-colors group-hover:fill-white" />
             )}
           </button>
-          {props.maxBalance && (
+          {props.maxBalance && props.maxBalance != 0 && (
             <button
               className={twMerge(
                 "h-min",
