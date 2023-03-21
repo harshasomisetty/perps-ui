@@ -201,16 +201,22 @@ export class ViewHelper {
 
     let addCollateral = addCollat
       ? new BN(addCollat * 10 ** custody.decimals)
-      : 0;
+      : new BN(0);
     let removeCollateral = removeCollat
       ? new BN(removeCollat * 10 ** custody.decimals)
-      : 0;
+      : new BN(0);
     let params = {};
 
     if (addCollateral > 0 || removeCollateral > 0) {
       params = { addCollateral, removeCollateral };
     }
 
+    console.log(
+      "final params",
+      params,
+      Number(params["addCollateral"]),
+      Number(params["removeCollateral"])
+    );
     const transaction = await program.methods
       // @ts-ignore
       .getLiquidationPrice(params)
@@ -227,6 +233,8 @@ export class ViewHelper {
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getLiquidationPrice"
     );
+    console.log("results in liquidation price", result);
+    console.log("decode logs", this.decodeLogs(result, index));
     return this.decodeLogs(result, index);
   };
 
