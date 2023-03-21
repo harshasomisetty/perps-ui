@@ -48,15 +48,33 @@ export function CollateralModal(props: Props) {
 
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
+  const [liqPrice, setLiqPrice] = useState(0);
 
   const [newCollateral, setNewCollateral] = useState(null);
   const [newLeverage, setNewLeverage] = useState(null);
   const [newLiqPrice, setNewLiqPrice] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const timeoutRef = useRef(null);
 
   useEffect(() => {
     async function fetchNewStats() {
+      console.log("console log new stassss");
+      let { perpetual_program } = await getPerpetualProgramAndProvider(
+        walletContextState
+      );
+
+      const View = new ViewHelper(
+        perpetual_program.provider.connection,
+        perpetual_program.provider
+      );
+
+      console.log("before old liq");
+      let fetchedOldLiq = await View.getLiquidationPrice(props.position);
+      console.log("old liq", Math.round((fetchedOldLiq / 10 ** 6) * 100) / 100);
+
+      setLiqPrice(Math.round((fetchedOldLiq / 10 ** 6) * 100) / 100);
+
       if (tab === Tab.Add && depositAmount === 0) {
         setNewCollateral(null);
         setNewLeverage(null);
@@ -73,14 +91,6 @@ export function CollateralModal(props: Props) {
 
       console.log("in fetch new stats colalteral chagne");
       console.log("col change", withdrawAmount, depositAmount);
-      let { perpetual_program } = await getPerpetualProgramAndProvider(
-        walletContextState
-      );
-
-      const View = new ViewHelper(
-        perpetual_program.provider.connection,
-        perpetual_program.provider
-      );
 
       let liquidationPrice = await View.getLiquidationPrice(
         props.position,
@@ -130,7 +140,7 @@ export function CollateralModal(props: Props) {
     return () => {
       clearTimeout(timeoutRef.current);
     };
-  }, [withdrawAmount, depositAmount]);
+  }, [open, withdrawAmount, depositAmount]);
 
   const stats = useGlobalStore((state) => state.priceStats);
 
@@ -161,7 +171,9 @@ export function CollateralModal(props: Props) {
 
   return (
     <Dialog.Root
+      open={open}
       onOpenChange={() => {
+        setOpen(!open);
         setWithdrawAmount(0);
         setDepositAmount(0);
       }}
@@ -278,7 +290,7 @@ export function CollateralModal(props: Props) {
                 // },
                 {
                   label: "Liq Price",
-                  value: `$${"temp"}`,
+                  value: `$${liqPrice}`,
                   newValue: `$${newLiqPrice}`,
                 },
                 // {
