@@ -134,6 +134,7 @@ export class ViewHelper {
     let collateral = new BN(payAmount * 10 ** custody.decimals);
     let size = new BN(positionAmount * 10 ** custody.decimals);
 
+    console.log("entry params", payAmount, positionAmount, side);
     let transaction: Transaction = await program.methods
       // @ts-ignore
       .getEntryPriceAndFee({
@@ -150,11 +151,12 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    // console.log("got entry result", result);
+    console.log("got entry result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getEntryPriceAndFee"
     );
     const res: any = this.decodeLogs(result, index);
+    console.log("res in entry price and fee", res);
 
     return {
       liquidationPrice: res.liquidationPrice,
@@ -291,6 +293,7 @@ export class ViewHelper {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
     let amountIn = new BN(amtIn * 10 ** receivingCustody.decimals);
 
+    console.log("amount in", Number(amountIn));
     let transaction = await program.methods
       // @ts-ignore
       .getSwapAmountAndFees({

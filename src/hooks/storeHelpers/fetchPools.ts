@@ -52,15 +52,18 @@ export async function getPoolData(
         );
         let fetchedAum;
 
-        try {
-          fetchedAum = await View.getAssetsUnderManagement(
-            poolObjs[pool.publicKey.toString()]
-          );
-        } catch (error) {
-          console.log("error");
-          fetchedAum = await View.getAssetsUnderManagement(
-            poolObjs[pool.publicKey.toString()]
-          );
+        let loopStatus = true;
+
+        while (loopStatus) {
+          try {
+            fetchedAum = await View.getAssetsUnderManagement(
+              poolObjs[pool.publicKey.toString()]
+            );
+            loopStatus = false;
+            console.log("got aum fetch");
+          } catch (error) {
+            console.log("error in aum");
+          }
         }
 
         poolObjs[pool.publicKey.toString()].setAum(fetchedAum);

@@ -102,8 +102,8 @@ export function TokenSelector(props: Props) {
             {props.tokenList.length > 1 && (
               <ChevronRightIcon className="fill-gray-500 transition-colors group-hover:fill-white" />
             )}
-            <MaxButton />
           </button>
+          <MaxButton />
         </div>
         <div>
           {props.pendingRateConversion ? (
@@ -126,7 +126,7 @@ export function TokenSelector(props: Props) {
                   ? "pointer-events-auto"
                   : "pointer-events-none"
               )}
-              placeholder="0"
+              placeholder=""
               type="number"
               value={Math.round(props.amount * 100) / 100}
               onChange={(e) => {

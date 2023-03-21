@@ -8,7 +8,6 @@ interface Props {
 }
 
 export function UserBalance(props: Props) {
-  console.log("props?", props);
   const { publicKey } = useWallet();
   const userData = useGlobalStore((state) => state.userData);
 

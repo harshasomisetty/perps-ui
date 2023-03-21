@@ -34,8 +34,10 @@ export function TradePosition(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
   const userData = useGlobalStore((state) => state.userData);
   const custodyData = useGlobalStore((state) => state.custodyData);
-  const setPositionData = useGlobalStore((state) => state.setPositionData);
   const stats = useGlobalStore((state) => state.priceStats);
+
+  const setPositionData = useGlobalStore((state) => state.setPositionData);
+
   const { publicKey, wallet } = useWallet();
   const walletContextState = useWallet();
   const { connection } = useConnection();
@@ -52,11 +54,13 @@ export function TradePosition(props: Props) {
 
   const [payAmount, setPayAmount] = useState(0);
   const [positionAmount, setPositionAmount] = useState(0);
-  const [conversionRatio, setConversionRatio] = useState(1);
   const [leverage, setLeverage] = useState(1);
+  const [conversionRatio, setConversionRatio] = useState(1);
   const [entryPrice, setEntryPrice] = useState(0);
   const [liquidationPrice, setLiquidationPrice] = useState(0);
   const [fee, setFee] = useState(0);
+
+  const [pendingRateConversion, setPendingRateConversion] = useState(false);
 
   async function handleTrade() {
     // console.log("in handle trade");
@@ -77,23 +81,6 @@ export function TradePosition(props: Props) {
     setPositionData(positionInfos);
   }
 
-  function adjustLeverage(converRatio?: number) {
-    if (!converRatio) {
-      converRatio = conversionRatio;
-    }
-    console.log("changed leverage", leverage);
-    if (lastChanged === Input.Pay) {
-      console.log("last change Pay", payAmount * converRatio * leverage);
-      setPositionAmount(payAmount * converRatio * leverage);
-    } else {
-      console.log(
-        "last change Position",
-        positionAmount / leverage / converRatio
-      );
-      setPayAmount(positionAmount / leverage / converRatio);
-    }
-  }
-
   useEffect(() => {
     // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
@@ -110,23 +97,18 @@ export function TradePosition(props: Props) {
 
   useEffect(() => {
     async function getConversionRatio() {
-      if (payAmount === 0) {
-        return;
-      }
-      let { perpetual_program } = await getPerpetualProgramAndProvider(
-        walletContextState
-      );
-
-      const View = new ViewHelper(
-        perpetual_program.provider.connection,
-        perpetual_program.provider
-      );
-
-      console.log("view swap");
       if (payToken != positionToken) {
-        console.log("tokens not same");
+        let { perpetual_program } = await getPerpetualProgramAndProvider(
+          walletContextState
+        );
+
+        const View = new ViewHelper(
+          perpetual_program.provider.connection,
+          perpetual_program.provider
+        );
+
         let swapInfo = await View.getSwapAmountAndFees(
-          payAmount,
+          1,
           pool!,
           pool!.getCustodyAccount(payToken)!,
           pool!.getCustodyAccount(positionToken)!
@@ -135,21 +117,51 @@ export function TradePosition(props: Props) {
         let payAmt =
           Number(swapInfo.amountOut) /
           10 ** pool!.getCustodyAccount(positionToken)!.decimals;
-        setConversionRatio(payAmt / payAmount);
-        console.log("payAmt", payAmt);
-        console.log("conversion ratio is ", payAmt / payAmount);
-        adjustLeverage(payAmt / payAmount);
+        setConversionRatio(payAmt);
       } else {
         console.log("conversion ratio is 1");
         setConversionRatio(1);
-        adjustLeverage(1);
       }
     }
-    getConversionRatio();
-  }, [payToken, positionToken]);
+    if (pool && payToken && positionToken) {
+      getConversionRatio();
+    }
+  }, [pool, payToken, positionToken]);
+
+  useEffect(() => {
+    async function updateSelectors() {
+      if (lastChanged === Input.Pay) {
+        if (!payAmount || payAmount === 0) {
+          setPositionAmount(0);
+        } else {
+          console.log("last change Pay", payAmount, conversionRatio, leverage);
+          setPositionAmount(payAmount * conversionRatio * leverage);
+        }
+      } else {
+        if (!positionAmount || positionAmount === 0) {
+          setPayAmount(0);
+        } else {
+          console.log(
+            "last change Position",
+            positionAmount / leverage / conversionRatio
+          );
+          setPayAmount(positionAmount / leverage / conversionRatio);
+        }
+      }
+    }
+    updateSelectors();
+  }, [conversionRatio, payAmount, positionAmount, leverage]);
 
   useEffect(() => {
     async function fetchData() {
+      if (!(payAmount > 0 && positionAmount > 0)) {
+        return;
+      }
+
+      setPendingRateConversion(true);
+
+      console.log("after check in trade amounts", payAmount, positionAmount);
+
       let { perpetual_program } = await getPerpetualProgramAndProvider(
         walletContextState
       );
@@ -159,7 +171,12 @@ export function TradePosition(props: Props) {
         perpetual_program.provider
       );
 
-      console.log("payAmount in postionToken", payAmount * conversionRatio);
+      console.log(
+        "payAmount in postionToken",
+        payAmount,
+        positionAmount,
+        pool?.getCustodyAccount(positionToken)
+      );
       let getEntryPrice = await View.getEntryPriceAndFee(
         payAmount * conversionRatio,
         positionAmount,
@@ -174,9 +191,11 @@ export function TradePosition(props: Props) {
       setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
       setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);
       setFee(Number(getEntryPrice.fee) / 10 ** 9);
+
+      setPendingRateConversion(false);
     }
 
-    if (pool && payAmount && positionAmount && props.side) {
+    if (pool && props.side) {
       clearTimeout(timeoutRef.current);
 
       timeoutRef.current = setTimeout(() => {
@@ -187,45 +206,15 @@ export function TradePosition(props: Props) {
       clearTimeout(timeoutRef.current);
     };
     // @ts-ignore
-  }, [wallet, pool, payAmount, props.side]);
+  }, [payAmount, positionAmount]);
 
-  useEffect(() => {
-    adjustLeverage();
-  }, [leverage]);
-
-  if (!pair) {
+  if (!pair || !pool || Object.values(stats).length === 0) {
     return (
       <div>
-        <p>no pair</p>
         <LoadingDots />
       </div>
     );
   }
-
-  if (!pool) {
-    return (
-      <div>
-        <p>no pool</p>
-        <LoadingDots />
-      </div>
-    );
-  }
-
-  if (Object.values(stats).length === 0) {
-    return (
-      <div>
-        <p>no stats</p>
-        <LoadingDots />
-      </div>
-    );
-  }
-
-  console.log("user dataaaa", userData);
-
-  // function UserBalance() {
-  //   return <p className="text-white">bob</p>;
-  // }
-  // TODO redo leverage calculation by seeing how much payToken * price / positionToken * price is
 
   return (
     <div className={props.className}>
@@ -239,7 +228,6 @@ export function TradePosition(props: Props) {
         token={payToken}
         onChangeAmount={(e) => {
           setPayAmount(e);
-          setPositionAmount(e * leverage);
           setLastChanged(Input.Pay);
         }}
         onSelectToken={setPayToken}
@@ -258,7 +246,6 @@ export function TradePosition(props: Props) {
         amount={positionAmount}
         token={positionToken}
         onChangeAmount={(e) => {
-          setPayAmount(e / leverage);
           setPositionAmount(e);
           setLastChanged(Input.Position);
         }}
@@ -267,6 +254,7 @@ export function TradePosition(props: Props) {
           router.push("/trade/" + token + "-USD", undefined, { shallow: true });
         }}
         tokenList={pool.getTokenList()}
+        pendingRateConversion={pendingRateConversion}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
       <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
@@ -301,7 +289,6 @@ export function TradePosition(props: Props) {
           Please specify a valid nonzero amount to pay
         </p>
       )}
-
       <TradeDetails
         className={twMerge(
           "-mb-4",
