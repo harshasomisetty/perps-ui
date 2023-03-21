@@ -30,9 +30,9 @@ export function TradeSwap(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
 
   const [payToken, setPayToken] = useState<TokenE>();
-  const [payAmount, setPayAmount] = useState<number>();
+  const [payAmount, setPayAmount] = useState<number>(0);
   const [receiveToken, setReceiveToken] = useState<TokenE>();
-  const [receiveAmount, setReceiveAmount] = useState<number>();
+  const [receiveAmount, setReceiveAmount] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
 
   const userData = useGlobalStore((state) => state.userData);
@@ -70,7 +70,7 @@ export function TradeSwap(props: Props) {
   useEffect(() => {
     async function fetchData() {
       // console.log("in fetch", payAmount);
-      if (payAmount == 0) {
+      if (payAmount == 0 || !payAmount) {
         setReceiveAmount(0);
         setFee(0);
         return;

@@ -32,6 +32,29 @@ export function TokenSelector(props: Props) {
   const stats = useGlobalStore((state) => state.priceStats);
   const [selectorOpen, setSelectorOpen] = useState(false);
 
+  function MaxButton() {
+    if (props.maxBalance) {
+      return (
+        <button
+          className={twMerge(
+            "h-min",
+            "w-min",
+            "bg-purple-500",
+            "rounded",
+            "py-1",
+            "px-2",
+            "text-white"
+          )}
+          onClick={() => props.onChangeAmount(props.maxBalance)}
+        >
+          Max
+        </button>
+      );
+    } else {
+      return <></>;
+    }
+  }
+
   if (props.token === undefined) {
     return (
       <div
@@ -79,23 +102,8 @@ export function TokenSelector(props: Props) {
             {props.tokenList.length > 1 && (
               <ChevronRightIcon className="fill-gray-500 transition-colors group-hover:fill-white" />
             )}
+            <MaxButton />
           </button>
-          {props.maxBalance && props.maxBalance != 0 && (
-            <button
-              className={twMerge(
-                "h-min",
-                "w-min",
-                "bg-purple-500",
-                "rounded",
-                "py-1",
-                "px-2",
-                "text-white"
-              )}
-              onClick={() => props.onChangeAmount(props.maxBalance)}
-            >
-              Max
-            </button>
-          )}
         </div>
         <div>
           {props.pendingRateConversion ? (

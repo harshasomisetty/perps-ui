@@ -13,13 +13,6 @@ export function UserBalance(props: Props) {
   const userData = useGlobalStore((state) => state.userData);
 
   let balance = userData.tokenBalances[props.token];
-  // console.log(
-  //   "user bal",
-  //   balance,
-  //   token.token,
-  //   userData.tokenBalances,
-  //   userData.tokenBalances[token.token]
-  // );
   if (!publicKey) {
     return (
       <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer">
