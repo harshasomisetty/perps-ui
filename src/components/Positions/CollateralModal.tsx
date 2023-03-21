@@ -2,7 +2,7 @@ import { SidebarTab } from "@/components/SidebarTab";
 import ArrowRight from "@carbon/icons-react/lib/ArrowRight";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
 import { useGlobalStore } from "@/stores/store";
@@ -16,6 +16,8 @@ import { changeCollateral } from "src/actions/changeCollateral";
 import { Tab } from "@/lib/types";
 import { BN } from "@project-serum/anchor";
 import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
 
 interface Props {
   className?: string;
@@ -47,33 +49,79 @@ export function CollateralModal(props: Props) {
   const [withdrawAmount, setWithdrawAmount] = useState(1);
   const [depositAmount, setDepositAmount] = useState(1);
 
+  const [newCollateral, setNewCollateral] = useState(0);
+  const [newLeverage, setNewLeverage] = useState(0);
+  const [newLiqPrice, setNewLiqPrice] = useState(0);
+
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    async function fetchNewStats() {
+      let { perpetual_program } = await getPerpetualProgramAndProvider(
+        walletContextState
+      );
+
+      const View = new ViewHelper(
+        perpetual_program.provider.connection,
+        perpetual_program.provider
+      );
+
+      let liquidationPrice = await View.getLiquidationPrice(
+        props.position,
+        pool.getCustodyAccount(props.position.token)!,
+        depositAmount,
+        withdrawAmount
+      );
+
+      console.log("liquidationPrice", liquidationPrice);
+
+      let newLiq = (
+        liquidationPrice /
+        10 ** pool.getCustodyAccount(props.position.token)!.decimals
+      ).toFixed(2);
+
+      setNewLiqPrice(newLiq);
+
+      let newCollat;
+      if (tab === Tab.Add) {
+        newCollat =
+          props.position.getCollateralUsd() +
+          depositAmount * stats[props.position.token].currentPrice;
+      } else {
+        newCollat = props.position.getCollateralUsd() - withdrawAmount;
+      }
+
+      console.log("set new collat", newCollat);
+      setNewCollateral(newCollat.toFixed(2));
+
+      let newLev;
+      let changeCollateral =
+        tab === Tab.Add
+          ? depositAmount * stats[props.position.token].currentPrice
+          : -1 * withdrawAmount;
+
+      newLev =
+        props.position.getSizeUsd() /
+        (props.position.getCollateralUsd() + changeCollateral);
+
+      setNewLeverage(newLev.toFixed(2));
+    }
+
+    if (pool && props.position && payTokenBalance) {
+      clearTimeout(timeoutRef.current);
+
+      timeoutRef.current = setTimeout(() => {
+        fetchNewStats();
+      }, 1000);
+    }
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
+  }, [withdrawAmount, depositAmount]);
+
   const stats = useGlobalStore((state) => state.priceStats);
 
-  function getNewLeverage() {
-    let changeCollateral =
-      tab === Tab.Add
-        ? depositAmount * stats[props.position.token].currentPrice
-        : -1 * withdrawAmount;
-
-    return (
-      props.position.getSizeUsd() /
-      (props.position.getCollateralUsd() + changeCollateral)
-    );
-  }
-
-  function getNewCollateral() {
-    if (tab === Tab.Add) {
-      return (
-        props.position.getCollateralUsd() +
-        depositAmount * stats[props.position.token].currentPrice
-      );
-    } else {
-      return props.position.getCollateralUsd() - withdrawAmount;
-    }
-  }
-
-  // TODO incorporate proper fetched new liq price into collateral modal
-  function getNewLiqPrice() {}
+  function getNewLeverage() {}
 
   async function handleChangeCollateral() {
     let changeAmount;
@@ -185,7 +233,7 @@ export function CollateralModal(props: Props) {
                   value: `$${formatNumberCommas(
                     props.position.getCollateralUsd()
                   )}`,
-                  newValue: `$${formatNumberCommas(getNewCollateral())}`,
+                  newValue: `$${newCollateral}`,
                 },
                 {
                   label: "Mark Price",
@@ -200,7 +248,7 @@ export function CollateralModal(props: Props) {
                 {
                   label: "Leverage",
                   value: `${props.position.getLeverage().toFixed(2)}`,
-                  newValue: `${getNewLeverage().toFixed(2)}`,
+                  newValue: `${newLeverage}`,
                 },
                 {
                   label: "Size",
@@ -212,8 +260,8 @@ export function CollateralModal(props: Props) {
                 // },
                 {
                   label: "Liq Price",
-                  value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
-                  newValue: `sdf`,
+                  value: `$${props.position.getSizeUsd()}`,
+                  newValue: `$${newLiqPrice}`,
                 },
                 // {
                 //   label: "Execution Fee",

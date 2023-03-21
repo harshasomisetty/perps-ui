@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { TokenE } from "@/lib/Token";
 import { swap } from "src/actions/swap";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { BN } from "@project-serum/anchor";
 import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";

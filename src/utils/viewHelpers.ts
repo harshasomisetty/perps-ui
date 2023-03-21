@@ -191,13 +191,29 @@ export class ViewHelper {
     };
   };
 
-  getLiquidationPrice = async (position: PositionAccount): Promise<BN> => {
+  getLiquidationPrice = async (
+    position: PositionAccount,
+    custody?: CustodyAccount,
+    addCollat?: number,
+    removeCollat?: number
+  ): Promise<BN> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
-    // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+    let addCollateral = addCollat
+      ? new BN(addCollat * 10 ** custody.decimals)
+      : 0;
+    let removeCollateral = removeCollat
+      ? new BN(removeCollat * 10 ** custody.decimals)
+      : 0;
+    let params = {};
+
+    if (addCollateral > 0 || removeCollateral > 0) {
+      params = { addCollateral, removeCollateral };
+    }
+
     const transaction = await program.methods
       // @ts-ignore
-      .getLiquidationPrice({})
+      .getLiquidationPrice(params)
       .accounts({
         perpetuals: PERPETUALS_ADDRESS,
         pool: position.pool,
