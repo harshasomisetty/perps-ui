@@ -96,7 +96,7 @@ export function TradePosition(props: Props) {
   useEffect(() => {
     // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
-    setPayToken(asToken(pair.split("-")[0]));
+    // setPayToken(asToken(pair.split("-")[0]));
   }, [pair]);
 
   useEffect(() => {
@@ -225,8 +225,7 @@ export function TradePosition(props: Props) {
         <div className="font-medium text-white">You Pay</div>
         {publicKey && (
           <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer">
-            {userData.tokenBalances[payToken] &&
-            userData.tokenBalances[payToken].toFixed(2) ? (
+            {userData.tokenBalances[payToken] ? (
               <>
                 <p>{userData.tokenBalances[payToken].toFixed(2)}</p>
                 <p className="font-normal">{payToken}</p>
