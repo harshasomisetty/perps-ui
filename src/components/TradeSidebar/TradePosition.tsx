@@ -64,14 +64,12 @@ export function TradePosition(props: Props) {
 
   async function handleTrade() {
     // console.log("in handle trade");
-    const payCustody = pool?.getCustodyAccount(payToken);
-    const positionCustody = pool?.getCustodyAccount(positionToken);
     await openPosition(
       walletContextState,
       connection,
       pool,
-      payCustody,
-      positionCustody,
+      payToken,
+      positionToken,
       payAmount,
       positionAmount,
       stats[payToken]?.currentPrice,
@@ -119,7 +117,7 @@ export function TradePosition(props: Props) {
           10 ** pool!.getCustodyAccount(positionToken)!.decimals;
         setConversionRatio(payAmt);
       } else {
-        console.log("conversion ratio is 1");
+        // console.log("conversion ratio is 1");
         setConversionRatio(1);
       }
     }
@@ -134,17 +132,17 @@ export function TradePosition(props: Props) {
         if (!payAmount || payAmount === 0) {
           setPositionAmount(0);
         } else {
-          console.log("last change Pay", payAmount, conversionRatio, leverage);
+          // console.log("last change Pay", payAmount, conversionRatio, leverage);
           setPositionAmount(payAmount * conversionRatio * leverage);
         }
       } else {
         if (!positionAmount || positionAmount === 0) {
           setPayAmount(0);
         } else {
-          console.log(
-            "last change Position",
-            positionAmount / leverage / conversionRatio
-          );
+          // console.log(
+          //   "last change Position",
+          //   positionAmount / leverage / conversionRatio
+          // );
           setPayAmount(positionAmount / leverage / conversionRatio);
         }
       }
@@ -160,7 +158,7 @@ export function TradePosition(props: Props) {
 
       setPendingRateConversion(true);
 
-      console.log("after check in trade amounts", payAmount, positionAmount);
+      // console.log("after check in trade amounts", payAmount, positionAmount);
 
       let { perpetual_program } = await getPerpetualProgramAndProvider(
         walletContextState
@@ -171,12 +169,12 @@ export function TradePosition(props: Props) {
         perpetual_program.provider
       );
 
-      console.log(
-        "payAmount in postionToken",
-        payAmount,
-        positionAmount,
-        pool?.getCustodyAccount(positionToken)
-      );
+      // console.log(
+      //   "payAmount in postionToken",
+      //   payAmount,
+      //   positionAmount,
+      //   pool?.getCustodyAccount(positionToken)
+      // );
       let getEntryPrice = await View.getEntryPriceAndFee(
         payAmount * conversionRatio,
         positionAmount,
@@ -185,8 +183,8 @@ export function TradePosition(props: Props) {
         pool!.getCustodyAccount(positionToken)!
       );
 
-      console.log("get entry values", getEntryPrice);
-      console.log("entry price", Number(getEntryPrice.entryPrice) / 10 ** 6);
+      // console.log("get entry values", getEntryPrice);
+      // console.log("entry price", Number(getEntryPrice.entryPrice) / 10 ** 6);
 
       setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
       setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);
@@ -275,7 +273,12 @@ export function TradePosition(props: Props) {
       <SolidButton
         className="mt-6 w-full"
         onClick={handleTrade}
-        disabled={!publicKey || payAmount === 0}
+        disabled={
+          !publicKey ||
+          payAmount === 0 ||
+          positionAmount * stats[positionToken].currentPrice >
+            pool.getCustodyAccount(positionToken!)?.getCustodyLiquidity(stats!)!
+        }
       >
         Place Order
       </SolidButton>
@@ -287,6 +290,15 @@ export function TradePosition(props: Props) {
       {!payAmount && (
         <p className="mt-2 text-center text-xs text-orange-500 ">
           Please specify a valid nonzero amount to pay
+        </p>
+      )}
+      {positionAmount * stats[positionToken].currentPrice >
+        pool
+          .getCustodyAccount(positionToken!)
+          ?.getCustodyLiquidity(stats!)! && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          This position exceeds pool liquidity, reduce your position size or
+          leverage
         </p>
       )}
       <TradeDetails

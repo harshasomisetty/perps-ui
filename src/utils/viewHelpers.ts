@@ -115,7 +115,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    console.log("result in aum fetch", result);
+    // console.log("result in aum fetch", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAssetsUnderManagement"
     );
@@ -235,8 +235,8 @@ export class ViewHelper {
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getLiquidationPrice"
     );
-    console.log("results in liquidation price", result);
-    console.log("decode logs", this.decodeLogs(result, index));
+    // console.log("results in liquidation price", result);
+    // console.log("decode logs", this.decodeLogs(result, index));
     return this.decodeLogs(result, index);
   };
 
@@ -293,7 +293,7 @@ export class ViewHelper {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
     let amountIn = new BN(amtIn * 10 ** receivingCustody.decimals);
 
-    console.log("amount in", Number(amountIn));
+    // console.log("amount in", Number(amountIn));
     let transaction = await program.methods
       // @ts-ignore
       .getSwapAmountAndFees({
@@ -310,7 +310,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    console.log("result in swap  fetch", result);
+    // console.log("result in swap  fetch", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getSwapAmountAndFees"
     );
@@ -345,7 +345,7 @@ export class ViewHelper {
       .transaction();
     const result = await this.simulateTransaction(transaction);
 
-    console.log("result", result);
+    // console.log("result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAddLiquidityAmountAndFee"
     );
@@ -407,7 +407,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    console.log("oracle result", result);
+    // console.log("oracle result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getOraclePrice"
     );

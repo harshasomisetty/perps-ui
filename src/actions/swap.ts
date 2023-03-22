@@ -16,7 +16,7 @@ import {
   manualSendTransaction,
 } from "@/utils/TransactionHandlers";
 
-export async function buildSwapTransaction(
+export async function swapTransactionBuilder(
   walletContextState: WalletContextState,
   connection: Connection,
   pool: PoolAccount,
@@ -25,13 +25,18 @@ export async function buildSwapTransaction(
   amtInNumber: number,
   minAmtOutNumber?: number
   // @ts-ignore
-): Promise<MethodsBuilder> {
+): Promise<{
+  methodBuilder: MethodsBuilder;
+  preInstructions: TransactionInstruction[];
+}> {
+  console.log("in swap builder");
   let { perpetual_program } = await getPerpetualProgramAndProvider(
     walletContextState
   );
   let publicKey = walletContextState.publicKey!;
 
   const receivingCustody = pool.getCustodyAccount(topToken)!;
+
   let fundingAccount = await getAssociatedTokenAddress(
     receivingCustody.mint,
     publicKey
@@ -39,6 +44,7 @@ export async function buildSwapTransaction(
 
   const dispensingCustody = pool.getCustodyAccount(bottomToken)!;
 
+  console.log("receiving accoutn", dispensingCustody.getTokenE());
   let receivingAccount = await getAssociatedTokenAddress(
     dispensingCustody.mint,
     publicKey
@@ -47,6 +53,16 @@ export async function buildSwapTransaction(
   let preInstructions: TransactionInstruction[] = [];
 
   if (receivingCustody.getTokenE() == TokenE.SOL) {
+    console.log("sending sol", receivingCustody.getTokenE());
+    let ataIx = await createAtaIfNeeded(
+      publicKey,
+      publicKey,
+      receivingCustody.mint,
+      connection
+    );
+
+    if (ataIx) preInstructions.push(ataIx);
+
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
@@ -56,31 +72,21 @@ export async function buildSwapTransaction(
     if (wrapInstructions) {
       preInstructions.push(...wrapInstructions);
     }
-  } else {
-    let ataIx = await createAtaIfNeeded(
-      publicKey,
-      publicKey,
-      receivingCustody.mint,
-      connection
-    );
-
-    if (ataIx) preInstructions.push(ataIx);
   }
 
   console.log("dispensing custody", dispensingCustody.getTokenE());
-  const associatedTokenAccount = await getAssociatedTokenAddress(
-    dispensingCustody.mint,
-    publicKey
+  console.log(
+    "dispensing ata, or receiving account",
+    receivingAccount.toString()
   );
-  console.log("dispensing ata", associatedTokenAccount.toString());
-  let ataIx1 = await createAtaIfNeeded(
+  let ataIx = await createAtaIfNeeded(
     publicKey,
     publicKey,
     dispensingCustody.mint,
     connection
   );
 
-  if (ataIx1) preInstructions.push(ataIx1);
+  if (ataIx) preInstructions.push(ataIx);
 
   console.log("params", minAmtOutNumber);
   let minAmountOut;
@@ -133,9 +139,10 @@ export async function buildSwapTransaction(
 
   if (preInstructions) {
     methodBuilder = methodBuilder.preInstructions(preInstructions);
+    console.log("swap builder does have pre isntructions", preInstructions);
   }
 
-  return methodBuilder;
+  return { methodBuilder, preInstructions };
 }
 
 export async function swap(
@@ -147,7 +154,7 @@ export async function swap(
   amtInNumber: number,
   minAmtOutNumber?: number
 ) {
-  let methodBuilder = await buildSwapTransaction(
+  let { methodBuilder } = await swapTransactionBuilder(
     walletContextState,
     connection,
     pool,

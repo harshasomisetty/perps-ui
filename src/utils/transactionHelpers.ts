@@ -25,6 +25,7 @@ export async function createAtaIfNeeded(
     publicKey
   );
 
+  console.log("creating ata", associatedTokenAccount.toString());
   if (!(await checkIfAccountExists(associatedTokenAccount, connection))) {
     console.log("ata doesn't exist");
     return createAssociatedTokenAccountInstruction(
@@ -52,13 +53,13 @@ export async function wrapSolIfNeeded(
     publicKey
   );
 
-  let ataIx = await createAtaIfNeeded(
-    publicKey,
-    payer,
-    NATIVE_MINT,
-    connection
-  );
-  if (ataIx) preInstructions.push(ataIx);
+  // let ataIx = await createAtaIfNeeded(
+  //   publicKey,
+  //   payer,
+  //   NATIVE_MINT,
+  //   connection
+  // );
+  // if (ataIx) preInstructions.push(ataIx);
 
   const balance =
     (await connection.getBalance(associatedTokenAccount)) / LAMPORTS_PER_SOL;

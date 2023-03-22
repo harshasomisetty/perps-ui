@@ -16,14 +16,14 @@ import {
 import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
 import {
   automaticSendTransaction,
   manualSendTransaction,
 } from "@/utils/TransactionHandlers";
-import { buildSwapTransaction } from "src/actions/swap";
+import { swapTransactionBuilder } from "src/actions/swap";
 
-export async function openPosition(
+export async function openPositionBuilder(
   walletContextState: WalletContextState,
   connection: Connection,
   pool: PoolAccount,
@@ -34,7 +34,7 @@ export async function openPosition(
   price: number,
   side: Side
 ) {
-  console.log("in open position");
+  // console.log("in open position");
   let { perpetual_program } = await getPerpetualProgramAndProvider(
     walletContextState
   );
@@ -63,32 +63,35 @@ export async function openPosition(
     perpetual_program.programId
   )[0];
 
-  let swapBuilder;
-  let ix;
-
+  const dispensingCustody = pool.getCustodyAccount(
+    positionCustody.getTokenE()
+  )!;
   let preInstructions: TransactionInstruction[] = [];
 
-  console.log("in tokens not equal open pos");
+  // console.log("in tokens not equal open pos");
   if (payCustody.getTokenE() != positionCustody.getTokenE()) {
-    swapBuilder = await buildSwapTransaction(
-      walletContextState,
-      connection,
-      pool,
-      payCustody.getTokenE(),
-      positionCustody.getTokenE(),
-      payAmount
-    );
+    console.log("first swapping in open pos");
+    let { methodBuilder: swapBuilder, preInstructions: swapPreInstructions } =
+      await swapTransactionBuilder(
+        walletContextState,
+        connection,
+        pool,
+        payCustody.getTokenE(),
+        positionCustody.getTokenE(),
+        payAmount
+      );
     // TODO calculate how much position token value is new payAmount
     // TODO open position using new payAmount
     console.log("make builder into instruction in openPos");
 
-    ix = await swapBuilder.instruction();
-    preInstructions.push(ix);
+    let ix = await swapBuilder.instruction();
+    preInstructions.push(...swapPreInstructions, ix);
   }
 
   console.log("after tokens not equal :)");
 
   if (positionCustody.getTokenE() == TokenE.SOL) {
+    console.log("wrapping sol if needed");
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
@@ -123,9 +126,8 @@ export async function openPosition(
 
   if (preInstructions) {
     methodBuilder = methodBuilder.preInstructions(preInstructions);
+    console.log(" pre instrucitons", preInstructions);
   }
-
-  console.log("about to send tx");
 
   try {
     // await automaticSendTransaction(methodBuilder, connection);
@@ -140,4 +142,31 @@ export async function openPosition(
     console.log(err);
     throw err;
   }
+}
+
+export async function openPosition(
+  walletContextState: WalletContextState,
+  connection: Connection,
+  pool: PoolAccount,
+  payToken: TokenE,
+  positionToken: TokenE,
+  payAmount: number,
+  positionAmount: number,
+  price: number,
+  side: Side
+) {
+  let payCustody = pool.getCustodyAccount(payToken)!;
+  let positionCustody = pool.getCustodyAccount(positionToken)!;
+
+  await openPositionBuilder(
+    walletContextState,
+    connection,
+    pool,
+    payCustody,
+    positionCustody,
+    payAmount,
+    positionAmount,
+    price,
+    side
+  );
 }

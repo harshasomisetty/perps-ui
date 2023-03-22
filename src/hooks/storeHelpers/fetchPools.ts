@@ -60,9 +60,9 @@ export async function getPoolData(
               poolObjs[pool.publicKey.toString()]
             );
             loopStatus = false;
-            console.log("got aum fetch");
+            // console.log("got aum fetch");
           } catch (error) {
-            console.log("error in aum");
+            // console.log("error in aum");
           }
         }
 
