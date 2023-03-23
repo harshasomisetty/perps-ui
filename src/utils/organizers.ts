@@ -39,7 +39,8 @@ export function getUserPositionTokens(
 
   if (
     positionData.status === "success" &&
-    Object.values(positionData.data).length > 0
+    Object.values(positionData.data).length > 0 &&
+    user
   ) {
     Object.values(positionData.data).forEach((position: PositionAccount) => {
       if (position.owner.toBase58() !== user.toBase58()) {

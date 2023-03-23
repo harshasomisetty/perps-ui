@@ -64,10 +64,6 @@ export function TradePosition(props: Props) {
 
   const [pendingRateConversion, setPendingRateConversion] = useState(false);
 
-  const userPositionTokens = Object.keys(
-    getUserPositionTokens(positionData, publicKey)
-  );
-  console.log("userPositionTokens", userPositionTokens);
   async function handleTrade() {
     // console.log("in handle trade");
     await openPosition(
@@ -220,7 +216,14 @@ export function TradePosition(props: Props) {
   }
 
   function isPositionAlreadyOpen() {
-    return userPositionTokens.includes(positionToken);
+    if (!positionToken || !publicKey) return false;
+    try {
+      return Object.keys(
+        getUserPositionTokens(positionData, publicKey)
+      ).includes(positionToken);
+    } catch {
+      return false;
+    }
   }
 
   if (!pair || !pool || Object.values(stats).length === 0) {
