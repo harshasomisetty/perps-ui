@@ -5,19 +5,21 @@ import { PublicKey } from "@solana/web3.js";
 import { NoPositions } from "@/components/Positions/NoPositions";
 import PoolPositionHeader from "@/components/Positions/PoolPositionHeader";
 import PoolPositionRow from "@/components/Positions/PoolPositionRow";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface Props {
   className?: string;
-  publicKey?: PublicKey;
 }
 
 export function ExistingPositions(props: Props) {
+  const { publicKey } = useWallet();
+
   const positionData = useGlobalStore((state) => state.positionData);
 
   let positions;
 
-  if (props.publicKey) {
-    positions = getPoolSortedPositions(positionData, props.publicKey);
+  if (publicKey) {
+    positions = getPoolSortedPositions(positionData, publicKey);
   } else {
     positions = getPoolSortedPositions(positionData);
   }

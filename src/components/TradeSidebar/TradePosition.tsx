@@ -19,6 +19,7 @@ import { LeverageSlider } from "@/components/LeverageSlider";
 import { SolidButton } from "@/components/SolidButton";
 import { TradeDetails } from "@/components/TradeSidebar/TradeDetails";
 import { UserBalance } from "@/components/Atoms/UserBalance";
+import { getUserPositionTokens } from "@/utils/organizers";
 
 interface Props {
   className?: string;
@@ -35,6 +36,7 @@ export function TradePosition(props: Props) {
   const userData = useGlobalStore((state) => state.userData);
   const custodyData = useGlobalStore((state) => state.custodyData);
   const stats = useGlobalStore((state) => state.priceStats);
+  const positionData = useGlobalStore((state) => state.positionData);
 
   const setPositionData = useGlobalStore((state) => state.setPositionData);
 
@@ -62,6 +64,10 @@ export function TradePosition(props: Props) {
 
   const [pendingRateConversion, setPendingRateConversion] = useState(false);
 
+  const userPositionTokens = Object.keys(
+    getUserPositionTokens(positionData, publicKey)
+  );
+  console.log("userPositionTokens", userPositionTokens);
   async function handleTrade() {
     // console.log("in handle trade");
     await openPosition(
@@ -206,6 +212,17 @@ export function TradePosition(props: Props) {
     // @ts-ignore
   }, [payAmount, positionAmount]);
 
+  function isLiquityExceeded() {
+    return (
+      positionAmount * stats[positionToken].currentPrice >
+      pool.getCustodyAccount(positionToken!)?.getCustodyLiquidity(stats!)!
+    );
+  }
+
+  function isPositionAlreadyOpen() {
+    return userPositionTokens.includes(positionToken);
+  }
+
   if (!pair || !pool || Object.values(stats).length === 0) {
     return (
       <div>
@@ -276,29 +293,31 @@ export function TradePosition(props: Props) {
         disabled={
           !publicKey ||
           payAmount === 0 ||
-          positionAmount * stats[positionToken].currentPrice >
-            pool.getCustodyAccount(positionToken!)?.getCustodyLiquidity(stats!)!
+          isLiquityExceeded() ||
+          isPositionAlreadyOpen()
         }
       >
         Place Order
       </SolidButton>
       {!publicKey && (
         <p className="mt-2 text-center text-xs text-orange-500">
-          Please connect wallet to execute order
+          Connect wallet to execute order
         </p>
       )}
       {!payAmount && (
         <p className="mt-2 text-center text-xs text-orange-500 ">
-          Please specify a valid nonzero amount to pay
+          Specify a valid nonzero amount to pay
         </p>
       )}
-      {positionAmount * stats[positionToken].currentPrice >
-        pool
-          .getCustodyAccount(positionToken!)
-          ?.getCustodyLiquidity(stats!)! && (
+      {isLiquityExceeded() && (
         <p className="mt-2 text-center text-xs text-orange-500 ">
           This position exceeds pool liquidity, reduce your position size or
           leverage
+        </p>
+      )}
+      {isPositionAlreadyOpen() && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          Position exists, modify or close current holding
         </p>
       )}
       <TradeDetails
