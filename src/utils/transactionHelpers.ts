@@ -5,6 +5,7 @@ import {
   createSyncNativeInstruction,
   getAssociatedTokenAddress,
   NATIVE_MINT,
+  TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
   Connection,
@@ -66,7 +67,9 @@ export async function wrapSolIfNeeded(
         lamports: Math.floor((payAmount - balance) * LAMPORTS_PER_SOL * 1.1),
       })
     );
-    preInstructions.push(createSyncNativeInstruction(associatedTokenAccount));
+    preInstructions.push(
+      createSyncNativeInstruction(associatedTokenAccount, TOKEN_PROGRAM_ID)
+    );
   }
 
   return preInstructions.length > 0 ? preInstructions : null;

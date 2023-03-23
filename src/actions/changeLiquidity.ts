@@ -11,7 +11,11 @@ import {
   automaticSendTransaction,
   manualSendTransaction,
 } from "@/utils/TransactionHandlers";
-import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import {
+  createAtaIfNeeded,
+  unwrapSolIfNeeded,
+  wrapSolIfNeeded,
+} from "@/utils/transactionHelpers";
 import { BN } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { WalletContextState } from "@solana/wallet-adapter-react";
@@ -57,6 +61,15 @@ export async function changeLiquidity(
   if (ataIx) preInstructions.push(ataIx);
 
   if (custody.getTokenE() == TokenE.SOL) {
+    let ataIx = await createAtaIfNeeded(
+      publicKey,
+      publicKey,
+      custody.mint,
+      connection
+    );
+
+    if (ataIx) preInstructions.push(ataIx);
+
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
@@ -67,6 +80,10 @@ export async function changeLiquidity(
       preInstructions.push(...wrapInstructions);
     }
   }
+
+  let postInstructions: TransactionInstruction[] = [];
+  let unwrapTx = await unwrapSolIfNeeded(publicKey, publicKey, connection);
+  if (unwrapTx) postInstructions.push(...unwrapTx);
 
   let methodBuilder;
 
@@ -126,7 +143,9 @@ export async function changeLiquidity(
   }
 
   if (preInstructions)
-    methodBuilder = methodBuilder.preInstructions(preInstructions);
+    methodBuilder = methodBuilder
+      .preInstructions(preInstructions)
+      .postInstructions(postInstructions);
 
   try {
     // await automaticSendTransaction(
