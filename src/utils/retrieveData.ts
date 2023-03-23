@@ -20,6 +20,7 @@ export async function fetchTokenBalance(
   publicKey: PublicKey,
   connection: Connection
 ): Promise<number> {
+  console.log("fetching user token", payToken);
   let tokenATA = await getAssociatedTokenAddress(
     new PublicKey(getTokenAddress(payToken)),
     publicKey
@@ -31,9 +32,10 @@ export async function fetchTokenBalance(
       .uiAmount!;
   }
 
-  let solBalance = (await connection.getBalance(publicKey)) / LAMPORTS_PER_SOL;
-
   if (payToken === TokenE.SOL) {
+    let solBalance =
+      (await connection.getBalance(publicKey)) / LAMPORTS_PER_SOL;
+    console.log("sol balance", solBalance, "token balance", balance);
     return balance + solBalance;
   }
   return balance;

@@ -232,7 +232,12 @@ export function TradeSwap(props: Props) {
       <SolidButton
         className="mt-6 w-full"
         onClick={handleSwap}
-        disabled={!publicKey || !payAmount}
+        disabled={
+          !publicKey ||
+          !payAmount ||
+          receiveAmount * stats[receiveToken].currentPrice >
+            pool.getCustodyAccount(receiveToken!)?.getCustodyLiquidity(stats!)!
+        }
       >
         Swap
       </SolidButton>
@@ -250,6 +255,12 @@ export function TradeSwap(props: Props) {
       "
         >
           Please specify a valid nonzero amount to swap
+        </p>
+      )}
+      {receiveAmount * stats[receiveToken].currentPrice >
+        pool.getCustodyAccount(receiveToken!)?.getCustodyLiquidity(stats!)! && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          This swap exceeds pool liquidity, reduce your swap size
         </p>
       )}
 

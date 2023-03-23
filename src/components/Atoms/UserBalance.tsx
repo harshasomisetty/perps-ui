@@ -25,7 +25,7 @@ export function UserBalance(props: Props) {
         className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
         onClick={props.onClick}
       >
-        <p>{balance.toFixed(2)}</p>
+        <p>{balance.toFixed(4)}</p>
         <p className="font-normal">{props.token}</p>
         <p className="text-zinc-400"> Balance</p>
       </div>

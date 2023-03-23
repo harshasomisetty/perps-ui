@@ -16,12 +16,17 @@ import {
 import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { createAtaIfNeeded, wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import {
+  createAtaIfNeeded,
+  unwrapSolIfNeeded,
+  wrapSolIfNeeded,
+} from "@/utils/transactionHelpers";
 import {
   automaticSendTransaction,
   manualSendTransaction,
 } from "@/utils/TransactionHandlers";
 import { swapTransactionBuilder } from "src/actions/swap";
+import { ViewHelper } from "@/utils/viewHelpers";
 
 export async function openPositionBuilder(
   walletContextState: WalletContextState,
@@ -35,7 +40,7 @@ export async function openPositionBuilder(
   side: Side
 ) {
   // console.log("in open position");
-  let { perpetual_program } = await getPerpetualProgramAndProvider(
+  let { perpetual_program, provider } = await getPerpetualProgramAndProvider(
     walletContextState
   );
   let publicKey = walletContextState.publicKey!;
@@ -71,6 +76,21 @@ export async function openPositionBuilder(
   // console.log("in tokens not equal open pos");
   if (payCustody.getTokenE() != positionCustody.getTokenE()) {
     console.log("first swapping in open pos");
+    const View = new ViewHelper(connection, provider);
+    let swapInfo = await View.getSwapAmountAndFees(
+      payAmount,
+      pool!,
+      pool!.getCustodyAccount(payCustody.getTokenE())!,
+      pool!.getCustodyAccount(positionCustody.getTokenE())!
+    );
+
+    console.log(
+      "swap info",
+      swapInfo,
+      Number(swapInfo.feeIn) / 10 ** 6,
+      Number(swapInfo.feeOut) / 10 ** 6
+    );
+
     let { methodBuilder: swapBuilder, preInstructions: swapPreInstructions } =
       await swapTransactionBuilder(
         walletContextState,
@@ -92,6 +112,15 @@ export async function openPositionBuilder(
 
   if (positionCustody.getTokenE() == TokenE.SOL) {
     console.log("wrapping sol if needed");
+    let ataIx = await createAtaIfNeeded(
+      publicKey,
+      publicKey,
+      positionCustody.mint,
+      connection
+    );
+
+    if (ataIx) preInstructions.push(ataIx);
+
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
@@ -102,6 +131,10 @@ export async function openPositionBuilder(
       preInstructions.push(...wrapInstructions);
     }
   }
+
+  let postInstructions: TransactionInstruction[] = [];
+  let unwrapTx = await unwrapSolIfNeeded(publicKey, publicKey, connection);
+  if (unwrapTx) postInstructions.push(...unwrapTx);
 
   const params: any = {
     price: newPrice,
@@ -125,8 +158,9 @@ export async function openPositionBuilder(
   });
 
   if (preInstructions) {
-    methodBuilder = methodBuilder.preInstructions(preInstructions);
-    console.log(" pre instrucitons", preInstructions);
+    methodBuilder = methodBuilder
+      .preInstructions(preInstructions)
+      .postInstructions(postInstructions);
   }
 
   try {

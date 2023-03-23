@@ -1,7 +1,7 @@
 import { checkIfAccountExists } from "@/utils/retrieveData";
-import { BN } from "@project-serum/anchor";
 import {
   createAssociatedTokenAccountInstruction,
+  createCloseAccountInstruction,
   createSyncNativeInstruction,
   getAssociatedTokenAddress,
   NATIVE_MINT,
@@ -53,14 +53,6 @@ export async function wrapSolIfNeeded(
     publicKey
   );
 
-  // let ataIx = await createAtaIfNeeded(
-  //   publicKey,
-  //   payer,
-  //   NATIVE_MINT,
-  //   connection
-  // );
-  // if (ataIx) preInstructions.push(ataIx);
-
   const balance =
     (await connection.getBalance(associatedTokenAccount)) / LAMPORTS_PER_SOL;
 
@@ -76,6 +68,38 @@ export async function wrapSolIfNeeded(
     );
     preInstructions.push(createSyncNativeInstruction(associatedTokenAccount));
   }
+
+  return preInstructions.length > 0 ? preInstructions : null;
+}
+
+export async function unwrapSolIfNeeded(
+  publicKey: PublicKey,
+  payer: PublicKey,
+  connection: Connection
+): Promise<TransactionInstruction[] | null> {
+  console.log("in unwrap sol if needed");
+  let preInstructions: TransactionInstruction[] = [];
+
+  const associatedTokenAccount = await getAssociatedTokenAddress(
+    NATIVE_MINT,
+    publicKey
+  );
+
+  // const balance =
+  //   (await connection.getBalance(associatedTokenAccount)) / LAMPORTS_PER_SOL;
+  const balance = 1;
+
+  if (balance > 0) {
+    preInstructions.push(
+      createCloseAccountInstruction(
+        associatedTokenAccount,
+        publicKey,
+        publicKey
+      )
+    );
+  }
+
+  console.log("unwrap sol ix", preInstructions);
 
   return preInstructions.length > 0 ? preInstructions : null;
 }

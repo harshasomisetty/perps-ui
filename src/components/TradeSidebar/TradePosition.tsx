@@ -217,7 +217,7 @@ export function TradePosition(props: Props) {
   return (
     <div className={props.className}>
       <div className="flex items-center justify-between text-sm ">
-        <div className="font-medium text-white">You Pay</div>
+        <div className="font-medium text-white">Your Collateral</div>
         <UserBalance token={payToken} />
       </div>
       <TokenSelector
