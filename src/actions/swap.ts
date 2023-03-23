@@ -146,8 +146,9 @@ export async function swapTransactionBuilder(
   });
 
   if (preInstructions) {
-    methodBuilder = methodBuilder.preInstructions(preInstructions);
-    // .postInstructions(postInstructions);
+    methodBuilder = methodBuilder
+      .preInstructions(preInstructions)
+      .postInstructions(postInstructions);
     console.log("swap builder does have pre instructions", preInstructions);
   }
 

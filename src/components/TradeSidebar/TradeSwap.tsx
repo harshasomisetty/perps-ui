@@ -51,7 +51,10 @@ export function TradeSwap(props: Props) {
   const router = useRouter();
 
   useEffect(() => {
-    if (Object.values(poolData).length > 0) {
+    if (
+      Object.values(poolData).length > 0 &&
+      Object.values(userData).length > 0
+    ) {
       setPool(Object.values(poolData)[0]);
 
       // let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
@@ -65,7 +68,7 @@ export function TradeSwap(props: Props) {
       setReceiveToken(tokenB);
       setReceiveTokenBalance(userData.tokenBalances[tokenB]);
     }
-  }, [poolData, userData]);
+  }, [poolData]);
 
   useEffect(() => {
     async function fetchData() {
