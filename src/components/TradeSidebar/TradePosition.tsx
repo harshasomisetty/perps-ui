@@ -20,6 +20,7 @@ import { SolidButton } from "@/components/SolidButton";
 import { TradeDetails } from "@/components/TradeSidebar/TradeDetails";
 import { UserBalance } from "@/components/Atoms/UserBalance";
 import { getUserPositionTokens } from "@/utils/organizers";
+import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
 
 interface Props {
   className?: string;
@@ -39,6 +40,7 @@ export function TradePosition(props: Props) {
   const positionData = useGlobalStore((state) => state.positionData);
 
   const setPositionData = useGlobalStore((state) => state.setPositionData);
+  const setUserData = useGlobalStore((state) => state.setUserData);
 
   const { publicKey, wallet } = useWallet();
   const walletContextState = useWallet();
@@ -79,6 +81,9 @@ export function TradePosition(props: Props) {
     );
     const positionInfos = await getPositionData(custodyData);
     setPositionData(positionInfos);
+
+    const uData = await getAllUserData(connection, publicKey, poolData);
+    setUserData(uData);
   }
 
   useEffect(() => {
