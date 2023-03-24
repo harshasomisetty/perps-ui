@@ -30,16 +30,17 @@ export function CandlestickChart(props: Props) {
           symbol={getSymbol(props.token)}
           theme="Dark"
         />
-        <a
-          href={`https://www.tradingview.com/symbols/${getSymbol(
-            props.token
-          )}/?exchange=COINBASE`}
-        >
-          <p className="text-center text-xs text-white underline">
-            {props.token} stock chart by TradingView
-          </p>
-        </a>
-        by TradingView
+        <div className="items-center text-center">
+          <a
+            href={`https://www.tradingview.com/symbols/${getSymbol(
+              props.token
+            )}/?exchange=COINBASE`}
+            className="text-xs text-white underline"
+          >
+            {props.token} stock chart
+          </a>
+          <span className="text-xs text-white"> by TradingView</span>
+        </div>
       </div>
     </div>
   );

@@ -6,11 +6,18 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { automaticSendTransaction } from "@/utils/TransactionHandlers";
+import {
+  automaticSendTransaction,
+  manualSendTransaction,
+} from "@/utils/TransactionHandlers";
+import {
+  createAtaIfNeeded,
+  unwrapSolIfNeeded,
+} from "@/utils/transactionHelpers";
 import { BN } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { WalletContextState } from "@solana/wallet-adapter-react";
-import { Connection } from "@solana/web3.js";
+import { Connection, TransactionInstruction } from "@solana/web3.js";
 
 export async function closePosition(
   walletContextState: WalletContextState,
@@ -36,6 +43,21 @@ export async function closePosition(
     publicKey
   );
 
+  let preInstructions: TransactionInstruction[] = [];
+
+  let ataIx = await createAtaIfNeeded(
+    publicKey,
+    publicKey,
+    custody.mint,
+    connection
+  );
+
+  if (ataIx) preInstructions.push(ataIx);
+
+  let postInstructions: TransactionInstruction[] = [];
+  let unwrapTx = await unwrapSolIfNeeded(publicKey, publicKey, connection);
+  if (unwrapTx) postInstructions.push(...unwrapTx);
+
   let methodBuilder = await perpetual_program.methods
     .closePosition({
       price: adjustedPrice,
@@ -51,12 +73,21 @@ export async function closePosition(
       custodyOracleAccount: custody.oracle.oracleAccount,
       custodyTokenAccount: custody.tokenAccount,
       tokenProgram: TOKEN_PROGRAM_ID,
-    });
+    })
+    .preInstructions(preInstructions)
+    .postInstructions(postInstructions);
 
   try {
-    await automaticSendTransaction(
-      methodBuilder,
-      perpetual_program.provider.connection
+    // await automaticSendTransaction(
+    //   methodBuilder,
+    //   perpetual_program.provider.connection
+    // );
+    let tx = await methodBuilder.transaction();
+    await manualSendTransaction(
+      tx,
+      publicKey,
+      connection,
+      walletContextState.signTransaction
     );
   } catch (err) {
     console.log(err);

@@ -38,7 +38,7 @@ export function Positions(props: Props) {
           <LoadingDots className="text-white" />
         )}
       </header>
-      <ExistingPositions publicKey={publicKey} />
+      <ExistingPositions />
     </div>
   );
 }

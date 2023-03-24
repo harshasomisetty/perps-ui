@@ -115,7 +115,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    console.log("result in aum fetch", result);
+    // console.log("result in aum fetch", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAssetsUnderManagement"
     );
@@ -134,6 +134,7 @@ export class ViewHelper {
     let collateral = new BN(payAmount * 10 ** custody.decimals);
     let size = new BN(positionAmount * 10 ** custody.decimals);
 
+    console.log("entry params", payAmount, positionAmount, side);
     let transaction: Transaction = await program.methods
       // @ts-ignore
       .getEntryPriceAndFee({
@@ -150,11 +151,12 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    // console.log("got entry result", result);
+    console.log("got entry result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getEntryPriceAndFee"
     );
     const res: any = this.decodeLogs(result, index);
+    console.log("res in entry price and fee", res);
 
     return {
       liquidationPrice: res.liquidationPrice,
@@ -191,13 +193,35 @@ export class ViewHelper {
     };
   };
 
-  getLiquidationPrice = async (position: PositionAccount): Promise<BN> => {
+  getLiquidationPrice = async (
+    position: PositionAccount,
+    custody?: CustodyAccount,
+    addCollat?: number,
+    removeCollat?: number
+  ): Promise<BN> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
 
-    // console.log("fee payer : ", DEFAULT_PERPS_USER.publicKey.toBase58());
+    let addCollateral = addCollat
+      ? new BN(addCollat * 10 ** custody.decimals)
+      : new BN(0);
+    let removeCollateral = removeCollat
+      ? new BN(removeCollat * 10 ** custody.decimals)
+      : new BN(0);
+    let params = {};
+
+    if (addCollateral > 0 || removeCollateral > 0) {
+      params = { addCollateral, removeCollateral };
+    }
+
+    console.log(
+      "final params",
+      params,
+      Number(params["addCollateral"]),
+      Number(params["removeCollateral"])
+    );
     const transaction = await program.methods
       // @ts-ignore
-      .getLiquidationPrice({})
+      .getLiquidationPrice(params)
       .accounts({
         perpetuals: PERPETUALS_ADDRESS,
         pool: position.pool,
@@ -211,6 +235,8 @@ export class ViewHelper {
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getLiquidationPrice"
     );
+    // console.log("results in liquidation price", result);
+    // console.log("decode logs", this.decodeLogs(result, index));
     return this.decodeLogs(result, index);
   };
 
@@ -259,13 +285,15 @@ export class ViewHelper {
   };
 
   getSwapAmountAndFees = async (
-    amountIn: BN,
+    amtIn: number,
     pool: PoolAccount,
     receivingCustody: CustodyAccount,
     dispensingCustody: CustodyAccount
   ): Promise<SwapAmountAndFees> => {
     let program = new Program(IDL, PERPETUALS_PROGRAM_ID, this.provider);
+    let amountIn = new BN(amtIn * 10 ** receivingCustody.decimals);
 
+    // console.log("amount in", Number(amountIn));
     let transaction = await program.methods
       // @ts-ignore
       .getSwapAmountAndFees({
@@ -282,6 +310,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
+    // console.log("result in swap  fetch", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getSwapAmountAndFees"
     );
@@ -316,7 +345,7 @@ export class ViewHelper {
       .transaction();
     const result = await this.simulateTransaction(transaction);
 
-    console.log("result", result);
+    // console.log("result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getAddLiquidityAmountAndFee"
     );
@@ -378,7 +407,7 @@ export class ViewHelper {
       .transaction();
 
     const result = await this.simulateTransaction(transaction);
-    console.log("oracle result", result);
+    // console.log("oracle result", result);
     const index = IDL.instructions.findIndex(
       (f) => f.name === "getOraclePrice"
     );

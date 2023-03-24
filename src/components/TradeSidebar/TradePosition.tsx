@@ -18,6 +18,8 @@ import { PoolSelector } from "@/components/PoolSelector";
 import { LeverageSlider } from "@/components/LeverageSlider";
 import { SolidButton } from "@/components/SolidButton";
 import { TradeDetails } from "@/components/TradeSidebar/TradeDetails";
+import { UserBalance } from "@/components/Atoms/UserBalance";
+import { getUserPositionTokens } from "@/utils/organizers";
 
 interface Props {
   className?: string;
@@ -33,8 +35,11 @@ export function TradePosition(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
   const userData = useGlobalStore((state) => state.userData);
   const custodyData = useGlobalStore((state) => state.custodyData);
-  const setPositionData = useGlobalStore((state) => state.setPositionData);
   const stats = useGlobalStore((state) => state.priceStats);
+  const positionData = useGlobalStore((state) => state.positionData);
+
+  const setPositionData = useGlobalStore((state) => state.setPositionData);
+
   const { publicKey, wallet } = useWallet();
   const walletContextState = useWallet();
   const { connection } = useConnection();
@@ -49,24 +54,24 @@ export function TradePosition(props: Props) {
   const [payToken, setPayToken] = useState<TokenE>();
   const [positionToken, setPositionToken] = useState<TokenE>();
 
-  const [payAmount, setPayAmount] = useState(0.1);
-  const [positionAmount, setPositionAmount] = useState(0.2);
-  const [conversionRatio, setConversionRatio] = useState(1);
+  const [payAmount, setPayAmount] = useState(0);
+  const [positionAmount, setPositionAmount] = useState(0);
   const [leverage, setLeverage] = useState(1);
+  const [conversionRatio, setConversionRatio] = useState(1);
   const [entryPrice, setEntryPrice] = useState(0);
   const [liquidationPrice, setLiquidationPrice] = useState(0);
   const [fee, setFee] = useState(0);
 
+  const [pendingRateConversion, setPendingRateConversion] = useState(false);
+
   async function handleTrade() {
     // console.log("in handle trade");
-    const payCustody = pool?.getCustodyAccount(payToken);
-    const positionCustody = pool?.getCustodyAccount(positionToken);
     await openPosition(
       walletContextState,
       connection,
       pool,
-      payCustody,
-      positionCustody,
+      payToken,
+      positionToken,
       payAmount,
       positionAmount,
       stats[payToken]?.currentPrice,
@@ -76,27 +81,12 @@ export function TradePosition(props: Props) {
     setPositionData(positionInfos);
   }
 
-  function adjustLeverage(converRatio?: number) {
-    if (!converRatio) {
-      converRatio = conversionRatio;
-    }
-    console.log("changed leverage", leverage);
-    if (lastChanged === Input.Pay) {
-      console.log("last change Pay", payAmount * converRatio * leverage);
-      setPositionAmount(payAmount * converRatio * leverage);
-    } else {
-      console.log(
-        "last change Position",
-        positionAmount / leverage / converRatio
-      );
-      setPayAmount(positionAmount / leverage / converRatio);
-    }
-  }
-
   useEffect(() => {
     // @ts-ignore
     setPositionToken(asToken(pair.split("-")[0]));
-    setPayToken(asToken(pair.split("-")[0]));
+    if (!payToken) {
+      setPayToken(asToken(pair.split("-")[0]));
+    }
   }, [pair]);
 
   useEffect(() => {
@@ -107,18 +97,18 @@ export function TradePosition(props: Props) {
 
   useEffect(() => {
     async function getConversionRatio() {
-      let { perpetual_program } = await getPerpetualProgramAndProvider(
-        walletContextState
-      );
-
-      const View = new ViewHelper(
-        perpetual_program.provider.connection,
-        perpetual_program.provider
-      );
-
       if (payToken != positionToken) {
+        let { perpetual_program } = await getPerpetualProgramAndProvider(
+          walletContextState
+        );
+
+        const View = new ViewHelper(
+          perpetual_program.provider.connection,
+          perpetual_program.provider
+        );
+
         let swapInfo = await View.getSwapAmountAndFees(
-          new BN(payAmount * 10 ** pool!.getCustodyAccount(payToken)!.decimals),
+          1,
           pool!,
           pool!.getCustodyAccount(payToken)!,
           pool!.getCustodyAccount(positionToken)!
@@ -127,21 +117,51 @@ export function TradePosition(props: Props) {
         let payAmt =
           Number(swapInfo.amountOut) /
           10 ** pool!.getCustodyAccount(positionToken)!.decimals;
-        setConversionRatio(payAmt / payAmount);
-        console.log("payAmt", payAmt);
-        console.log("conversion ratio is ", payAmt / payAmount);
-        adjustLeverage(payAmt / payAmount);
+        setConversionRatio(payAmt);
       } else {
-        console.log("conversion ratio is 1");
+        // console.log("conversion ratio is 1");
         setConversionRatio(1);
-        adjustLeverage(1);
       }
     }
-    getConversionRatio();
-  }, [payToken, positionToken]);
+    if (pool && payToken && positionToken) {
+      getConversionRatio();
+    }
+  }, [pool, payToken, positionToken]);
+
+  useEffect(() => {
+    async function updateSelectors() {
+      if (lastChanged === Input.Pay) {
+        if (!payAmount || payAmount === 0) {
+          setPositionAmount(0);
+        } else {
+          // console.log("last change Pay", payAmount, conversionRatio, leverage);
+          setPositionAmount(payAmount * conversionRatio * leverage);
+        }
+      } else {
+        if (!positionAmount || positionAmount === 0) {
+          setPayAmount(0);
+        } else {
+          // console.log(
+          //   "last change Position",
+          //   positionAmount / leverage / conversionRatio
+          // );
+          setPayAmount(positionAmount / leverage / conversionRatio);
+        }
+      }
+    }
+    updateSelectors();
+  }, [conversionRatio, payAmount, positionAmount, leverage]);
 
   useEffect(() => {
     async function fetchData() {
+      if (!(payAmount > 0 && positionAmount > 0)) {
+        return;
+      }
+
+      setPendingRateConversion(true);
+
+      // console.log("after check in trade amounts", payAmount, positionAmount);
+
       let { perpetual_program } = await getPerpetualProgramAndProvider(
         walletContextState
       );
@@ -151,7 +171,12 @@ export function TradePosition(props: Props) {
         perpetual_program.provider
       );
 
-      console.log("payAmount in postionToken", payAmount * conversionRatio);
+      // console.log(
+      //   "payAmount in postionToken",
+      //   payAmount,
+      //   positionAmount,
+      //   pool?.getCustodyAccount(positionToken)
+      // );
       let getEntryPrice = await View.getEntryPriceAndFee(
         payAmount * conversionRatio,
         positionAmount,
@@ -160,15 +185,17 @@ export function TradePosition(props: Props) {
         pool!.getCustodyAccount(positionToken)!
       );
 
-      console.log("get entry values", getEntryPrice);
-      console.log("entry price", Number(getEntryPrice.entryPrice) / 10 ** 6);
+      // console.log("get entry values", getEntryPrice);
+      // console.log("entry price", Number(getEntryPrice.entryPrice) / 10 ** 6);
 
       setEntryPrice(Number(getEntryPrice.entryPrice) / 10 ** 6);
       setLiquidationPrice(Number(getEntryPrice.liquidationPrice) / 10 ** 6);
       setFee(Number(getEntryPrice.fee) / 10 ** 9);
+
+      setPendingRateConversion(false);
     }
 
-    if (pool && payAmount && positionAmount && props.side) {
+    if (pool && props.side) {
       clearTimeout(timeoutRef.current);
 
       timeoutRef.current = setTimeout(() => {
@@ -179,68 +206,46 @@ export function TradePosition(props: Props) {
       clearTimeout(timeoutRef.current);
     };
     // @ts-ignore
-  }, [wallet, pool, payAmount, props.side]);
+  }, [payAmount, positionAmount]);
 
-  useEffect(() => {
-    adjustLeverage();
-  }, [leverage]);
+  function isLiquityExceeded() {
+    return (
+      positionAmount * stats[positionToken].currentPrice >
+      pool.getCustodyAccount(positionToken!)?.getCustodyLiquidity(stats!)!
+    );
+  }
 
-  if (!pair) {
+  function isPositionAlreadyOpen() {
+    if (!positionToken || !publicKey) return false;
+    try {
+      return Object.keys(
+        getUserPositionTokens(positionData, publicKey)
+      ).includes(positionToken);
+    } catch {
+      return false;
+    }
+  }
+
+  if (!pair || !pool || Object.values(stats).length === 0) {
     return (
       <div>
-        <p>no pair</p>
         <LoadingDots />
       </div>
     );
   }
-
-  if (!pool) {
-    return (
-      <div>
-        <p>no pool</p>
-        <LoadingDots />
-      </div>
-    );
-  }
-
-  if (Object.values(stats).length === 0) {
-    return (
-      <div>
-        <p>no stats</p>
-        <LoadingDots />
-      </div>
-    );
-  }
-
-  // TODO redo leverage calculation by seeing how much payToken * price / positionToken * price is
 
   return (
     <div className={props.className}>
       <div className="flex items-center justify-between text-sm ">
-        <div className="font-medium text-white">You Pay</div>
-        {publicKey && (
-          <div className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer">
-            {userData.tokenBalances[payToken] &&
-            userData.tokenBalances[payToken].toFixed(2) ? (
-              <>
-                <p>{userData.tokenBalances[payToken].toFixed(2)}</p>
-                <p className="font-normal">{payToken}</p>
-                <p className="text-zinc-400"> Balance</p>
-              </>
-            ) : (
-              <LoadingDots />
-            )}
-          </div>
-        )}
+        <div className="font-medium text-white">Your Collateral</div>
+        <UserBalance token={payToken} />
       </div>
       <TokenSelector
         className="mt-2"
         amount={payAmount}
         token={payToken}
         onChangeAmount={(e) => {
-          console.log("token selector wrp on change", e);
           setPayAmount(e);
-          setPositionAmount(e * leverage);
           setLastChanged(Input.Pay);
         }}
         onSelectToken={setPayToken}
@@ -259,15 +264,15 @@ export function TradePosition(props: Props) {
         amount={positionAmount}
         token={positionToken}
         onChangeAmount={(e) => {
-          setPayAmount(e / leverage);
           setPositionAmount(e);
           setLastChanged(Input.Position);
         }}
         onSelectToken={(token) => {
           setPositionToken(token);
-          router.push("/trade/" + token + "-USD");
+          router.push("/trade/" + token + "-USD", undefined, { shallow: true });
         }}
         tokenList={pool.getTokenList()}
+        pendingRateConversion={pendingRateConversion}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
       <PoolSelector className="mt-2" pool={pool} onSelectPool={setPool} />
@@ -288,21 +293,36 @@ export function TradePosition(props: Props) {
       <SolidButton
         className="mt-6 w-full"
         onClick={handleTrade}
-        disabled={!publicKey || payAmount === 0}
+        disabled={
+          !publicKey ||
+          payAmount === 0 ||
+          isLiquityExceeded() ||
+          isPositionAlreadyOpen()
+        }
       >
         Place Order
       </SolidButton>
       {!publicKey && (
         <p className="mt-2 text-center text-xs text-orange-500">
-          Please connect wallet to execute order
+          Connect wallet to execute order
         </p>
       )}
       {!payAmount && (
         <p className="mt-2 text-center text-xs text-orange-500 ">
-          Please specify a valid nonzero amount to pay
+          Specify a valid nonzero amount to pay
         </p>
       )}
-
+      {isLiquityExceeded() && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          This position exceeds pool liquidity, reduce your position size or
+          leverage
+        </p>
+      )}
+      {isPositionAlreadyOpen() && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          Position exists, modify or close current holding
+        </p>
+      )}
       <TradeDetails
         className={twMerge(
           "-mb-4",

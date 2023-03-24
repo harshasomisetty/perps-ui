@@ -16,14 +16,19 @@ import {
 import { Side, TradeSide } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
-import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import {
+  createAtaIfNeeded,
+  unwrapSolIfNeeded,
+  wrapSolIfNeeded,
+} from "@/utils/transactionHelpers";
 import {
   automaticSendTransaction,
   manualSendTransaction,
 } from "@/utils/TransactionHandlers";
-import { buildSwapTransaction } from "src/actions/swap";
+import { swapTransactionBuilder } from "src/actions/swap";
+import { ViewHelper } from "@/utils/viewHelpers";
 
-export async function openPosition(
+export async function openPositionBuilder(
   walletContextState: WalletContextState,
   connection: Connection,
   pool: PoolAccount,
@@ -34,8 +39,8 @@ export async function openPosition(
   price: number,
   side: Side
 ) {
-  console.log("in open position");
-  let { perpetual_program } = await getPerpetualProgramAndProvider(
+  // console.log("in open position");
+  let { perpetual_program, provider } = await getPerpetualProgramAndProvider(
     walletContextState
   );
   let publicKey = walletContextState.publicKey!;
@@ -63,32 +68,59 @@ export async function openPosition(
     perpetual_program.programId
   )[0];
 
-  let swapBuilder;
-  let ix;
-
+  const dispensingCustody = pool.getCustodyAccount(
+    positionCustody.getTokenE()
+  )!;
   let preInstructions: TransactionInstruction[] = [];
 
-  console.log("in tokens not equal open pos");
+  // console.log("in tokens not equal open pos");
   if (payCustody.getTokenE() != positionCustody.getTokenE()) {
-    swapBuilder = await buildSwapTransaction(
-      walletContextState,
-      connection,
-      pool,
-      payCustody.getTokenE(),
-      positionCustody.getTokenE(),
-      payAmount
+    console.log("first swapping in open pos");
+    const View = new ViewHelper(connection, provider);
+    let swapInfo = await View.getSwapAmountAndFees(
+      payAmount,
+      pool!,
+      pool!.getCustodyAccount(payCustody.getTokenE())!,
+      pool!.getCustodyAccount(positionCustody.getTokenE())!
     );
+
+    console.log(
+      "swap info",
+      swapInfo,
+      Number(swapInfo.feeIn) / 10 ** 6,
+      Number(swapInfo.feeOut) / 10 ** 6
+    );
+
+    let { methodBuilder: swapBuilder, preInstructions: swapPreInstructions } =
+      await swapTransactionBuilder(
+        walletContextState,
+        connection,
+        pool,
+        payCustody.getTokenE(),
+        positionCustody.getTokenE(),
+        payAmount
+      );
     // TODO calculate how much position token value is new payAmount
     // TODO open position using new payAmount
     console.log("make builder into instruction in openPos");
 
-    ix = await swapBuilder.instruction();
-    preInstructions.push(ix);
+    let ix = await swapBuilder.instruction();
+    preInstructions.push(...swapPreInstructions, ix);
   }
 
   console.log("after tokens not equal :)");
 
   if (positionCustody.getTokenE() == TokenE.SOL) {
+    console.log("wrapping sol if needed");
+    let ataIx = await createAtaIfNeeded(
+      publicKey,
+      publicKey,
+      positionCustody.mint,
+      connection
+    );
+
+    if (ataIx) preInstructions.push(ataIx);
+
     let wrapInstructions = await wrapSolIfNeeded(
       publicKey,
       publicKey,
@@ -99,6 +131,10 @@ export async function openPosition(
       preInstructions.push(...wrapInstructions);
     }
   }
+
+  let postInstructions: TransactionInstruction[] = [];
+  let unwrapTx = await unwrapSolIfNeeded(publicKey, publicKey, connection);
+  if (unwrapTx) postInstructions.push(...unwrapTx);
 
   const params: any = {
     price: newPrice,
@@ -122,10 +158,10 @@ export async function openPosition(
   });
 
   if (preInstructions) {
-    methodBuilder = methodBuilder.preInstructions(preInstructions);
+    methodBuilder = methodBuilder
+      .preInstructions(preInstructions)
+      .postInstructions(postInstructions);
   }
-
-  console.log("about to send tx");
 
   try {
     // await automaticSendTransaction(methodBuilder, connection);
@@ -140,4 +176,31 @@ export async function openPosition(
     console.log(err);
     throw err;
   }
+}
+
+export async function openPosition(
+  walletContextState: WalletContextState,
+  connection: Connection,
+  pool: PoolAccount,
+  payToken: TokenE,
+  positionToken: TokenE,
+  payAmount: number,
+  positionAmount: number,
+  price: number,
+  side: Side
+) {
+  let payCustody = pool.getCustodyAccount(payToken)!;
+  let positionCustody = pool.getCustodyAccount(positionToken)!;
+
+  await openPositionBuilder(
+    walletContextState,
+    connection,
+    pool,
+    payCustody,
+    positionCustody,
+    payAmount,
+    positionAmount,
+    price,
+    side
+  );
 }

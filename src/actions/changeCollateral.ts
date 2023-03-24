@@ -5,7 +5,10 @@ import {
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { automaticSendTransaction } from "@/utils/TransactionHandlers";
+import {
+  automaticSendTransaction,
+  manualSendTransaction,
+} from "@/utils/TransactionHandlers";
 import { BN } from "@project-serum/anchor";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Connection, TransactionInstruction } from "@solana/web3.js";
@@ -19,7 +22,7 @@ export async function changeCollateral(
   connection: Connection,
   pool: PoolAccount,
   position: PositionAccount,
-  collateral: BN,
+  collatNum: number,
   tab: Tab
 ) {
   let { perpetual_program } = await getPerpetualProgramAndProvider(
@@ -44,12 +47,14 @@ export async function changeCollateral(
         publicKey,
         publicKey,
         connection,
-        Number(collateral)
+        collatNum
       );
       if (wrapInstructions) {
         preInstructions.push(...wrapInstructions);
       }
     }
+
+    let collateral = new BN(collatNum * 10 ** custody.decimals);
 
     methodBuilder = perpetual_program.methods
       .addCollateral({
@@ -68,7 +73,7 @@ export async function changeCollateral(
         tokenProgram: TOKEN_PROGRAM_ID,
       });
   } else {
-    let collateralUsd = collateral;
+    let collateralUsd = new BN(collatNum * 10 ** 6);
     methodBuilder = perpetual_program.methods
       .removeCollateral({
         collateralUsd,
@@ -91,10 +96,17 @@ export async function changeCollateral(
     methodBuilder = methodBuilder.preInstructions(preInstructions);
 
   try {
-    await automaticSendTransaction(
-      methodBuilder,
-      perpetual_program.provider.connection
+    let tx = await methodBuilder.transaction();
+    await manualSendTransaction(
+      tx,
+      publicKey,
+      connection,
+      walletContextState.signTransaction
     );
+    // await automaticSendTransaction(
+    //   methodBuilder,
+    //   perpetual_program.provider.connection
+    // );
   } catch (err) {
     console.log(err);
     throw err;

@@ -2,7 +2,7 @@ import { SidebarTab } from "@/components/SidebarTab";
 import ArrowRight from "@carbon/icons-react/lib/ArrowRight";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Add from "@carbon/icons-react/lib/Add";
 import Subtract from "@carbon/icons-react/lib/Subtract";
 import { useGlobalStore } from "@/stores/store";
@@ -16,6 +16,8 @@ import { changeCollateral } from "src/actions/changeCollateral";
 import { Tab } from "@/lib/types";
 import { BN } from "@project-serum/anchor";
 import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
 
 interface Props {
   className?: string;
@@ -38,38 +40,111 @@ export function CollateralModal(props: Props) {
   let payToken = props.position.token;
 
   let payTokenBalance = userData.tokenBalances[pool.getTokenList()[0]!];
-  let liqBalance = userData.lpBalances[pool.address.toString()];
+  // let liqBalance = userData.lpBalances[pool.address.toString()];
 
   const custodyData = useGlobalStore((state) => state.custodyData);
 
   const setPositionData = useGlobalStore((state) => state.setPositionData);
 
-  const [withdrawAmount, setWithdrawAmount] = useState(1);
-  const [depositAmount, setDepositAmount] = useState(1);
+  const [withdrawAmount, setWithdrawAmount] = useState(0);
+  const [depositAmount, setDepositAmount] = useState(0);
+  const [liqPrice, setLiqPrice] = useState(0);
+
+  const [newCollateral, setNewCollateral] = useState(null);
+  const [newLeverage, setNewLeverage] = useState(null);
+  const [newLiqPrice, setNewLiqPrice] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    async function fetchNewStats() {
+      console.log("console log new stassss");
+      let { perpetual_program } = await getPerpetualProgramAndProvider(
+        walletContextState
+      );
+
+      const View = new ViewHelper(
+        perpetual_program.provider.connection,
+        perpetual_program.provider
+      );
+
+      console.log("before old liq");
+      let fetchedOldLiq = await View.getLiquidationPrice(props.position);
+      console.log("old liq", Math.round((fetchedOldLiq / 10 ** 6) * 100) / 100);
+
+      setLiqPrice(Math.round((fetchedOldLiq / 10 ** 6) * 100) / 100);
+
+      if (tab === Tab.Add && depositAmount === 0) {
+        setNewCollateral(null);
+        setNewLeverage(null);
+        setNewLiqPrice(null);
+        return;
+      }
+
+      if (tab === Tab.Remove && withdrawAmount === 0) {
+        setNewCollateral(null);
+        setNewLeverage(null);
+        setNewLiqPrice(null);
+        return;
+      }
+
+      console.log("in fetch new stats colalteral chagne");
+      console.log("col change", withdrawAmount, depositAmount);
+
+      let liquidationPrice = await View.getLiquidationPrice(
+        props.position,
+        pool.getCustodyAccount(props.position.token)!,
+        depositAmount,
+        withdrawAmount
+      );
+
+      console.log("liquidationPrice", liquidationPrice);
+
+      let newLiq = Math.round((liquidationPrice / 10 ** 6) * 100) / 100;
+
+      setNewLiqPrice(newLiq);
+
+      let newCollat;
+      if (tab === Tab.Add) {
+        newCollat =
+          props.position.getCollateralUsd() +
+          depositAmount * stats[props.position.token].currentPrice;
+      } else {
+        newCollat = props.position.getCollateralUsd() - withdrawAmount;
+      }
+
+      console.log("set new collat", newCollat);
+      setNewCollateral(Math.round(newCollat * 100) / 100);
+
+      let newLev;
+      let changeCollateral =
+        tab === Tab.Add
+          ? depositAmount * stats[props.position.token].currentPrice
+          : -1 * withdrawAmount;
+
+      newLev =
+        props.position.getSizeUsd() /
+        (props.position.getCollateralUsd() + changeCollateral);
+
+      setNewLeverage(Math.round(newLev * 100) / 100);
+    }
+
+    if (pool && props.position && payTokenBalance) {
+      clearTimeout(timeoutRef.current);
+
+      timeoutRef.current = setTimeout(() => {
+        fetchNewStats();
+      }, 1000);
+    }
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
+  }, [open, withdrawAmount, depositAmount]);
 
   const stats = useGlobalStore((state) => state.priceStats);
 
-  function getNewLeverage() {
-    let changeCollateral =
-      tab === Tab.Add
-        ? depositAmount * stats[props.position.token].currentPrice
-        : -1 * withdrawAmount;
-
-    return (
-      props.position.getSizeUsd() /
-      (props.position.getCollateralUsd() + changeCollateral)
-    );
-  }
-
-  function getNewCollateral() {
-    return (
-      props.position.getCollateralUsd() +
-      depositAmount * stats[props.position.token].currentPrice
-    );
-  }
-
-  // TODO incorporate proper fetched new liq price into collateral modal
-  function getNewLiqPrice() {}
+  function getNewLeverage() {}
 
   async function handleChangeCollateral() {
     let changeAmount;
@@ -86,7 +161,7 @@ export function CollateralModal(props: Props) {
       connection,
       pool,
       props.position,
-      new BN(changeAmount),
+      tab === Tab.Add ? depositAmount : withdrawAmount,
       tab
     );
 
@@ -95,7 +170,14 @@ export function CollateralModal(props: Props) {
   }
 
   return (
-    <Dialog.Root>
+    <Dialog.Root
+      open={open}
+      onOpenChange={() => {
+        setOpen(!open);
+        setWithdrawAmount(0);
+        setDepositAmount(0);
+      }}
+    >
       <Dialog.Trigger asChild>{props.children}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed top-0 bottom-0 left-0 right-0 grid place-items-center bg-black/80 text-white">
@@ -108,8 +190,8 @@ export function CollateralModal(props: Props) {
               <SidebarTab
                 selected={tab === Tab.Add}
                 onClick={() => {
-                  // setLiqAmount(1);
-                  // setDepositAmount(0);
+                  setWithdrawAmount(0);
+                  setDepositAmount(0);
                   setTab(Tab.Add);
                 }}
               >
@@ -119,8 +201,8 @@ export function CollateralModal(props: Props) {
               <SidebarTab
                 selected={tab === Tab.Remove}
                 onClick={() => {
-                  // setLiqAmount(1);
-                  // setDepositAmount(0);
+                  setWithdrawAmount(0);
+                  setDepositAmount(0);
                   setTab(Tab.Remove);
                 }}
               >
@@ -181,7 +263,7 @@ export function CollateralModal(props: Props) {
                   value: `$${formatNumberCommas(
                     props.position.getCollateralUsd()
                   )}`,
-                  newValue: `$${formatNumberCommas(getNewCollateral())}`,
+                  newValue: `$${newCollateral}`,
                 },
                 {
                   label: "Mark Price",
@@ -196,7 +278,7 @@ export function CollateralModal(props: Props) {
                 {
                   label: "Leverage",
                   value: `${props.position.getLeverage().toFixed(2)}`,
-                  newValue: `${getNewLeverage().toFixed(2)}`,
+                  newValue: `${newLeverage}`,
                 },
                 {
                   label: "Size",
@@ -208,8 +290,8 @@ export function CollateralModal(props: Props) {
                 // },
                 {
                   label: "Liq Price",
-                  value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
-                  newValue: `sdf`,
+                  value: `$${liqPrice}`,
+                  newValue: `$${newLiqPrice}`,
                 },
                 // {
                 //   label: "Execution Fee",
@@ -229,17 +311,18 @@ export function CollateralModal(props: Props) {
                   <div className="space flex flex-row items-center space-x-1">
                     <div className="text-sm text-white">{value}</div>
 
-                    {newValue && (
-                      <>
-                        <p className="text-sm text-white">
-                          <ArrowRight />
-                        </p>
+                    {newValue &&
+                      !(newValue === "null" || newValue === "$null") && (
+                        <>
+                          <p className="text-sm text-white">
+                            <ArrowRight />
+                          </p>
 
-                        <div className="text-sm font-semibold text-white">
-                          {newValue}
-                        </div>
-                      </>
-                    )}
+                          <div className="text-sm font-semibold text-white">
+                            {newValue}
+                          </div>
+                        </>
+                      )}
                   </div>
                 </div>
               ))}
@@ -249,7 +332,7 @@ export function CollateralModal(props: Props) {
               <Dialog.Close asChild>
                 <SolidButton
                   className="w-full"
-                  disabled={!publicKey || !depositAmount}
+                  disabled={!publicKey || (!depositAmount && !withdrawAmount)}
                   onClick={handleChangeCollateral}
                 >
                   {tab === Tab.Add ? "Add Collateral" : "Remove Collateral"}

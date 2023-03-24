@@ -86,7 +86,7 @@ export function PoolSelector(props: Props) {
               key={pool.address.toString()}
               onClick={() => props.onSelectPool?.(pool)}
             >
-              <PoolTokens tokens={pool.getTokenList()} />
+              <PoolTokens tokens={pool.getTokenList()} className="h-5 w-5" />
               <div>
                 <div className="truncate text-sm font-medium text-white">
                   {pool.name}

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { TokenE } from "@/lib/Token";
 import { swap } from "src/actions/swap";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { BN } from "@project-serum/anchor";
 import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/store";
 import { PoolAccount } from "@/lib/PoolAccount";
@@ -16,6 +15,7 @@ import { PoolSelector } from "@/components/PoolSelector";
 import { SolidButton } from "@/components/SolidButton";
 import { TradeSwapDetails } from "@/components/TradeSidebar/TradeSwapDetails";
 import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
+import { UserBalance } from "@/components/Atoms/UserBalance";
 
 interface Props {
   className?: string;
@@ -30,7 +30,7 @@ export function TradeSwap(props: Props) {
   const poolData = useGlobalStore((state) => state.poolData);
 
   const [payToken, setPayToken] = useState<TokenE>();
-  const [payAmount, setPayAmount] = useState<number>(1);
+  const [payAmount, setPayAmount] = useState<number>(0);
   const [receiveToken, setReceiveToken] = useState<TokenE>();
   const [receiveAmount, setReceiveAmount] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
@@ -51,11 +51,17 @@ export function TradeSwap(props: Props) {
   const router = useRouter();
 
   useEffect(() => {
-    if (Object.values(poolData).length > 0) {
+    if (
+      Object.values(poolData).length > 0 &&
+      Object.values(userData).length > 0
+    ) {
       setPool(Object.values(poolData)[0]);
 
-      let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
-      let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
+      // let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
+      // let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
+      let tokenA = TokenE.USDC;
+      let tokenB = TokenE.TEST;
+      console.log("userData", userData);
 
       setPayToken(tokenA);
       setPayTokenBalance(userData.tokenBalances[tokenA]);
@@ -67,7 +73,7 @@ export function TradeSwap(props: Props) {
   useEffect(() => {
     async function fetchData() {
       // console.log("in fetch", payAmount);
-      if (payAmount == 0) {
+      if (payAmount == 0 || !payAmount) {
         setReceiveAmount(0);
         setFee(0);
         return;
@@ -76,15 +82,23 @@ export function TradeSwap(props: Props) {
       let { provider } = await getPerpetualProgramAndProvider(wallet as any);
 
       const View = new ViewHelper(connection, provider);
+      console.log("trying to get swap amt", payToken, receiveToken, payAmount);
 
       let swapInfo = await View.getSwapAmountAndFees(
-        new BN(payAmount * 10 ** pool!.getCustodyAccount(payToken)!.decimals),
+        payAmount,
         pool!,
         pool!.getCustodyAccount(payToken)!,
         pool!.getCustodyAccount(receiveToken)!
       );
 
       let f = Number(swapInfo.feeOut) / 10 ** 6;
+
+      console.log(
+        "rec amt? ",
+        Number(swapInfo.amountOut),
+        pool!.getCustodyAccount(receiveToken)!.decimals,
+        pool!.getCustodyAccount(receiveToken)!.decimals
+      );
 
       let recAmt =
         Number(swapInfo.amountOut) /
@@ -148,25 +162,16 @@ export function TradeSwap(props: Props) {
       </div>
     );
   }
+  console.log("pay token balance", payTokenBalance, payToken);
 
   return (
     <div className={props.className}>
       <div className="flex items-center justify-between text-sm">
         <div className="text-sm font-medium text-white">You Pay</div>
-        <div
-          className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
+        <UserBalance
+          token={payToken}
           onClick={() => setPayAmount(payTokenBalance)}
-        >
-          {payTokenBalance ? (
-            <>
-              <p>{payTokenBalance?.toFixed(3) ?? 0}</p>
-              <p className="font-normal">{payToken}</p>
-              <p className="text-zinc-400"> Balance</p>
-            </>
-          ) : (
-            <LoadingDots />
-          )}
-        </div>
+        />
       </div>
       <TokenSelector
         className="mt-2"
@@ -196,20 +201,10 @@ export function TradeSwap(props: Props) {
       </div>
       <div className="flex items-center justify-between text-sm">
         <div className="text-sm font-medium text-white">You Receive</div>
-        <div
-          className="flex flex-row space-x-1 font-medium text-white hover:cursor-pointer"
+        <UserBalance
+          token={receiveToken}
           onClick={() => setReceiveAmount(receiveTokenBalance)}
-        >
-          {receiveTokenBalance ? (
-            <>
-              <p>{receiveTokenBalance?.toFixed(3) ?? 0}</p>
-              <p className="font-normal">{receiveToken}</p>
-              <p className="text-zinc-400"> Balance</p>
-            </>
-          ) : (
-            <LoadingDots />
-          )}
-        </div>
+        />
       </div>
       <TokenSelector
         className="mt-2"
@@ -240,7 +235,12 @@ export function TradeSwap(props: Props) {
       <SolidButton
         className="mt-6 w-full"
         onClick={handleSwap}
-        disabled={!publicKey || !payAmount}
+        disabled={
+          !publicKey ||
+          !payAmount ||
+          receiveAmount * stats[receiveToken].currentPrice >
+            pool.getCustodyAccount(receiveToken!)?.getCustodyLiquidity(stats!)!
+        }
       >
         Swap
       </SolidButton>
@@ -258,6 +258,12 @@ export function TradeSwap(props: Props) {
       "
         >
           Please specify a valid nonzero amount to swap
+        </p>
+      )}
+      {receiveAmount * stats[receiveToken].currentPrice >
+        pool.getCustodyAccount(receiveToken!)?.getCustodyLiquidity(stats!)! && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          This swap exceeds pool liquidity, reduce your swap size
         </p>
       )}
 
