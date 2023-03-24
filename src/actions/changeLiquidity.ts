@@ -140,12 +140,14 @@ export async function changeLiquidity(
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .remainingAccounts(pool.getCustodyMetas());
+
+    if (custody.getTokenE() == TokenE.SOL) {
+      methodBuilder = methodBuilder.postInstructions(postInstructions);
+    }
   }
 
   if (preInstructions)
-    methodBuilder = methodBuilder
-      .preInstructions(preInstructions)
-      .postInstructions(postInstructions);
+    methodBuilder = methodBuilder.preInstructions(preInstructions);
 
   try {
     // await automaticSendTransaction(
