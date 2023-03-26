@@ -10,11 +10,19 @@ import {
   manualSendTransaction,
 } from "@/utils/TransactionHandlers";
 import { BN } from "@project-serum/anchor";
-import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import {
+  getAssociatedTokenAddress,
+  NATIVE_MINT,
+  TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 import { Connection, TransactionInstruction } from "@solana/web3.js";
 import { Tab } from "@/lib/types";
 import { TokenE } from "@/lib/Token";
-import { wrapSolIfNeeded } from "@/utils/transactionHelpers";
+import {
+  createAtaIfNeeded,
+  unwrapSolIfNeeded,
+  wrapSolIfNeeded,
+} from "@/utils/transactionHelpers";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 
 export async function changeCollateral(
@@ -41,8 +49,20 @@ export async function changeCollateral(
   let preInstructions: TransactionInstruction[] = [];
 
   let methodBuilder;
+  let postInstructions: TransactionInstruction[] = [];
+  let unwrapTx = await unwrapSolIfNeeded(publicKey, publicKey, connection);
+  if (unwrapTx) postInstructions.push(...unwrapTx);
+
   if (tab == Tab.Add) {
     if (position.token == TokenE.SOL) {
+      let ataIx = await createAtaIfNeeded(
+        publicKey,
+        publicKey,
+        NATIVE_MINT,
+        connection
+      );
+      if (ataIx) preInstructions.push(ataIx);
+
       let wrapInstructions = await wrapSolIfNeeded(
         publicKey,
         publicKey,
@@ -73,6 +93,16 @@ export async function changeCollateral(
         tokenProgram: TOKEN_PROGRAM_ID,
       });
   } else {
+    if (position.token == TokenE.SOL) {
+      let ataIx = await createAtaIfNeeded(
+        publicKey,
+        publicKey,
+        NATIVE_MINT,
+        connection
+      );
+      if (ataIx) preInstructions.push(ataIx);
+    }
+
     let collateralUsd = new BN(collatNum * 10 ** 6);
     methodBuilder = perpetual_program.methods
       .removeCollateral({
@@ -94,6 +124,9 @@ export async function changeCollateral(
 
   if (preInstructions)
     methodBuilder = methodBuilder.preInstructions(preInstructions);
+
+  if (position.token == TokenE.SOL)
+    methodBuilder = methodBuilder.postInstructions(postInstructions);
 
   try {
     let tx = await methodBuilder.transaction();

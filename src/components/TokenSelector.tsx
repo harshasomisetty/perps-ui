@@ -4,6 +4,7 @@ import { cloneElement, useState } from "react";
 import { TokenE, getTokenIcon } from "@/lib/Token";
 import { useGlobalStore } from "@/stores/store";
 import { TokenSelectorList } from "@/components/TokenSelectorList";
+import { MaxButton } from "@/components/Atoms/MaxButton";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -31,29 +32,6 @@ interface Props {
 export function TokenSelector(props: Props) {
   const stats = useGlobalStore((state) => state.priceStats);
   const [selectorOpen, setSelectorOpen] = useState(false);
-
-  function MaxButton() {
-    if (props.maxBalance) {
-      return (
-        <button
-          className={twMerge(
-            "h-min",
-            "w-min",
-            "bg-purple-500",
-            "rounded",
-            "py-1",
-            "px-2",
-            "text-white"
-          )}
-          onClick={() => props.onChangeAmount(props.maxBalance)}
-        >
-          Max
-        </button>
-      );
-    } else {
-      return <></>;
-    }
-  }
 
   if (props.token === undefined) {
     return (
@@ -103,7 +81,10 @@ export function TokenSelector(props: Props) {
               <ChevronRightIcon className="fill-gray-500 transition-colors group-hover:fill-white" />
             )}
           </button>
-          <MaxButton />
+          <MaxButton
+            maxBalance={props.maxBalance}
+            onChangeAmount={props.onChangeAmount}
+          />
         </div>
         <div>
           {props.pendingRateConversion ? (

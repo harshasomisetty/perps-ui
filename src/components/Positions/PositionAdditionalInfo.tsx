@@ -13,6 +13,7 @@ import { SolidButton } from "@/components/SolidButton";
 import { PositionValueDelta } from "@/components/Positions/PositionValueDelta";
 import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
 import { CollateralModal } from "@/components/Positions/CollateralModal";
+import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
 
 interface Props {
   className?: string;
@@ -23,6 +24,7 @@ interface Props {
 
 export function PositionAdditionalInfo(props: Props) {
   const walletContextState = useWallet();
+  const { publicKey } = useWallet();
 
   const { connection } = useConnection();
   const stats = useGlobalStore((state) => state.priceStats);
@@ -31,6 +33,7 @@ export function PositionAdditionalInfo(props: Props) {
   const custodyData = useGlobalStore((state) => state.custodyData);
 
   const setPositionData = useGlobalStore((state) => state.setPositionData);
+  const setUserData = useGlobalStore((state) => state.setUserData);
 
   const positionPool = poolData[props.position.pool.toString()]!;
   const positionCustody = custodyData[props.position.custody.toString()]!;
@@ -47,6 +50,8 @@ export function PositionAdditionalInfo(props: Props) {
 
     const positionInfos = await getPositionData(custodyData);
     setPositionData(positionInfos);
+    const userData = await getAllUserData(connection, publicKey, poolData);
+    setUserData(userData);
   }
 
   if (Object.values(stats).length === 0) return <p>sdf</p>;

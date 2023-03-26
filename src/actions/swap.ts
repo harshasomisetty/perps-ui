@@ -146,10 +146,13 @@ export async function swapTransactionBuilder(
   });
 
   if (preInstructions) {
-    methodBuilder = methodBuilder
-      .preInstructions(preInstructions)
-      .postInstructions(postInstructions);
-    console.log("swap builder does have pre instructions", preInstructions);
+    methodBuilder = methodBuilder.preInstructions(preInstructions);
+  }
+  if (
+    dispensingCustody.getTokenE() == TokenE.SOL ||
+    receivingCustody.getTokenE() == TokenE.SOL
+  ) {
+    methodBuilder = methodBuilder.postInstructions(postInstructions);
   }
 
   return { methodBuilder, preInstructions, postInstructions };

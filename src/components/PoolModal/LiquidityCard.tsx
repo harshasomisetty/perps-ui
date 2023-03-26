@@ -229,6 +229,7 @@ export default function LiquidityCard(props: Props) {
               className="mt-2"
               amount={liqAmount}
               onChangeAmount={setLiqAmount}
+              maxBalance={liqBalance ? liqBalance : 0}
             />
           )}
         </div>

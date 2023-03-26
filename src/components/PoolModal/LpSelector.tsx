@@ -1,3 +1,4 @@
+import { MaxButton } from "@/components/Atoms/MaxButton";
 import { twMerge } from "tailwind-merge";
 
 interface Props {
@@ -27,7 +28,12 @@ export const LpSelector = (props: Props) => {
       >
         <div className="flex items-center space-x-2">
           <p>{props.label ? props.label : "LP Tokens"}</p>
-          {props.maxBalance && (
+
+          <MaxButton
+            maxBalance={props.maxBalance}
+            onChangeAmount={props.onChangeAmount}
+          />
+          {/* {props.maxBalance && (
             <button
               className={twMerge(
                 "h-min",
@@ -42,7 +48,7 @@ export const LpSelector = (props: Props) => {
             >
               Max
             </button>
-          )}
+          )} */}
         </div>
         <div>
           {props.pendingRateConversion ? (
