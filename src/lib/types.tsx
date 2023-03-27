@@ -4,40 +4,51 @@ import { PublicKey } from "@solana/web3.js";
 
 export interface Pool {
   name: string;
-  tokens: Token[];
+  custodies: PublicKey[];
+  ratios: TokenRatios[];
+  // tokens: Token[];
   aumUsd: BN;
+
   bump: number;
   lpTokenBump: number;
   inceptionTime: BN;
 }
 
-export interface Token {
-  custody: PublicKey;
-  targetRatio: BN;
-  minRatio: BN;
-  maxRatio: BN;
+export interface TokenRatios {
+  target: BN;
+  min: BN;
+  max: BN;
 }
 
+// export interface Token {
+//   custody: PublicKey;
+//   targetRatio: BN;
+//   minRatio: BN;
+//   maxRatio: BN;
+// }
+
 export interface Custody {
-  assets: Assets;
-  borrowRate: BorrowRateParams;
-  borrowRateState: BorrowRateState;
-  bump: number;
-  collectedFees: Stats;
-  decimals: number;
-  fees: Fees;
-  isStable: boolean;
-  longPositions: PositionStats;
-  mint: PublicKey;
-  oracle: OracleParams;
-  permissions: Permissions;
   pool: PublicKey;
-  pricing: PricingParams;
-  shortPositions: PositionStats;
+  mint: PublicKey;
   tokenAccount: PublicKey;
-  tokenAccountBump: number;
-  tradeStats: TradeStats;
+  decimals: number;
+  isStable: boolean;
+  oracle: OracleParams;
+  pricing: PricingParams;
+  permissions: Permissions;
+  fees: Fees;
+  borrowRate: BorrowRateParams;
+
+  assets: Assets;
+  collectedFees: Stats;
   volumeStats: Stats;
+  tradeStats: TradeStats;
+  longPositions: PositionStats;
+  shortPositions: PositionStats;
+  borrowRateState: BorrowRateState;
+
+  bump: number;
+  tokenAccountBump: number;
 }
 
 export interface BorrowRateParams {
@@ -200,7 +211,7 @@ export interface Position {
   collateralAmount: BN;
 }
 
-interface PriceStat {
+export interface PriceStat {
   change24hr: number;
   currentPrice: number;
   high24hr: number;

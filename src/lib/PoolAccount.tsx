@@ -1,7 +1,7 @@
-import { GeckoStats } from "@/hooks/storeHelpers/fetchPrices";
+import { PriceStats } from "@/hooks/storeHelpers/fetchPrices";
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { TokenE } from "@/lib/Token";
-import { AccountMeta, Pool, Token } from "@/lib/types";
+import { AccountMeta, Pool, TokenRatios } from "@/lib/types";
 import { PERPETUALS_PROGRAM_ID } from "@/utils/constants";
 import { BN } from "@project-serum/anchor";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
@@ -10,46 +10,52 @@ import { PublicKey } from "@solana/web3.js";
 
 export class PoolAccount {
   public name: string;
-  public tokens: Token[];
+  public custodies: Record<string, CustodyAccount>;
+  public ratios: Record<string, TokenRatios>;
+  // public tokens: Token[];
   public aumUsd: BN;
   public bump: number;
   public lpTokenBump: number;
   public inceptionTime: BN;
 
-  public custodies: Record<string, CustodyAccount>;
-  public address: PublicKey;
-
   // public lpDecimals: number = 8;
+  public address: PublicKey;
   public lpData: Mint;
 
   constructor(
     pool: Pool,
-    custodies: Record<string, CustodyAccount>,
+    custodyData: Record<string, CustodyAccount>,
     address: PublicKey,
     lpData: Mint
   ) {
     this.name = pool.name;
-    this.tokens = pool.tokens;
     this.aumUsd = pool.aumUsd;
     this.bump = pool.bump;
     this.lpTokenBump = pool.lpTokenBump;
     this.inceptionTime = pool.inceptionTime;
 
     let tempCustodies: Record<string, CustodyAccount> = {};
-    pool.tokens.forEach((token) => {
-      tempCustodies[token.custody.toString()] =
-        custodies[token.custody.toString()]!;
+    pool.custodies.forEach((custody: PublicKey) => {
+      tempCustodies[custody.toString()] = custodyData[custody.toString()]!;
+    });
+
+    let tempRatios: Record<string, TokenRatios> = {};
+    pool.ratios.forEach((ratio: TokenRatios, index: number) => {
+      tempRatios[pool.custodies[index].toString()] = ratio;
     });
 
     this.custodies = tempCustodies;
+    this.ratios = tempRatios;
 
     this.address = address;
     this.lpData = lpData;
   }
 
-  getCustodyStruct(publicKey: PublicKey): Token | undefined {
-    const token = this.tokens.find((t) => t.custody.equals(publicKey));
-    return token ?? this.tokens[0];
+  getRatioStruct(publicKey: PublicKey): TokenRatios {
+    return this.ratios[publicKey.toString()]
+      ? this.ratios[publicKey.toString()]
+      : { target: new BN(1), min: new BN(1), max: new BN(1) };
+    // find the indexin
   }
 
   getCustodyAccount(token: TokenE): CustodyAccount | null {
@@ -101,7 +107,7 @@ export class PoolAccount {
 
     return custodyMetas;
   }
-  getLiquidities(stats: GeckoStats): number | null {
+  getLiquidities(stats: PriceStats): number | null {
     // get liquidities from token custodies
     // if (Object.keys(stats).length == 0) {
     //   return null;

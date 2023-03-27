@@ -17,14 +17,12 @@ export async function getCustodyData(): Promise<
   let fetchedCustodies: FetchCustody[] =
     await perpetual_program.account.custody.all();
 
-  //   console.log("fetchedCustodies in store", fetchedCustodies);
   let custodyInfos: Record<string, CustodyAccount> = fetchedCustodies.reduce(
     (acc: Record<string, CustodyAccount>, { account, publicKey }) => (
       (acc[publicKey.toString()] = new CustodyAccount(account, publicKey)), acc
     ),
     {}
   );
-  //   console.log("custodyInfos returned in store", custodyInfos);
 
   return custodyInfos;
 }

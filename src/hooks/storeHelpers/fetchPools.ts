@@ -35,9 +35,13 @@ export async function getPoolData(
 
         const View = new ViewHelper(provider.connection, provider);
 
+        console.log("fetching pools actual data", pool);
+
         let poolData: Pool = {
           name: pool.account.name,
-          tokens: pool.account.tokens,
+          custodies: pool.account.custodies,
+          ratios: pool.account.ratios,
+          // tokens: pool.account.tokens,
           aumUsd: pool.account.aumUsd,
           bump: pool.account.bump,
           lpTokenBump: pool.account.lpTokenBump,
