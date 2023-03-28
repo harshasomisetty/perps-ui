@@ -64,7 +64,7 @@ export async function wrapSolIfNeeded(
       SystemProgram.transfer({
         fromPubkey: publicKey,
         toPubkey: associatedTokenAccount,
-        lamports: Math.floor((payAmount - balance) * LAMPORTS_PER_SOL * 1.1),
+        lamports: Math.floor((payAmount - balance) * LAMPORTS_PER_SOL * 3),
       })
     );
     preInstructions.push(

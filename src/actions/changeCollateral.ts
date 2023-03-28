@@ -103,6 +103,7 @@ export async function changeCollateral(
       if (ataIx) preInstructions.push(ataIx);
     }
 
+    // Decimals are 6, since collateral is in USD
     let collateralUsd = new BN(collatNum * 10 ** 6);
     methodBuilder = perpetual_program.methods
       .removeCollateral({

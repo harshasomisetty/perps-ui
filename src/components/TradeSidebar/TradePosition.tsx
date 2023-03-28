@@ -107,6 +107,9 @@ export function TradePosition(props: Props) {
           walletContextState
         );
 
+        let payCustody = pool!.getCustodyAccount(payToken)!;
+        let positionCustody = pool!.getCustodyAccount(positionToken)!;
+
         const View = new ViewHelper(
           perpetual_program.provider.connection,
           perpetual_program.provider
@@ -115,16 +118,18 @@ export function TradePosition(props: Props) {
         let swapInfo = await View.getSwapAmountAndFees(
           1,
           pool!,
-          pool!.getCustodyAccount(payToken)!,
-          pool!.getCustodyAccount(positionToken)!
+          payCustody,
+          positionCustody
         );
 
+        let f =
+          Number(swapInfo.feeIn.add(swapInfo.feeOut)) /
+          10 ** positionCustody.decimals;
+
         let payAmt =
-          Number(swapInfo.amountOut) /
-          10 ** pool!.getCustodyAccount(positionToken)!.decimals;
+          Number(swapInfo.amountOut) / 10 ** positionCustody.decimals - f;
         setConversionRatio(payAmt);
       } else {
-        // console.log("conversion ratio is 1");
         setConversionRatio(1);
       }
     }
@@ -176,12 +181,6 @@ export function TradePosition(props: Props) {
         perpetual_program.provider
       );
 
-      // console.log(
-      //   "payAmount in postionToken",
-      //   payAmount,
-      //   positionAmount,
-      //   pool?.getCustodyAccount(positionToken)
-      // );
       let getEntryPrice = await View.getEntryPriceAndFee(
         payAmount * conversionRatio,
         positionAmount,

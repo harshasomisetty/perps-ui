@@ -13,6 +13,6 @@ export function getCurrentWeight(
   const custodyPrice = stats[token].currentPrice;
 
   return pool.getLiquidities(stats)
-    ? (custodyAmount * custodyPrice) / pool.getLiquidities(stats)
+    ? (100 * custodyAmount * custodyPrice) / pool.getLiquidities(stats)
     : 0;
 }

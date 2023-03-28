@@ -59,8 +59,8 @@ export function TradeSwap(props: Props) {
 
       // let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
       // let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
-      let tokenA = TokenE.USDC;
-      let tokenB = TokenE.TEST;
+      let tokenA = TokenE.TEST;
+      let tokenB = TokenE.SOL;
       console.log("userData", userData);
 
       setPayToken(tokenA);
@@ -84,25 +84,22 @@ export function TradeSwap(props: Props) {
       const View = new ViewHelper(connection, provider);
       console.log("trying to get swap amt", payToken, receiveToken, payAmount);
 
+      let payCustody = pool!.getCustodyAccount(payToken)!;
+      let receiveCustody = pool!.getCustodyAccount(receiveToken)!;
+
       let swapInfo = await View.getSwapAmountAndFees(
         payAmount,
         pool!,
-        pool!.getCustodyAccount(payToken)!,
-        pool!.getCustodyAccount(receiveToken)!
+        payCustody,
+        receiveCustody
       );
 
-      let f = Number(swapInfo.feeOut) / 10 ** 6;
-
-      console.log(
-        "rec amt? ",
-        Number(swapInfo.amountOut),
-        pool!.getCustodyAccount(receiveToken)!.decimals,
-        pool!.getCustodyAccount(receiveToken)!.decimals
-      );
+      let f =
+        Number(swapInfo.feeIn.add(swapInfo.feeOut)) /
+        10 ** receiveCustody.decimals;
 
       let recAmt =
-        Number(swapInfo.amountOut) /
-        10 ** pool!.getCustodyAccount(receiveToken)!.decimals;
+        Number(swapInfo.amountOut) / 10 ** receiveCustody.decimals - f;
 
       console.log("f and rec", f, recAmt);
       // TODO check the fees here
