@@ -84,38 +84,29 @@ export async function openPositionBuilder(
       positionCustody
     );
 
-    // console.log(
-    //   "swap info",
-    //   swapInfo,
-    //   Number(swapInfo.feeIn) / 10 ** 6,
-    //   Number(swapInfo.feeOut) / 10 ** 6
-    // );
+    let swapAmountOut =
+      Number(swapInfo.amountOut) / 10 ** positionCustody.decimals;
 
-    console.log(
-      "swap builder amount out",
-      Number(swapInfo.amountOut) / 10 ** positionCustody.decimals
-    );
+    let swapFee = Number(swapInfo.feeOut) / 10 ** positionCustody.decimals;
 
-    let f =
-      Number(swapInfo.feeIn.add(swapInfo.feeOut)) /
-      10 ** positionCustody.decimals;
+    let recAmt = swapAmountOut - swapFee;
 
-    finalPayAmount = Number(swapInfo.amountOut) / 10 ** payCustody.decimals - f;
-    console.log("changing finalpayamt", finalPayAmount, payAmount);
+    console.log("rec amt in swap builder", recAmt, swapAmountOut, swapFee);
+    // infa
+    // swap needs to be returning atleast collateral + pool.fee1
 
     // TODO: get entry price entry and fee, add that onto the swap builder
     let getEntryPrice = await View.getEntryPriceAndFee(
-      finalPayAmount,
+      recAmt,
       positionAmount,
       side,
       pool!,
       positionCustody!
     );
 
-    console.log("entry price in swap builder", Number(getEntryPrice.fee));
+    let entryFee = Number(getEntryPrice.fee) / 10 ** positionCustody.decimals;
 
-    let recAmt =
-      Number(swapInfo.amountOut) / 10 ** positionCustody.decimals - f;
+    console.log("entry price in swap builder", entryFee);
 
     let { methodBuilder: swapBuilder, preInstructions: swapPreInstructions } =
       await swapTransactionBuilder(
@@ -124,15 +115,16 @@ export async function openPositionBuilder(
         pool,
         payCustody.getTokenE(),
         positionCustody.getTokenE(),
-        payAmount +
-          Number(getEntryPrice.fee) / 10 ** positionCustody.decimals +
-          f,
+        payAmount + entryFee + swapFee,
         recAmt
       );
     console.log("make builder into instruction in openPos");
 
     let ix = await swapBuilder.instruction();
     preInstructions.push(...swapPreInstructions, ix);
+
+    finalPayAmount = recAmt - entryFee;
+    console.log("changing finalpayamt", finalPayAmount, payAmount);
   }
 
   console.log(
