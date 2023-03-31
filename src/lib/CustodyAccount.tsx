@@ -1,4 +1,4 @@
-import { GeckoStats } from "@/hooks/storeHelpers/fetchPrices";
+import { PriceStats } from "@/hooks/storeHelpers/fetchPrices";
 import { PublicKey } from "@solana/web3.js";
 import { tokenAddressToToken, TokenE } from "./Token";
 import {
@@ -13,6 +13,7 @@ import {
   Stats,
   TradeStats,
   Permissions,
+  PriceStat,
 } from "./types";
 
 export class CustodyAccount {
@@ -54,6 +55,7 @@ export class CustodyAccount {
     this.fees = custody.fees;
     this.borrowRate = custody.borrowRate;
 
+    console.log("custody assets", custody.assets);
     this.assets = custody.assets;
     this.collectedFees = custody.collectedFees;
     this.volumeStats = custody.volumeStats;
@@ -72,7 +74,7 @@ export class CustodyAccount {
     return tokenAddressToToken(this.mint.toString())!;
   }
 
-  getCustodyLiquidity(stats: GeckoStats): number {
+  getCustodyLiquidity(stats: PriceStats): number {
     if (Object.values(stats).length === 0) {
       throw new Error("stats not loaded");
     }
@@ -86,5 +88,28 @@ export class CustodyAccount {
       console.log("stats error", e, stats);
       throw e;
     }
+  }
+
+  getCurrentWeight(stats: PriceStat, liquidity: number): number {
+    let weight =
+      (100 *
+        stats.currentPrice *
+        (Number(this.assets.owned) / 10 ** this.decimals)) /
+      liquidity;
+
+    return weight ? weight : 0;
+  }
+
+  getAmount(): number {
+    return Number(this.assets.owned) / 10 ** this.decimals;
+  }
+
+  getAddFee(): number {
+    return Number(this.fees.addLiquidity) / 100;
+  }
+  getUtilizationRate(): number {
+    return Number(this.assets.owned) != 0
+      ? 100 * Number(this.assets.locked.div(this.assets.owned))
+      : 0;
   }
 }

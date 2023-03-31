@@ -76,7 +76,7 @@ export function TradePosition(props: Props) {
       positionToken,
       payAmount,
       positionAmount,
-      stats[payToken]?.currentPrice,
+      stats[positionToken]?.currentPrice,
       props.side
     );
     const positionInfos = await getPositionData(custodyData);
@@ -88,6 +88,7 @@ export function TradePosition(props: Props) {
 
   useEffect(() => {
     // @ts-ignore
+
     setPositionToken(asToken(pair.split("-")[0]));
     if (!payToken) {
       setPayToken(asToken(pair.split("-")[0]));
@@ -107,6 +108,9 @@ export function TradePosition(props: Props) {
           walletContextState
         );
 
+        let payCustody = pool!.getCustodyAccount(payToken)!;
+        let positionCustody = pool!.getCustodyAccount(positionToken)!;
+
         const View = new ViewHelper(
           perpetual_program.provider.connection,
           perpetual_program.provider
@@ -115,16 +119,18 @@ export function TradePosition(props: Props) {
         let swapInfo = await View.getSwapAmountAndFees(
           1,
           pool!,
-          pool!.getCustodyAccount(payToken)!,
-          pool!.getCustodyAccount(positionToken)!
+          payCustody,
+          positionCustody
         );
 
+        let f =
+          Number(swapInfo.feeIn.add(swapInfo.feeOut)) /
+          10 ** positionCustody.decimals;
+
         let payAmt =
-          Number(swapInfo.amountOut) /
-          10 ** pool!.getCustodyAccount(positionToken)!.decimals;
+          Number(swapInfo.amountOut) / 10 ** positionCustody.decimals - f;
         setConversionRatio(payAmt);
       } else {
-        // console.log("conversion ratio is 1");
         setConversionRatio(1);
       }
     }
@@ -176,12 +182,6 @@ export function TradePosition(props: Props) {
         perpetual_program.provider
       );
 
-      // console.log(
-      //   "payAmount in postionToken",
-      //   payAmount,
-      //   positionAmount,
-      //   pool?.getCustodyAccount(positionToken)
-      // );
       let getEntryPrice = await View.getEntryPriceAndFee(
         payAmount * conversionRatio,
         positionAmount,
@@ -231,6 +231,13 @@ export function TradePosition(props: Props) {
     }
   }
 
+  function isBalanceValid() {
+    return (
+      payAmount <=
+      (userData.tokenBalances[payToken] ? userData.tokenBalances[payToken] : 0)
+    );
+  }
+
   if (!pair || !pool || Object.values(stats).length === 0) {
     return (
       <div>
@@ -276,7 +283,7 @@ export function TradePosition(props: Props) {
           setPositionToken(token);
           router.push("/trade/" + token + "-USD", undefined, { shallow: true });
         }}
-        tokenList={pool.getTokenList()}
+        tokenList={pool.getTokenList([TokenE.USDC, TokenE.USDT])}
         pendingRateConversion={pendingRateConversion}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>
@@ -302,7 +309,8 @@ export function TradePosition(props: Props) {
           !publicKey ||
           payAmount === 0 ||
           isLiquityExceeded() ||
-          isPositionAlreadyOpen()
+          isPositionAlreadyOpen() ||
+          !isBalanceValid()
         }
       >
         Place Order
@@ -323,6 +331,12 @@ export function TradePosition(props: Props) {
           leverage
         </p>
       )}
+      {!isBalanceValid() && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          Insufficient balance
+        </p>
+      )}
+
       {isPositionAlreadyOpen() && (
         <p className="mt-2 text-center text-xs text-orange-500 ">
           Position exists, modify or close current holding

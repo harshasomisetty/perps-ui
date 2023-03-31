@@ -1,15 +1,6 @@
 import { getTokenId, TokenE, TOKEN_LIST } from "@/lib/Token";
 import { PriceStats } from "@/lib/types";
 
-interface Stats {
-  change24hr: number;
-  currentPrice: number;
-  high24hr: number;
-  low24hr: number;
-}
-
-export type GeckoStats = Record<TokenE, Stats>;
-
 type FetchedData = {
   [key: string]: {
     usd: number;
@@ -40,7 +31,7 @@ export function fetchAllStats(): PriceStats {
         };
 
         return acc;
-      }, {} as GeckoStats);
+      }, {} as PriceStats);
 
       return allStats;
     })
@@ -55,7 +46,7 @@ export function fetchAllStats(): PriceStats {
         };
 
         return acc;
-      }, {} as GeckoStats);
+      }, {} as PriceStats);
 
       return allStats;
     });

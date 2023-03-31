@@ -11,7 +11,7 @@ interface Props {
 export function TableHeader(props: Props) {
   return (
     <div className="flex flex-row space-x-1">
-      {Object.keys(props.pool.tokens).length > 0 ? (
+      {Object.keys(props.pool.custodies).length > 0 ? (
         <PoolTokens
           tokens={props.pool.getTokenList()}
           className={props.iconClassName}

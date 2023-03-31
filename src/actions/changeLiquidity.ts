@@ -115,6 +115,8 @@ export async function changeLiquidity(
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .remainingAccounts(pool.getCustodyMetas());
+
+    console.log("created add method builder");
   } else if (tab == Tab.Remove) {
     console.log("in liq remove");
     let lpAmountIn = new BN(liquidityAmount * 10 ** pool.lpData.decimals);
@@ -140,15 +142,17 @@ export async function changeLiquidity(
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .remainingAccounts(pool.getCustodyMetas());
-
-    if (custody.getTokenE() == TokenE.SOL) {
-      methodBuilder = methodBuilder.postInstructions(postInstructions);
-    }
   }
 
+  console.log("before pre");
   if (preInstructions)
     methodBuilder = methodBuilder.preInstructions(preInstructions);
 
+  if (custody.getTokenE() == TokenE.SOL) {
+    methodBuilder = methodBuilder.postInstructions(postInstructions);
+  }
+
+  console.log("after pre");
   try {
     // await automaticSendTransaction(
     //   methodBuilder,

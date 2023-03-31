@@ -1,6 +1,7 @@
 import { CustodyAccount } from "@/lib/CustodyAccount";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { PositionAccount } from "@/lib/PositionAccount";
+import { TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
@@ -74,8 +75,10 @@ export async function closePosition(
       custodyTokenAccount: custody.tokenAccount,
       tokenProgram: TOKEN_PROGRAM_ID,
     })
-    .preInstructions(preInstructions)
-    .postInstructions(postInstructions);
+    .preInstructions(preInstructions);
+
+  if (position.token == TokenE.SOL)
+    methodBuilder = methodBuilder.postInstructions(postInstructions);
 
   try {
     // await automaticSendTransaction(

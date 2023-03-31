@@ -94,13 +94,16 @@ export async function swapTransactionBuilder(
   if (ataIx) preInstructions.push(ataIx);
 
   // console.log("params", minAmtOutNumber);
+  console.log("/n/n/n setting min amount");
   let minAmountOut;
   // TODO explain why there is an if statement here
   if (minAmtOutNumber) {
+    console.log("FIRST min amt");
     minAmountOut = new BN(minAmtOutNumber * 10 ** dispensingCustody.decimals)
       .mul(new BN(90))
       .div(new BN(100));
   } else {
+    console.log("SECOND min amt");
     minAmountOut = new BN(amtInNumber * 10 ** dispensingCustody.decimals)
       .mul(new BN(90))
       .div(new BN(100));
@@ -117,6 +120,12 @@ export async function swapTransactionBuilder(
     amountIn,
     minAmountOut,
   };
+
+  console.log(
+    "swap params",
+    Number(params.amountIn),
+    Number(params.minAmountOut)
+  );
 
   // console.log(
   //   "amout ins",

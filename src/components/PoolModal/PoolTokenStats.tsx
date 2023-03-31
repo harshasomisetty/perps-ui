@@ -7,6 +7,7 @@ import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
 import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 import { ACCOUNT_URL } from "@/utils/TransactionHandlers";
+import { getCurrentWeight } from "@/lib/classGetters";
 
 interface Props {
   className?: string;
@@ -68,38 +69,22 @@ export default function PoolTokenStats(props: Props) {
                         </a>
                       </div>
                     </td>
-                    <td>{Number(custody.fees.addLiquidity) / 100}%</td>
+                    <td>{custody.getAddFee()}%</td>
                     <td>
                       ${formatNumberCommas(custody.getCustodyLiquidity(stats))}
                     </td>
                     <td>${formatNumberCommas(stats[token].currentPrice)}</td>
+                    <td>{formatNumberCommas(custody.getAmount())}</td>
                     <td>
                       {formatNumberCommas(
-                        Number(custody.assets.owned) / 10 ** custody.decimals
-                      )}
-                    </td>
-                    <td>
-                      {formatNumberCommas(
-                        (100 *
-                          stats[token].currentPrice *
-                          (Number(custody.assets.owned) /
-                            10 ** custody.decimals)) /
-                          props.pool.getLiquidities(stats)!
+                        getCurrentWeight(props.pool, custody, stats)
                       )}
                       % /{" "}
-                      {Number(
-                        pool?.getCustodyStruct(custody.address)!.targetRatio
-                      ) / 100}
+                      {Number(pool?.getRatioStruct(custody.address)!.target) /
+                        100}
                       %
                     </td>
-                    <td>
-                      {formatNumberCommas(
-                        100 *
-                          (Number(custody.assets.locked) /
-                            Number(custody.assets.owned))
-                      )}
-                      %
-                    </td>
+                    <td>{formatNumberCommas(custody.getUtilizationRate())}%</td>
                     <td>
                       <a
                         target="_blank"

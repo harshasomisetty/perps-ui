@@ -1890,10 +1890,16 @@ export type Perpetuals = {
             "type": "string"
           },
           {
-            "name": "tokens",
+            "name": "custodies",
+            "type": {
+              "vec": "publicKey"
+            }
+          },
+          {
+            "name": "ratios",
             "type": {
               "vec": {
-                "defined": "PoolToken"
+                "defined": "TokenRatios"
               }
             }
           },
@@ -2040,16 +2046,12 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "targetRatio",
-            "type": "u64"
-          },
-          {
-            "name": "minRatio",
-            "type": "u64"
-          },
-          {
-            "name": "maxRatio",
-            "type": "u64"
+            "name": "ratios",
+            "type": {
+              "vec": {
+                "defined": "TokenRatios"
+              }
+            }
           }
         ]
       }
@@ -2301,7 +2303,16 @@ export type Perpetuals = {
       "name": "RemoveCustodyParams",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "ratios",
+            "type": {
+              "vec": {
+                "defined": "TokenRatios"
+              }
+            }
+          }
+        ]
       }
     },
     {
@@ -2379,16 +2390,12 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "targetRatio",
-            "type": "u64"
-          },
-          {
-            "name": "minRatio",
-            "type": "u64"
-          },
-          {
-            "name": "maxRatio",
-            "type": "u64"
+            "name": "ratios",
+            "type": {
+              "vec": {
+                "defined": "TokenRatios"
+              }
+            }
           }
         ]
       }
@@ -2572,15 +2579,27 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "maxIncrease",
+            "name": "ratioMult",
             "type": "u64"
           },
           {
-            "name": "maxDecrease",
+            "name": "utilizationMult",
             "type": "u64"
           },
           {
-            "name": "swap",
+            "name": "swapIn",
+            "type": "u64"
+          },
+          {
+            "name": "swapOut",
+            "type": "u64"
+          },
+          {
+            "name": "stableSwapIn",
+            "type": "u64"
+          },
+          {
+            "name": "stableSwapOut",
             "type": "u64"
           },
           {
@@ -2870,11 +2889,11 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "weightedLeverage",
+            "name": "weightedPrice",
             "type": "u128"
           },
           {
-            "name": "totalLeverage",
+            "name": "totalQuantity",
             "type": "u128"
           },
           {
@@ -3073,24 +3092,20 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "PoolToken",
+      "name": "TokenRatios",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "custody",
-            "type": "publicKey"
-          },
-          {
-            "name": "targetRatio",
+            "name": "target",
             "type": "u64"
           },
           {
-            "name": "minRatio",
+            "name": "min",
             "type": "u64"
           },
           {
-            "name": "maxRatio",
+            "name": "max",
             "type": "u64"
           }
         ]
@@ -3302,51 +3317,56 @@ export type Perpetuals = {
     },
     {
       "code": 6014,
+      "name": "InvalidPoolConfig",
+      "msg": "Invalid pool config"
+    },
+    {
+      "code": 6015,
       "name": "InvalidCustodyConfig",
       "msg": "Invalid custody config"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "InsufficientAmountReturned",
       "msg": "Insufficient token amount returned"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "MaxPriceSlippage",
       "msg": "Price slippage limit exceeded"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "MaxLeverage",
       "msg": "Position leverage limit exceeded"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "CustodyAmountLimit",
       "msg": "Custody amount limit exceeded"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "PositionAmountLimit",
       "msg": "Position amount limit exceeded"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "TokenRatioOutOfRange",
       "msg": "Token ratio out of range"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "UnsupportedToken",
       "msg": "Token is not supported"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "InstructionNotAllowed",
       "msg": "Instruction is not allowed at this time"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "MaxUtilization",
       "msg": "Token utilization limit exceeded"
     }
@@ -5245,10 +5265,16 @@ export const IDL: Perpetuals = {
             "type": "string"
           },
           {
-            "name": "tokens",
+            "name": "custodies",
+            "type": {
+              "vec": "publicKey"
+            }
+          },
+          {
+            "name": "ratios",
             "type": {
               "vec": {
-                "defined": "PoolToken"
+                "defined": "TokenRatios"
               }
             }
           },
@@ -5395,16 +5421,12 @@ export const IDL: Perpetuals = {
             }
           },
           {
-            "name": "targetRatio",
-            "type": "u64"
-          },
-          {
-            "name": "minRatio",
-            "type": "u64"
-          },
-          {
-            "name": "maxRatio",
-            "type": "u64"
+            "name": "ratios",
+            "type": {
+              "vec": {
+                "defined": "TokenRatios"
+              }
+            }
           }
         ]
       }
@@ -5656,7 +5678,16 @@ export const IDL: Perpetuals = {
       "name": "RemoveCustodyParams",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "ratios",
+            "type": {
+              "vec": {
+                "defined": "TokenRatios"
+              }
+            }
+          }
+        ]
       }
     },
     {
@@ -5734,16 +5765,12 @@ export const IDL: Perpetuals = {
             }
           },
           {
-            "name": "targetRatio",
-            "type": "u64"
-          },
-          {
-            "name": "minRatio",
-            "type": "u64"
-          },
-          {
-            "name": "maxRatio",
-            "type": "u64"
+            "name": "ratios",
+            "type": {
+              "vec": {
+                "defined": "TokenRatios"
+              }
+            }
           }
         ]
       }
@@ -5927,15 +5954,27 @@ export const IDL: Perpetuals = {
             }
           },
           {
-            "name": "maxIncrease",
+            "name": "ratioMult",
             "type": "u64"
           },
           {
-            "name": "maxDecrease",
+            "name": "utilizationMult",
             "type": "u64"
           },
           {
-            "name": "swap",
+            "name": "swapIn",
+            "type": "u64"
+          },
+          {
+            "name": "swapOut",
+            "type": "u64"
+          },
+          {
+            "name": "stableSwapIn",
+            "type": "u64"
+          },
+          {
+            "name": "stableSwapOut",
             "type": "u64"
           },
           {
@@ -6225,11 +6264,11 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "weightedLeverage",
+            "name": "weightedPrice",
             "type": "u128"
           },
           {
-            "name": "totalLeverage",
+            "name": "totalQuantity",
             "type": "u128"
           },
           {
@@ -6428,24 +6467,20 @@ export const IDL: Perpetuals = {
       }
     },
     {
-      "name": "PoolToken",
+      "name": "TokenRatios",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "custody",
-            "type": "publicKey"
-          },
-          {
-            "name": "targetRatio",
+            "name": "target",
             "type": "u64"
           },
           {
-            "name": "minRatio",
+            "name": "min",
             "type": "u64"
           },
           {
-            "name": "maxRatio",
+            "name": "max",
             "type": "u64"
           }
         ]
@@ -6657,51 +6692,56 @@ export const IDL: Perpetuals = {
     },
     {
       "code": 6014,
+      "name": "InvalidPoolConfig",
+      "msg": "Invalid pool config"
+    },
+    {
+      "code": 6015,
       "name": "InvalidCustodyConfig",
       "msg": "Invalid custody config"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "InsufficientAmountReturned",
       "msg": "Insufficient token amount returned"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "MaxPriceSlippage",
       "msg": "Price slippage limit exceeded"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "MaxLeverage",
       "msg": "Position leverage limit exceeded"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "CustodyAmountLimit",
       "msg": "Custody amount limit exceeded"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "PositionAmountLimit",
       "msg": "Position amount limit exceeded"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "TokenRatioOutOfRange",
       "msg": "Token ratio out of range"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "UnsupportedToken",
       "msg": "Token is not supported"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "InstructionNotAllowed",
       "msg": "Instruction is not allowed at this time"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "MaxUtilization",
       "msg": "Token utilization limit exceeded"
     }
