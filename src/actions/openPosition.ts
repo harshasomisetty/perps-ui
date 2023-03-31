@@ -170,7 +170,7 @@ export async function openPositionBuilder(
 
   const params: any = {
     price: newPrice,
-    collateral: new BN(finalPayAmount * 10 ** payCustody.decimals),
+    collateral: new BN(finalPayAmount * 10 ** positionCustody.decimals),
     size: new BN(positionAmount * 10 ** positionCustody.decimals),
     side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
   };

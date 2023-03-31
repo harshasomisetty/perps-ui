@@ -231,6 +231,13 @@ export function TradePosition(props: Props) {
     }
   }
 
+  function isBalanceValid() {
+    return (
+      payAmount <=
+      (userData.tokenBalances[payToken] ? userData.tokenBalances[payToken] : 0)
+    );
+  }
+
   if (!pair || !pool || Object.values(stats).length === 0) {
     return (
       <div>
@@ -302,7 +309,8 @@ export function TradePosition(props: Props) {
           !publicKey ||
           payAmount === 0 ||
           isLiquityExceeded() ||
-          isPositionAlreadyOpen()
+          isPositionAlreadyOpen() ||
+          !isBalanceValid()
         }
       >
         Place Order
@@ -323,6 +331,12 @@ export function TradePosition(props: Props) {
           leverage
         </p>
       )}
+      {!isBalanceValid() && (
+        <p className="mt-2 text-center text-xs text-orange-500 ">
+          Insufficient balance
+        </p>
+      )}
+
       {isPositionAlreadyOpen() && (
         <p className="mt-2 text-center text-xs text-orange-500 ">
           Position exists, modify or close current holding
