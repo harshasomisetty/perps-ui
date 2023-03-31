@@ -93,10 +93,8 @@ export async function openPositionBuilder(
 
     console.log(
       "swap builder amount out",
-      Number(swapInfo.amountOut) / 10 ** 9
+      Number(swapInfo.amountOut) / 10 ** positionCustody.decimals
     );
-
-    // let receiveCustody = pool!.getCustodyAccount(positionCustody.getTokenE())!;
 
     let f =
       Number(swapInfo.feeIn.add(swapInfo.feeOut)) /
@@ -116,6 +114,9 @@ export async function openPositionBuilder(
 
     console.log("entry price in swap builder", Number(getEntryPrice.fee));
 
+    let recAmt =
+      Number(swapInfo.amountOut) / 10 ** positionCustody.decimals - f;
+
     let { methodBuilder: swapBuilder, preInstructions: swapPreInstructions } =
       await swapTransactionBuilder(
         walletContextState,
@@ -123,7 +124,10 @@ export async function openPositionBuilder(
         pool,
         payCustody.getTokenE(),
         positionCustody.getTokenE(),
-        payAmount + Number(getEntryPrice.fee) / 10 ** positionCustody.decimals
+        payAmount +
+          Number(getEntryPrice.fee) / 10 ** positionCustody.decimals +
+          f,
+        recAmt
       );
     console.log("make builder into instruction in openPos");
 

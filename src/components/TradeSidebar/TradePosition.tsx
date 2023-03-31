@@ -76,7 +76,7 @@ export function TradePosition(props: Props) {
       positionToken,
       payAmount,
       positionAmount,
-      stats[payToken]?.currentPrice,
+      stats[positionToken]?.currentPrice,
       props.side
     );
     const positionInfos = await getPositionData(custodyData);
@@ -88,6 +88,7 @@ export function TradePosition(props: Props) {
 
   useEffect(() => {
     // @ts-ignore
+
     setPositionToken(asToken(pair.split("-")[0]));
     if (!payToken) {
       setPayToken(asToken(pair.split("-")[0]));
@@ -275,7 +276,7 @@ export function TradePosition(props: Props) {
           setPositionToken(token);
           router.push("/trade/" + token + "-USD", undefined, { shallow: true });
         }}
-        tokenList={pool.getTokenList()}
+        tokenList={pool.getTokenList([TokenE.USDC, TokenE.USDT])}
         pendingRateConversion={pendingRateConversion}
       />
       <div className="mt-4 text-xs text-zinc-400">Pool</div>

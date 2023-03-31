@@ -80,10 +80,14 @@ export class PoolAccount {
     )[0];
   }
 
-  getTokenList(): TokenE[] {
-    return Object.values(this.custodies).map((custody) => {
-      return custody?.getTokenE()!;
-    });
+  getTokenList(exclude?: TokenE[]): TokenE[] {
+    return Object.values(this.custodies)
+      .map((custody) => {
+        return custody?.getTokenE();
+      })
+      .filter((token) => {
+        return !exclude || !exclude.includes(token);
+      });
   }
 
   getCustodyMetas(): AccountMeta[] {

@@ -57,10 +57,10 @@ export function TradeSwap(props: Props) {
     ) {
       setPool(Object.values(poolData)[0]);
 
-      // let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
-      // let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
-      let tokenA = TokenE.TEST;
-      let tokenB = TokenE.SOL;
+      let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
+      let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
+      // let tokenA = TokenE.SOL;
+      // let tokenB = TokenE.TEST;
       console.log("userData", userData);
 
       setPayToken(tokenA);
