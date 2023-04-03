@@ -77,7 +77,8 @@ export function TradePosition(props: Props) {
       payAmount,
       positionAmount,
       stats[positionToken]?.currentPrice,
-      props.side
+      props.side,
+      leverage
     );
     const positionInfos = await getPositionData(custodyData);
     setPositionData(positionInfos);
@@ -302,6 +303,9 @@ export function TradePosition(props: Props) {
           setLeverage(e);
         }}
       />
+      <p className="mt-2 text-center text-xs text-orange-500 ">
+        Leverage current only works until 25x due to immediate loss from fees
+      </p>
       <SolidButton
         className="mt-6 w-full"
         onClick={handleTrade}

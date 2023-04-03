@@ -37,7 +37,8 @@ export async function openPositionBuilder(
   payAmount: number,
   positionAmount: number,
   price: number,
-  side: Side
+  side: Side,
+  leverage: number
 ) {
   // console.log("in open position");
   let { perpetual_program, provider } = await getPerpetualProgramAndProvider(
@@ -70,9 +71,7 @@ export async function openPositionBuilder(
 
   let preInstructions: TransactionInstruction[] = [];
 
-  // console.log("in tokens not equal open pos");
-
-  let finalPayAmount = payAmount;
+  let finalPayAmount = positionAmount / leverage;
 
   if (payCustody.getTokenE() != positionCustody.getTokenE()) {
     console.log("first swapping in open pos");
@@ -92,10 +91,7 @@ export async function openPositionBuilder(
     let recAmt = swapAmountOut - swapFee;
 
     console.log("rec amt in swap builder", recAmt, swapAmountOut, swapFee);
-    // infa
-    // swap needs to be returning atleast collateral + pool.fee1
 
-    // TODO: get entry price entry and fee, add that onto the swap builder
     let getEntryPrice = await View.getEntryPriceAndFee(
       recAmt,
       positionAmount,
@@ -106,7 +102,26 @@ export async function openPositionBuilder(
 
     let entryFee = Number(getEntryPrice.fee) / 10 ** positionCustody.decimals;
 
-    console.log("entry price in swap builder", entryFee);
+    console.log("entry fee in swap builder", entryFee);
+
+    let swapInfo2 = await View.getSwapAmountAndFees(
+      payAmount + entryFee + swapFee,
+      pool!,
+      payCustody,
+      positionCustody
+    );
+
+    let swapAmountOut2 =
+      Number(swapInfo2.amountOut) / 10 ** positionCustody.decimals -
+      Number(swapInfo2.feeOut) / 10 ** positionCustody.decimals -
+      entryFee;
+
+    let extraSwap = 0;
+
+    if (swapAmountOut2 < finalPayAmount) {
+      let difference = (finalPayAmount - swapAmountOut2) / swapAmountOut2;
+      extraSwap = difference * (payAmount + entryFee + swapFee);
+    }
 
     let { methodBuilder: swapBuilder, preInstructions: swapPreInstructions } =
       await swapTransactionBuilder(
@@ -115,35 +130,18 @@ export async function openPositionBuilder(
         pool,
         payCustody.getTokenE(),
         positionCustody.getTokenE(),
-        payAmount + entryFee + swapFee,
+        payAmount + entryFee + swapFee + extraSwap,
         recAmt
       );
-    console.log("make builder into instruction in openPos");
 
     let ix = await swapBuilder.instruction();
     preInstructions.push(...swapPreInstructions, ix);
-
-    finalPayAmount = recAmt - entryFee;
-    console.log("changing finalpayamt", finalPayAmount, payAmount);
   }
-
-  console.log(
-    "after tokens not equal :)",
-    preInstructions.length,
-    positionCustody.getTokenE()
-  );
-
-  console.log(
-    "in sol not equal open pos",
-    preInstructions.length,
-    positionCustody.getTokenE() == TokenE.SOL
-  );
 
   if (
     preInstructions.length == 0 &&
     positionCustody.getTokenE() == TokenE.SOL
   ) {
-    console.log("in sol not equal open pos");
     let ataIx = await createAtaIfNeeded(
       publicKey,
       publicKey,
@@ -174,12 +172,6 @@ export async function openPositionBuilder(
     size: new BN(positionAmount * 10 ** positionCustody.decimals),
     side: side.toString() == "Long" ? TradeSide.Long : TradeSide.Short,
   };
-
-  console.log(
-    "params in number for open postiion",
-    positionAmount * 10 ** positionCustody.decimals,
-    payAmount * 10 ** payCustody.decimals
-  );
 
   let methodBuilder = perpetual_program.methods.openPosition(params).accounts({
     owner: publicKey,
@@ -230,7 +222,8 @@ export async function openPosition(
   payAmount: number,
   positionAmount: number,
   price: number,
-  side: Side
+  side: Side,
+  leverage: number
 ) {
   let payCustody = pool.getCustodyAccount(payToken)!;
   let positionCustody = pool.getCustodyAccount(positionToken)!;
@@ -244,6 +237,7 @@ export async function openPosition(
     payAmount,
     positionAmount,
     price,
-    side
+    side,
+    leverage
   );
 }

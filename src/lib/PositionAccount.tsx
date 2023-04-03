@@ -3,6 +3,7 @@ import { TokenE } from "@/lib/Token";
 import { Position, Side } from "@/lib/types";
 import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
+import { format } from "date-fns";
 
 export class PositionAccount {
   public owner: PublicKey;
@@ -63,9 +64,11 @@ export class PositionAccount {
   }
 
   // TODO fix getTimestamp to proper date
-  getTimestamp(): number {
-    // console.log("in get time", Number(this.openTime), Number(this.updateTime));
-    return Math.floor(Number(this.openTime) / 1000);
+  getTimestamp(): string {
+    const date = new Date(Number(this.openTime) * 1000);
+    const dateString = date.toLocaleString();
+
+    return dateString;
   }
 
   getCollateralUsd(): number {

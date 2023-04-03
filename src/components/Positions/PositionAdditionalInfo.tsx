@@ -2,7 +2,6 @@ import CloseIcon from "@carbon/icons-react/lib/Close";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { format } from "date-fns";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
 import { useGlobalStore } from "@/stores/store";
@@ -85,7 +84,7 @@ export function PositionAdditionalInfo(props: Props) {
         <div>
           <div className="text-xs text-zinc-500">Time</div>
           <div className="mt-1 text-sm text-white">
-            {format(props.position.getTimestamp(), "d MMM yyyy • p")}
+            {props.position.getTimestamp()}
           </div>
         </div>
         <div>
