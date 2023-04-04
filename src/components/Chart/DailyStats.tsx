@@ -1,7 +1,7 @@
-import { twMerge } from "tailwind-merge";
 import { TokenE } from "@/lib/Token";
-import { formatNumberCommas } from "@/utils/formatters";
 import { useGlobalStore } from "@/stores/store";
+import { formatNumberCommas } from "@/utils/formatters";
+import { twMerge } from "tailwind-merge";
 
 interface DailyStatsProps {
   className?: string;

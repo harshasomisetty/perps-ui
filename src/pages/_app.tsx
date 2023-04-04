@@ -1,5 +1,4 @@
 import "@/styles/globals.css";
-import React, { ReactNode } from "react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   ConnectionProvider,
@@ -24,9 +23,9 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import { AppProps } from "next/app";
-import { FC, useMemo } from "react";
-import "react-toastify/dist/ReactToastify.css";
+import React, { FC, ReactNode, useMemo } from "react";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 

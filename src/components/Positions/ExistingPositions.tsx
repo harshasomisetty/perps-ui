@@ -1,11 +1,10 @@
-import { twMerge } from "tailwind-merge";
-import { useGlobalStore } from "@/stores/store";
-import { countDictList, getPoolSortedPositions } from "@/utils/organizers";
-import { PublicKey } from "@solana/web3.js";
 import { NoPositions } from "@/components/Positions/NoPositions";
 import PoolPositionHeader from "@/components/Positions/PoolPositionHeader";
 import PoolPositionRow from "@/components/Positions/PoolPositionRow";
+import { useGlobalStore } from "@/stores/store";
+import { countDictList, getPoolSortedPositions } from "@/utils/organizers";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;

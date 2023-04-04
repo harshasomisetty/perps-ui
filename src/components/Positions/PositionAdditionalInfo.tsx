@@ -1,18 +1,18 @@
+import { CollateralModal } from "@/components/Positions/CollateralModal";
+import { PositionValueDelta } from "@/components/Positions/PositionValueDelta";
+import { SolidButton } from "@/components/SolidButton";
+import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
+import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { Side } from "@/lib/types";
+import { useGlobalStore } from "@/stores/store";
+import { formatPrice } from "@/utils/formatters";
 import CloseIcon from "@carbon/icons-react/lib/Close";
 import EditIcon from "@carbon/icons-react/lib/Edit";
 import { BN } from "@project-serum/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { closePosition } from "src/actions/closePosition";
 import { twMerge } from "tailwind-merge";
-import { useGlobalStore } from "@/stores/store";
-import { Side } from "@/lib/types";
-import { PositionAccount } from "@/lib/PositionAccount";
-import { formatPrice } from "@/utils/formatters";
-import { SolidButton } from "@/components/SolidButton";
-import { PositionValueDelta } from "@/components/Positions/PositionValueDelta";
-import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
-import { CollateralModal } from "@/components/Positions/CollateralModal";
-import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
 
 interface Props {
   className?: string;

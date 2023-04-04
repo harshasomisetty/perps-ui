@@ -33,22 +33,6 @@ export const LpSelector = (props: Props) => {
             maxBalance={props.maxBalance}
             onChangeAmount={props.onChangeAmount}
           />
-          {/* {props.maxBalance && (
-            <button
-              className={twMerge(
-                "h-min",
-                "w-min",
-                "bg-purple-500",
-                "rounded",
-                "py-1",
-                "px-2",
-                "text-white"
-              )}
-              onClick={() => props.onChangeAmount?.(props.maxBalance!)}
-            >
-              Max
-            </button>
-          )} */}
         </div>
         <div>
           {props.pendingRateConversion ? (

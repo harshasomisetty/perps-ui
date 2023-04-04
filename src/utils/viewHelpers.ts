@@ -1,10 +1,17 @@
+import { CustodyAccount } from "@/lib/CustodyAccount";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { Side } from "@/lib/types";
+import { IDL, Perpetuals } from "@/target/types/perpetuals";
 import {
   DEFAULT_PERPS_USER,
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
   PERPETUALS_PROGRAM_ID,
 } from "@/utils/constants";
+import { IdlCoder } from "@/utils/IdlCoder";
 import { AnchorProvider, BN, Program } from "@project-serum/anchor";
+import { decode } from "@project-serum/anchor/dist/cjs/utils/bytes/base64";
 import {
   Connection,
   PublicKey,
@@ -12,13 +19,6 @@ import {
   SimulatedTransactionResponse,
   Transaction,
 } from "@solana/web3.js";
-import { IDL, Perpetuals } from "@/target/types/perpetuals";
-import { decode } from "@project-serum/anchor/dist/cjs/utils/bytes/base64";
-import { IdlCoder } from "@/utils/IdlCoder";
-import { CustodyAccount } from "@/lib/CustodyAccount";
-import { PositionAccount } from "@/lib/PositionAccount";
-import { PoolAccount } from "@/lib/PoolAccount";
-import { Side } from "@/lib/types";
 
 export type PositionSide = "long" | "short";
 

@@ -1,4 +1,4 @@
-import { getTokenId, TokenE, TOKEN_LIST } from "@/lib/Token";
+import { TOKEN_LIST, getTokenId } from "@/lib/Token";
 import { PriceStats } from "@/lib/types";
 
 type FetchedData = {
@@ -19,7 +19,6 @@ export function fetchAllStats(): PriceStats {
   )
     .then((resp) => resp.json())
     .then((data: FetchedData) => {
-      // console.log("fetching once");
       const allStats = TOKEN_LIST.reduce((acc, token) => {
         const tokenData = data[getTokenId(token)];
 

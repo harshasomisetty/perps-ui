@@ -6,9 +6,7 @@ export interface Pool {
   name: string;
   custodies: PublicKey[];
   ratios: TokenRatios[];
-  // tokens: Token[];
   aumUsd: BN;
-
   bump: number;
   lpTokenBump: number;
   inceptionTime: BN;
@@ -19,13 +17,6 @@ export interface TokenRatios {
   min: BN;
   max: BN;
 }
-
-// export interface Token {
-//   custody: PublicKey;
-//   targetRatio: BN;
-//   minRatio: BN;
-//   maxRatio: BN;
-// }
 
 export interface Custody {
   pool: PublicKey;
@@ -74,24 +65,6 @@ export interface PositionStats {
   cumulativeInterest: BN;
   cumulativeInterestSnapshot: BN;
 }
-
-// export interface TokenCustody {
-//   custodyAccount: PublicKey;
-//   tokenAccount: PublicKey;
-//   mintAccount: PublicKey;
-//   oracleAccount: PublicKey;
-//   name: TokenE;
-//   owned: BN;
-//   locked: BN;
-//   decimals: number;
-//   targetRatio: number;
-//   volume: VolumeStats;
-//   oiLong: number;
-//   oiShort: number;
-//   feeStats: FeeStats;
-//   fees: Fees;
-//   rate: Rates;
-// }
 
 export interface Assets {
   collateral: BN;

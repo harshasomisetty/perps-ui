@@ -1,14 +1,6 @@
+import CloseIcon from "@carbon/icons-react/lib/Close";
 import * as Slider from "@radix-ui/react-slider";
 import { twMerge } from "tailwind-merge";
-import CloseIcon from "@carbon/icons-react/lib/Close";
-
-function formatNumber(num: number) {
-  const formatter = Intl.NumberFormat("en", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 0,
-  });
-  return formatter.format(num);
-}
 
 function clamp(num: number, min: number, max: number) {
   return Math.min(max, Math.max(num, min));

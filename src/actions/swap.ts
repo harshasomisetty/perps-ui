@@ -1,24 +1,24 @@
+import { PoolAccount } from "@/lib/PoolAccount";
 import { TokenE } from "@/lib/Token";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
   TRANSFER_AUTHORITY,
 } from "@/utils/constants";
-import { BN } from "@project-serum/anchor";
-import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { Connection, TransactionInstruction } from "@solana/web3.js";
-import { PoolAccount } from "@/lib/PoolAccount";
-import { WalletContextState } from "@solana/wallet-adapter-react";
+import {
+  automaticSendTransaction,
+  manualSendTransaction,
+} from "@/utils/TransactionHandlers";
 import {
   createAtaIfNeeded,
   unwrapSolIfNeeded,
   wrapSolIfNeeded,
 } from "@/utils/transactionHelpers";
+import { BN } from "@project-serum/anchor";
 import { MethodsBuilder } from "@project-serum/anchor/dist/cjs/program/namespace/methods";
-import {
-  automaticSendTransaction,
-  manualSendTransaction,
-} from "@/utils/TransactionHandlers";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { WalletContextState } from "@solana/wallet-adapter-react";
+import { Connection, TransactionInstruction } from "@solana/web3.js";
 
 export async function swapTransactionBuilder(
   walletContextState: WalletContextState,

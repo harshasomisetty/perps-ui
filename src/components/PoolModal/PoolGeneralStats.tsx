@@ -1,9 +1,9 @@
-import { twMerge } from "tailwind-merge";
-import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
-import { formatNumberCommas } from "@/utils/formatters";
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 import { PoolAccount } from "@/lib/PoolAccount";
 import { useGlobalStore } from "@/stores/store";
-import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
+import { formatNumberCommas } from "@/utils/formatters";
+import { getLiquidityBalance, getLiquidityShare } from "@/utils/retrieveData";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   pool: PoolAccount;

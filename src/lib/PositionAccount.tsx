@@ -3,7 +3,6 @@ import { TokenE } from "@/lib/Token";
 import { Position, Side } from "@/lib/types";
 import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { format } from "date-fns";
 
 export class PositionAccount {
   public owner: PublicKey;
@@ -87,8 +86,4 @@ export class PositionAccount {
     // return this.getSizeUsd() - this.getCollateralUsd();
     return Number(this.getCollateralUsd()) + pnl;
   }
-
-  // getLiquidationPrice(): number {
-  //   return this.getPrice() * this.getLeverage();
-  // }
 }

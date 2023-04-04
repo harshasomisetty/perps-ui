@@ -1,18 +1,18 @@
-import { twMerge } from "tailwind-merge";
-import { cloneElement } from "react";
-import GrowthIcon from "@carbon/icons-react/lib/Growth";
-import EditIcon from "@carbon/icons-react/lib/Edit";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
+import EditIcon from "@carbon/icons-react/lib/Edit";
+import GrowthIcon from "@carbon/icons-react/lib/Growth";
 import NewTab from "@carbon/icons-react/lib/NewTab";
+import { cloneElement } from "react";
+import { twMerge } from "tailwind-merge";
 
-import { getTokenIcon, getTokenLabel } from "@/lib/Token";
-import { formatNumberCommas } from "@/utils/formatters";
-import { Side } from "@/lib/types";
-import { PositionAccount } from "@/lib/PositionAccount";
-import { useGlobalStore } from "@/stores/store";
-import { PositionColumn } from "@/components/Positions/PositionColumn";
 import { CollateralModal } from "@/components/Positions/CollateralModal";
+import { PositionColumn } from "@/components/Positions/PositionColumn";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { getTokenIcon, getTokenLabel } from "@/lib/Token";
+import { Side } from "@/lib/types";
+import { useGlobalStore } from "@/stores/store";
 import { ACCOUNT_URL } from "@/utils/TransactionHandlers";
+import { formatNumberCommas } from "@/utils/formatters";
 
 interface Props {
   className?: string;
@@ -26,12 +26,6 @@ interface Props {
 export default function PositionBasicInfo(props: Props) {
   const tokenIcon = getTokenIcon(props.position.token);
   const stats = useGlobalStore((state) => state.priceStats);
-
-  // function getNetValue(): number {
-  //   // let netValue = 0
-  //   // let collateral = props.position.getCollateralUsd();
-  //   return Number(props.position.getCollateralUsd()) + props.pnl;
-  // }
 
   return (
     <div className={twMerge("flex", "items-center", "py-5", props.className)}>
@@ -91,11 +85,6 @@ export default function PositionBasicInfo(props: Props) {
         <div className="text-sm text-white">
           ${formatNumberCommas(props.position.getNetValue(props.pnl))}
         </div>
-        {/* <PositionValueDelta
-          className="mt-0.5"
-          valueDelta={props.position.valueDelta}
-          valueDeltaPercentage={props.position.valueDeltaPercentage}
-        /> */}
       </PositionColumn>
       <PositionColumn num={4}>
         <div className="flex items-center">

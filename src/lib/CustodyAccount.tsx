@@ -1,4 +1,3 @@
-import { PriceStats } from "@/hooks/storeHelpers/fetchPrices";
 import { PublicKey } from "@solana/web3.js";
 import { tokenAddressToToken, TokenE } from "./Token";
 import {
@@ -14,6 +13,7 @@ import {
   TradeStats,
   Permissions,
   PriceStat,
+  PriceStats,
 } from "./types";
 
 export class CustodyAccount {

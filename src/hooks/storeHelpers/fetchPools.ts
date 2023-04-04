@@ -1,11 +1,11 @@
-import { PoolAccount } from "@/lib/PoolAccount";
-import { getPerpetualProgramAndProvider } from "@/utils/constants";
-import { Pool } from "@/lib/types";
 import { CustodyAccount } from "@/lib/CustodyAccount";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { Pool } from "@/lib/types";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { getMint } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
-import { ViewHelper } from "@/utils/viewHelpers";
 
 interface FetchPool {
   account: Pool;
@@ -19,7 +19,6 @@ export async function getPoolData(
 
   // @ts-ignore
   let fetchedPools: FetchPool[] = await perpetual_program.account.pool.all();
-
   let poolObjs: Record<string, PoolAccount> = {};
 
   await Promise.all(
@@ -41,7 +40,6 @@ export async function getPoolData(
           name: pool.account.name,
           custodies: pool.account.custodies,
           ratios: pool.account.ratios,
-          // tokens: pool.account.tokens,
           aumUsd: pool.account.aumUsd,
           bump: pool.account.bump,
           lpTokenBump: pool.account.lpTokenBump,
@@ -64,10 +62,7 @@ export async function getPoolData(
               poolObjs[pool.publicKey.toString()]
             );
             loopStatus = false;
-            // console.log("got aum fetch");
-          } catch (error) {
-            // console.log("error in aum");
-          }
+          } catch (error) {}
         }
 
         poolObjs[pool.publicKey.toString()].setAum(fetchedAum);

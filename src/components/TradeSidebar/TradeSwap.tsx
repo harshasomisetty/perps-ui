@@ -1,21 +1,21 @@
-import { useEffect, useRef, useState } from "react";
-import { TokenE } from "@/lib/Token";
-import { swap } from "src/actions/swap";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useRouter } from "next/router";
-import { useGlobalStore } from "@/stores/store";
-import { PoolAccount } from "@/lib/PoolAccount";
-import { twMerge } from "tailwind-merge";
-import ArrowsVertical from "@carbon/icons-react/lib/ArrowsVertical";
-import { getPerpetualProgramAndProvider } from "@/utils/constants";
-import { ViewHelper } from "@/utils/viewHelpers";
+import { UserBalance } from "@/components/Atoms/UserBalance";
 import { LoadingDots } from "@/components/LoadingDots";
-import { TokenSelector } from "@/components/TokenSelector";
 import { PoolSelector } from "@/components/PoolSelector";
 import { SolidButton } from "@/components/SolidButton";
+import { TokenSelector } from "@/components/TokenSelector";
 import { TradeSwapDetails } from "@/components/TradeSidebar/TradeSwapDetails";
 import { getAllUserData } from "@/hooks/storeHelpers/fetchUserData";
-import { UserBalance } from "@/components/Atoms/UserBalance";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { TokenE } from "@/lib/Token";
+import { useGlobalStore } from "@/stores/store";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
+import ArrowsVertical from "@carbon/icons-react/lib/ArrowsVertical";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
+import { swap } from "src/actions/swap";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;
@@ -23,32 +23,27 @@ interface Props {
 
 export function TradeSwap(props: Props) {
   const { connection } = useConnection();
-  const { publicKey, signTransaction, wallet } = useWallet();
+  const { publicKey, wallet } = useWallet();
   const walletContextState = useWallet();
-
-  const stats = useGlobalStore((state) => state.priceStats);
-  const poolData = useGlobalStore((state) => state.poolData);
 
   const [payToken, setPayToken] = useState<TokenE>();
   const [payAmount, setPayAmount] = useState<number>(0);
   const [receiveToken, setReceiveToken] = useState<TokenE>();
   const [receiveAmount, setReceiveAmount] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
-
-  const userData = useGlobalStore((state) => state.userData);
-  // convert to state
-
   const [payTokenBalance, setPayTokenBalance] = useState(0);
   const [receiveTokenBalance, setReceiveTokenBalance] = useState(0);
-
   const [pool, setPool] = useState<PoolAccount | null>(null);
-
-  const setUserData = useGlobalStore((state) => state.setUserData);
 
   const [pendingRateConversion, setPendingRateConversion] = useState(false);
 
   const timeoutRef = useRef(null);
   const router = useRouter();
+
+  const stats = useGlobalStore((state) => state.priceStats);
+  const poolData = useGlobalStore((state) => state.poolData);
+  const userData = useGlobalStore((state) => state.userData);
+  const setUserData = useGlobalStore((state) => state.setUserData);
 
   useEffect(() => {
     if (
@@ -59,9 +54,6 @@ export function TradeSwap(props: Props) {
 
       let tokenA = Object.values(poolData)[0]?.getTokenList()[0];
       let tokenB = Object.values(poolData)[0]?.getTokenList()[1];
-      // let tokenA = TokenE.SOL;
-      // let tokenB = TokenE.TEST;
-      console.log("userData", userData);
 
       setPayToken(tokenA);
       setPayTokenBalance(userData.tokenBalances[tokenA]);
@@ -72,7 +64,6 @@ export function TradeSwap(props: Props) {
 
   useEffect(() => {
     async function fetchData() {
-      // console.log("in fetch", payAmount);
       if (payAmount == 0 || !payAmount) {
         setReceiveAmount(0);
         setFee(0);

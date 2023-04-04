@@ -1,10 +1,10 @@
-import { twMerge } from "tailwind-merge";
-import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
-import { cloneElement, useState } from "react";
+import { MaxButton } from "@/components/Atoms/MaxButton";
+import { TokenSelectorList } from "@/components/TokenSelectorList";
 import { TokenE, getTokenIcon } from "@/lib/Token";
 import { useGlobalStore } from "@/stores/store";
-import { TokenSelectorList } from "@/components/TokenSelectorList";
-import { MaxButton } from "@/components/Atoms/MaxButton";
+import ChevronRightIcon from "@carbon/icons-react/lib/ChevronRight";
+import { cloneElement, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 function formatNumber(num: number) {
   const formatter = Intl.NumberFormat("en", {
@@ -12,10 +12,6 @@ function formatNumber(num: number) {
     minimumFractionDigits: 2,
   });
   return formatter.format(num);
-}
-
-function decimalTrim(num: number) {
-  return parseFloat(num.toFixed(4));
 }
 
 interface Props {

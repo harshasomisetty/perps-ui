@@ -1,13 +1,13 @@
-import { twMerge } from "tailwind-merge";
 import { getTokenIcon, TokenE } from "@/lib/Token";
-import { cloneElement } from "react";
+import { Side } from "@/lib/types";
 import {
   formatFees,
   formatNumber,
   formatNumberLessThan,
   formatPrice,
 } from "@/utils/formatters";
-import { Side } from "@/lib/types";
+import { cloneElement } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;

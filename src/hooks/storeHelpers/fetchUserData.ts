@@ -59,7 +59,6 @@ export async function getAllUserData(
   publicKey: PublicKey,
   poolData: Record<string, PoolAccount>
 ): Promise<UserAccount> {
-  // console.log("in fetch all user dat");
   let lpBalances = await getUserLpAll(connection, publicKey, poolData);
 
   let tokenBalances = await getUserTokenAll(connection, publicKey, poolData);

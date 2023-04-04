@@ -1,9 +1,9 @@
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useGlobalStore } from "@/stores/store";
 import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
-import { NoPositions } from "@/components/Positions/NoPositions";
 import { LoadingDots } from "@/components/LoadingDots";
 import { ExistingPositions } from "@/components/Positions/ExistingPositions";
+import { NoPositions } from "@/components/Positions/NoPositions";
+import { useGlobalStore } from "@/stores/store";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface Props {
   className?: string;

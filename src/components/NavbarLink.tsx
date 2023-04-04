@@ -1,7 +1,7 @@
-import { useRouter } from "next/router";
 import Link from "next/link";
-import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/router";
 import { cloneElement } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   href: string;

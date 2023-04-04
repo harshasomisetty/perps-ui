@@ -1,12 +1,6 @@
 import { MethodsBuilder } from "@project-serum/anchor/dist/cjs/program/namespace/methods";
+import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { toast } from "react-toastify";
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionSignature,
-} from "@solana/web3.js";
 
 export const TRX_URL = (txid: string) =>
   `https://explorer.solana.com/tx/${txid}?cluster=devnet`;

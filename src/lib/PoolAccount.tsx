@@ -112,27 +112,6 @@ export class PoolAccount {
     return custodyMetas;
   }
   getLiquidities(stats: PriceStats): number | null {
-    // get liquidities from token custodies
-    // if (Object.keys(stats).length == 0) {
-    //   return null;
-    // }
-
-    // const totalAmount = Object.values(this.custodies).reduce(
-    //   (acc: number, tokenCustody: CustodyAccount) => {
-    //     // @ts-ignore
-    //     let singleLiq =
-    //       // @ts-ignore
-    //       stats[tokenAddressToToken(tokenCustody.mint.toString())]
-    //         .currentPrice *
-    //       ((Number(tokenCustody.assets.owned) -
-    //         Number(tokenCustody.assets.locked)) /
-    //         10 ** tokenCustody.decimals);
-    //     return acc + singleLiq;
-    //   },
-    //   0
-    // );
-
-    // return totalAmount;
     return this.aumUsd.toNumber() / 10 ** 6;
   }
 

@@ -1,13 +1,13 @@
-import { twMerge } from "tailwind-merge";
-import { useEffect, useState } from "react";
-import { PositionAccount } from "@/lib/PositionAccount";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useGlobalStore } from "@/stores/store";
-import { ViewHelper } from "@/utils/viewHelpers";
-import { getPerpetualProgramAndProvider } from "@/utils/constants";
 import { LoadingDots } from "@/components/LoadingDots";
 import { PositionAdditionalInfo } from "@/components/Positions/PositionAdditionalInfo";
 import PositionBasicInfo from "@/components/Positions/PositionBasicInfo";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { useGlobalStore } from "@/stores/store";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { ViewHelper } from "@/utils/viewHelpers";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;

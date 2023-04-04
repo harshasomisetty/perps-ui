@@ -1,7 +1,7 @@
-import { twMerge } from "tailwind-merge";
-import { cloneElement, useState } from "react";
 import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
 import { useRouter } from "next/router";
+import { cloneElement, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 import { TokenE, getTokenIcon, getTokenLabel } from "@/lib/Token";
 

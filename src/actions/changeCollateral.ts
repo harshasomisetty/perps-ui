@@ -1,5 +1,7 @@
 import { PoolAccount } from "@/lib/PoolAccount";
 import { PositionAccount } from "@/lib/PositionAccount";
+import { TokenE } from "@/lib/Token";
+import { Tab } from "@/lib/types";
 import {
   getPerpetualProgramAndProvider,
   PERPETUALS_ADDRESS,
@@ -9,21 +11,19 @@ import {
   automaticSendTransaction,
   manualSendTransaction,
 } from "@/utils/TransactionHandlers";
+import {
+  createAtaIfNeeded,
+  unwrapSolIfNeeded,
+  wrapSolIfNeeded,
+} from "@/utils/transactionHelpers";
 import { BN } from "@project-serum/anchor";
 import {
   getAssociatedTokenAddress,
   NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { Connection, TransactionInstruction } from "@solana/web3.js";
-import { Tab } from "@/lib/types";
-import { TokenE } from "@/lib/Token";
-import {
-  createAtaIfNeeded,
-  unwrapSolIfNeeded,
-  wrapSolIfNeeded,
-} from "@/utils/transactionHelpers";
 import { WalletContextState } from "@solana/wallet-adapter-react";
+import { Connection, TransactionInstruction } from "@solana/web3.js";
 
 export async function changeCollateral(
   walletContextState: WalletContextState,

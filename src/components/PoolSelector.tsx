@@ -1,12 +1,12 @@
-import * as Dropdown from "@radix-ui/react-dropdown-menu";
-import CheckmarkIcon from "@carbon/icons-react/lib/Checkmark";
-import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
-import { twMerge } from "tailwind-merge";
-import { useState } from "react";
-import { PoolAccount } from "@/lib/PoolAccount";
-import { useGlobalStore } from "@/stores/store";
 import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
 import { PoolTokens } from "@/components/PoolTokens";
+import { PoolAccount } from "@/lib/PoolAccount";
+import { useGlobalStore } from "@/stores/store";
+import CheckmarkIcon from "@carbon/icons-react/lib/Checkmark";
+import ChevronDownIcon from "@carbon/icons-react/lib/ChevronDown";
+import * as Dropdown from "@radix-ui/react-dropdown-menu";
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;

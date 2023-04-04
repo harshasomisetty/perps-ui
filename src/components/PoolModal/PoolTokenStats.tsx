@@ -1,13 +1,13 @@
+import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
+import { PoolAccount } from "@/lib/PoolAccount";
 import { getTokenIcon, getTokenLabel } from "@/lib/Token";
+import { getCurrentWeight } from "@/lib/classGetters";
+import { useGlobalStore } from "@/stores/store";
+import { ACCOUNT_URL } from "@/utils/TransactionHandlers";
+import { formatNumberCommas } from "@/utils/formatters";
+import NewTab from "@carbon/icons-react/lib/NewTab";
 import { cloneElement } from "react";
 import { twMerge } from "tailwind-merge";
-import NewTab from "@carbon/icons-react/lib/NewTab";
-import { formatNumberCommas } from "@/utils/formatters";
-import { PoolAccount } from "@/lib/PoolAccount";
-import { useGlobalStore } from "@/stores/store";
-import { LoadingSpinner } from "@/components/Icons/LoadingSpinner";
-import { ACCOUNT_URL } from "@/utils/TransactionHandlers";
-import { getCurrentWeight } from "@/lib/classGetters";
 
 interface Props {
   className?: string;

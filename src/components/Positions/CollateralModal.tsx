@@ -1,23 +1,22 @@
+import { LpSelector } from "@/components/PoolModal/LpSelector";
 import { SidebarTab } from "@/components/SidebarTab";
+import { SolidButton } from "@/components/SolidButton";
+import { TokenSelector } from "@/components/TokenSelector";
+import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
+import { PositionAccount } from "@/lib/PositionAccount";
+import { Tab } from "@/lib/types";
+import { useGlobalStore } from "@/stores/store";
+import { getPerpetualProgramAndProvider } from "@/utils/constants";
+import { formatNumberCommas } from "@/utils/formatters";
+import { ViewHelper } from "@/utils/viewHelpers";
+import Add from "@carbon/icons-react/lib/Add";
 import ArrowRight from "@carbon/icons-react/lib/ArrowRight";
+import Subtract from "@carbon/icons-react/lib/Subtract";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useRef, useState } from "react";
-import Add from "@carbon/icons-react/lib/Add";
-import Subtract from "@carbon/icons-react/lib/Subtract";
-import { useGlobalStore } from "@/stores/store";
-import { PositionAccount } from "@/lib/PositionAccount";
-import { TokenSelector } from "@/components/TokenSelector";
-import { LpSelector } from "@/components/PoolModal/LpSelector";
-import { twMerge } from "tailwind-merge";
-import { SolidButton } from "@/components/SolidButton";
-import { formatNumberCommas } from "@/utils/formatters";
 import { changeCollateral } from "src/actions/changeCollateral";
-import { Tab } from "@/lib/types";
-import { BN } from "@project-serum/anchor";
-import { getPositionData } from "@/hooks/storeHelpers/fetchPositions";
-import { getPerpetualProgramAndProvider } from "@/utils/constants";
-import { ViewHelper } from "@/utils/viewHelpers";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   className?: string;
@@ -40,7 +39,6 @@ export function CollateralModal(props: Props) {
   let payToken = props.position.token;
 
   let payTokenBalance = userData.tokenBalances[pool.getTokenList()[0]!];
-  // let liqBalance = userData.lpBalances[pool.address.toString()];
 
   const custodyData = useGlobalStore((state) => state.custodyData);
 
@@ -59,7 +57,6 @@ export function CollateralModal(props: Props) {
 
   useEffect(() => {
     async function fetchNewStats() {
-      console.log("console log new stassss");
       let { perpetual_program } = await getPerpetualProgramAndProvider(
         walletContextState
       );
@@ -69,9 +66,7 @@ export function CollateralModal(props: Props) {
         perpetual_program.provider
       );
 
-      console.log("before old liq");
       let fetchedOldLiq = await View.getLiquidationPrice(props.position);
-      console.log("old liq", Math.round((fetchedOldLiq / 10 ** 6) * 100) / 100);
 
       setLiqPrice(Math.round((fetchedOldLiq / 10 ** 6) * 100) / 100);
 
@@ -89,17 +84,12 @@ export function CollateralModal(props: Props) {
         return;
       }
 
-      console.log("in fetch new stats colalteral chagne");
-      console.log("col change", withdrawAmount, depositAmount);
-
       let liquidationPrice = await View.getLiquidationPrice(
         props.position,
         pool.getCustodyAccount(props.position.token)!,
         depositAmount,
         withdrawAmount
       );
-
-      console.log("liquidationPrice", liquidationPrice);
 
       let newLiq = Math.round((liquidationPrice / 10 ** 6) * 100) / 100;
 
@@ -114,7 +104,6 @@ export function CollateralModal(props: Props) {
         newCollat = props.position.getCollateralUsd() - withdrawAmount;
       }
 
-      console.log("set new collat", newCollat);
       setNewCollateral(Math.round(newCollat * 100) / 100);
 
       let newLev;
@@ -143,8 +132,6 @@ export function CollateralModal(props: Props) {
   }, [open, withdrawAmount, depositAmount]);
 
   const stats = useGlobalStore((state) => state.priceStats);
-
-  function getNewLeverage() {}
 
   async function handleChangeCollateral() {
     let changeAmount;
@@ -182,10 +169,6 @@ export function CollateralModal(props: Props) {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed top-0 bottom-0 left-0 right-0 grid place-items-center bg-black/80 text-white">
           <Dialog.Content className="max-w-s mt-6 rounded bg-zinc-800 p-4">
-            {/* <Dialog.Title className="DialogTitle">Modify Position</Dialog.Title> */}
-            {/* <Dialog.Description className="DialogDescription">
-              Modify your position by adding or removing collateral.
-            </Dialog.Description> */}
             <div className="mb-2 grid grid-cols-2 gap-x-1 rounded bg-black p-1">
               <SidebarTab
                 selected={tab === Tab.Add}
@@ -284,19 +267,11 @@ export function CollateralModal(props: Props) {
                   label: "Size",
                   value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
                 },
-                // {
-                //   label: "Borrow Fee",
-                //   value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
-                // },
                 {
                   label: "Liq Price",
                   value: `$${liqPrice}`,
                   newValue: `$${newLiqPrice}`,
                 },
-                // {
-                //   label: "Execution Fee",
-                //   value: `$${formatNumberCommas(props.position.getSizeUsd())}`,
-                // },
               ].map(({ label, value, newValue }, i) => (
                 <div
                   className={twMerge(

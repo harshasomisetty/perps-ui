@@ -1,12 +1,11 @@
-import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
-import { AnchorProvider, Program, Wallet } from "@project-serum/anchor";
-
-import { WalletContextState } from "@solana/wallet-adapter-react";
-import { IDL as PERPETUALS_IDL, Perpetuals } from "@/target/types/perpetuals";
 import * as PerpetualsJson from "@/target/idl/perpetuals.json";
+import { IDL as PERPETUALS_IDL, Perpetuals } from "@/target/types/perpetuals";
 import { getProvider } from "@/utils/provider";
-import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
+import { AnchorProvider, Program, Wallet } from "@project-serum/anchor";
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
+import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
+import { WalletContextState } from "@solana/wallet-adapter-react";
+import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 
 export const PERPETUALS_PROGRAM_ID = new PublicKey(
   PerpetualsJson["metadata"]["address"]
@@ -33,7 +32,7 @@ class DefaultWallet implements Wallet {
 }
 
 export async function getPerpetualProgramAndProvider(
-  walletContextState: WalletContextState
+  walletContextState?: WalletContextState
 ): Promise<{
   perpetual_program: Program<Perpetuals>;
   provider: AnchorProvider;
@@ -52,7 +51,6 @@ export async function getPerpetualProgramAndProvider(
       publicKey: walletContextState.publicKey,
     };
 
-    // console.log("wallet context state", walletContextState.wallet?.adapter.url);
     provider = await getProvider(wallet);
   } else {
     provider = await getProvider(new DefaultWallet(DEFAULT_PERPS_USER));

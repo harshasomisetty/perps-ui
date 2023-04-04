@@ -1,12 +1,12 @@
-import { twMerge } from "tailwind-merge";
 import ChartCandlestickIcon from "@carbon/icons-react/lib/ChartCandlestick";
 import CircleDash from "@carbon/icons-react/lib/CircleDash";
+import StoragePoolIcon from "@carbon/icons-react/lib/StoragePool";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import StoragePoolIcon from "@carbon/icons-react/lib/StoragePool";
+import { twMerge } from "tailwind-merge";
 
-import { NavbarLink } from "./NavbarLink";
 import UserAdmin from "@carbon/icons-react/lib/UserAdmin";
+import { NavbarLink } from "./NavbarLink";
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
